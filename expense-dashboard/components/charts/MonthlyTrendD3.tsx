@@ -13,9 +13,11 @@ import {
 
 interface MonthlyTrendD3Props {
   data: MonthlyData[];
+  onExpand?: () => void;
+  isExpanded?: boolean;
 }
 
-export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
+export default function MonthlyTrendD3({ data, onExpand, isExpanded = false }: MonthlyTrendD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -25,12 +27,11 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
     d3.select(containerRef.current).selectAll('*').remove();
     
     const container = containerRef.current;
-    const { svg, g, width, height } = createResponsiveSVG(container, {
-      top: 20,
-      right: 30,
-      bottom: 40,
-      left: 70
-    });
+    const margin = isExpanded
+      ? { top: 30, right: 30, bottom: 30, left: 60 } // Balanced margins
+      : { top: 20, right: 30, bottom: 40, left: 70 };
+
+    const { svg, g, width, height } = createResponsiveSVG(container, margin);
     
     // Create scales
     const xScale = d3.scaleTime()
@@ -194,50 +195,112 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
           .duration(200)
           .attr('r', 4);
         
+        
         tooltip.style('visibility', 'hidden');
       });
     
-    // Add legend
-    const legend = g.append('g')
-      .attr('transform', `translate(${width - 200}, 0)`);
-    
-    const legendItems = [
-      { label: 'Total', color: '#FFFFFF' },
-      { label: 'Living', color: '#06b6d4' },
-      { label: 'Present', color: '#f59e0b' },
-      { label: 'Future', color: '#22c55e' }
-    ];
-    
-    legendItems.forEach((item, i) => {
-      const legendRow = legend.append('g')
-        .attr('transform', `translate(0, ${i * 20})`);
-      
-      legendRow.append('line')
-        .attr('x1', 0)
-        .attr('x2', 20)
-        .attr('y1', 0)
-        .attr('y2', 0)
-        .attr('stroke', item.color)
-        .attr('stroke-width', 2);
-      
-      legendRow.append('text')
-        .attr('x', 25)
-        .attr('y', 4)
-        .text(item.label)
-        .style('font-size', '12px')
-        .style('fill', '#6b7280');
-    });
-    
-  }, [data]);
+  }, [data, isExpanded]);
   
   return (
-    <div className="liquid-card p-5">
-      <h2 className="text-label text-secondary-text mb-4">Monthly Spending Trend</h2>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+      {!isExpanded && (
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-label text-secondary-text">Monthly Spending Trend</h2>
+          {onExpand && (
+            <button 
+              onClick={onExpand}
+              className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+              aria-label="Expand Chart"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
+      
+      {/* Chart Area */}
       <div 
         ref={containerRef} 
-        className="w-full relative"
-        style={{ height: '400px' }}
+        className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
+        style={{ height: isExpanded ? '100%' : '400px', flexGrow: 1 }} 
       />
+      
+      {/* Legend - Floating in Expanded Mode */}
+      {isExpanded && (
+        <div 
+          style={{
+            position: 'absolute',
+            // Rotated 90deg CW: 
+            // Top (of chart) -> Left (screen)
+            // Right (of chart) -> Top (screen)  <- Wait, user wants Legend Top Right.
+            // Bottom (of chart) -> Right (screen)
+            // Left (of chart) -> Bottom (screen)
+            //
+            // User requested: "top right corner of the graph when it is in landscape mode (bottom right if you look at it from the pc perspective)"
+            // PC Bottom Right (Phone Bottom Right).
+            // This corresponds to Chart Bottom Right?  (Bottom -> Right, Right -> Top... confusing).
+            // Let's rely on standard quadrants.
+            // Screen Bottom Right = (Max X, Max Y) in Screen.
+            // Screen X = Chart Y (inverted? or just swapped?)
+            // If translate(-50%, -50%) rotate(90deg):
+            // +X (Screen) = +Y (Chart).
+            // +Y (Screen) = -X (Chart)?
+            // It's safest to put it 'right: 0' and 'bottom: 0' and see.
+            // To place at Screen Bottom Right:
+            // Screen Bottom = Component Right Edge -> right: 0
+            // Screen Right = Component Top Edge -> top: 0
+            top: '0px',
+            right: '0px',
+            display: 'flex',
+            flexDirection: 'column', // Vertical list looks better in corner? User said "horizontal style" earlier? 
+            // User script: "Vertical list... on the left side".
+            // Let's use 'column' to stack them neatly in the corner.
+            gap: '8px',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            padding: '12px',
+            borderRadius: '12px',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            zIndex: 10
+          }}
+        >
+          {[
+            { label: 'Total', color: '#FFFFFF' },
+            { label: 'Living', color: '#06b6d4' },
+            { label: 'Present', color: '#f59e0b' },
+            { label: 'Future', color: '#22c55e' }
+          ].map(item => (
+            <div key={item.label} className="flex items-center gap-2">
+              <div 
+                style={{ width: '8px', height: '8px', backgroundColor: item.color, borderRadius: '50%' }}
+              />
+              <span className="text-xs font-medium text-secondary-text">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Legacy Legend for Desktop */}
+      <div className={`flex flex-wrap gap-4 justify-center items-center ${isExpanded ? 'hidden' : 'mt-4'}`}>
+        {[
+          { label: 'Total', color: '#FFFFFF' },
+          { label: 'Living', color: '#06b6d4' },
+          { label: 'Present', color: '#f59e0b' },
+          { label: 'Future', color: '#22c55e' }
+        ].map(item => (
+          <div key={item.label} className="flex items-center gap-2">
+            <div 
+              style={{ width: '12px', height: '12px', backgroundColor: item.color, borderRadius: '3px' }}
+            />
+            <span className="text-xs font-medium text-secondary-text">{item.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
