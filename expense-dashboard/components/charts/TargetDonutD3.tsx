@@ -42,9 +42,9 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
     
     // Color scale mapping
     const colorMap: Record<string, string> = {
-      'Living': '#10b981',   // Green
-      'Present': '#3b82f6',  // Blue
-      'Future': '#f59e0b'    // Orange
+      'Living': '#06b6d4',   // Cyber Cyan
+      'Present': '#f59e0b',  // Alert Amber
+      'Future': '#22c55e'    // Growth Green
     };
     
     // Pie generator

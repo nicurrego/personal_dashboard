@@ -204,6 +204,42 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
         count={activeFilterCount}
         isOpen={isFilterOpen}
       />
+      
+      {/* Search/Reset Floating Actions */}
+      {isFilterOpen && (
+        <button
+          onClick={() => setFilters({
+            dateRange: { start: null, end: null },
+            categories: [],
+            locations: [],
+            targets: [],
+            months: []
+          })}
+          className="liquid-button"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '96px', // Next to FAB (24px + 56px + ~16px gap)
+            zIndex: 9998,
+            padding: '0 20px',
+            height: '56px',
+            borderRadius: '16px',
+            backgroundColor: 'rgba(217, 70, 239, 0.2)', // Laser Magenta tint
+            border: '2px solid rgba(217, 70, 239, 0.5)',
+            color: '#d946ef',
+            backdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '13px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          }}
+        >
+          Reset all
+        </button>
+      )}
 
       {/* Filter Popup - Accordion Style */}
       {isFilterOpen && (
@@ -213,6 +249,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           uniqueValues={uniqueValues}
           order={filterOrder}
           setOrder={setFilterOrder}
+          onClose={() => setIsFilterOpen(false)}
         />
       )}
     </div>
@@ -252,13 +289,15 @@ function FilterAccordion({
   setFilters, 
   uniqueValues,
   order,
-  setOrder
+  setOrder,
+  onClose
 }: { 
   filters: FilterState; 
   setFilters: (f: FilterState) => void;
   uniqueValues: { years: number[]; categories: string[]; locations: string[]; targets: string[]; methods: string[] };
   order: string[];
   setOrder: (order: string[]) => void;
+  onClose: () => void;
 }) {
   const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -504,9 +543,9 @@ function FilterAccordion({
                 {['Living', 'Present', 'Future'].map(target => {
                   const isSelected = filters.targets.includes(target);
                   const targetColors: { [key: string]: string } = {
-                    'Living': '#0A84FF',
-                    'Present': '#FF9F0A',
-                    'Future': '#CCFF00'
+                    'Living': '#06b6d4',   // Cyber Cyan
+                    'Present': '#f59e0b',  // Alert Amber
+                    'Future': '#22c55e'    // Growth Green
                   };
                   const color = targetColors[target];
                   return (
@@ -812,22 +851,35 @@ function FilterAccordion({
   };
 
   const content = (
-    <div 
-      className="text-white"
-      style={{ 
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        bottom: '100px', // Position above FAB button
-        backgroundColor: '#000000',
-        zIndex: 9997,
-        maxHeight: '70vh',
-        overflowY: 'auto',
-        borderTopLeftRadius: '20px',
-        borderTopRightRadius: '20px',
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.5)',
-      }}
-    >
+    <>
+      <div 
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9996,
+        }}
+      />
+      <div 
+        className="text-white liquid-card"
+        style={{ 
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: '100px', // Position above FAB button
+          backgroundColor: 'rgba(0, 0, 0, 0.85)', // Slightly transparent black
+          backdropFilter: 'blur(20px)', // Glass effect on the panel itself
+          zIndex: 9997,
+          maxHeight: '70vh',
+          overflowY: 'auto',
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
+          boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
       <DndContext 
         sensors={sensors} 
         collisionDetection={closestCenter} 
@@ -846,7 +898,8 @@ function FilterAccordion({
           </div>
         </SortableContext>
       </DndContext>
-    </div>
+      </div>
+    </>
   );
 
   return createPortal(content, document.body);

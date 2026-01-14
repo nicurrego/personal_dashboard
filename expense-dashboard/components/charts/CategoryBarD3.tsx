@@ -62,10 +62,10 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
     // Optional: Hide bottom axis for cleaner look if value labels are used
     // createStyledAxis(g, xAxis, 'bottom', `translate(0,${height})`);
     
-    // Color scale (Liquid Gradient: Cobalt -> Acid Green)
+    // Color scale (System Gradient: Flux Violet -> Cyber Cyan)
     const colorScale = d3.scaleSequential()
       .domain([0, data.length])
-      .interpolator(d3.interpolateRgb('#0A84FF', '#CCFF00'));
+      .interpolator(d3.interpolateRgb('#8B5CF6', '#06b6d4'));
       
     // Draw Bars
     g.selectAll('.bar')
@@ -108,8 +108,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', '#FF9F0A') // Electric Orange Highlight
-          .attr('filter', 'drop-shadow(0 0 8px #FF9F0A)');
+          .attr('fill', '#d946ef') // Laser Magenta Highlight
+          .attr('filter', 'drop-shadow(0 0 8px #d946ef)');
           
         tooltip
           .html(`

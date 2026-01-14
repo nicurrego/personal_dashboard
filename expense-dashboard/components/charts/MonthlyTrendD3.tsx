@@ -110,9 +110,9 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
         .attr('stop-opacity', 0);
     };
     
-    createAreaGradient('living-gradient', '#10b981');
-    createAreaGradient('present-gradient', '#3b82f6');
-    createAreaGradient('future-gradient', '#f59e0b');
+    createAreaGradient('living-gradient', '#06b6d4');
+    createAreaGradient('present-gradient', '#f59e0b');
+    createAreaGradient('future-gradient', '#22c55e');
     
     // Add area fills
     const area = d3.area<MonthlyData>()
@@ -128,10 +128,10 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
     
    // Draw lines with animation
     const lines = [
-      { data, generator: totalLine, color: '#1f2937', width: 3, label: 'Total' },
-      { data, generator: livingLine, color: '#10b981', width: 2, label: 'Living' },
-      { data, generator: presentLine, color: '#3b82f6', width: 2, label: 'Present' },
-      { data, generator: futureLine, color: '#f59e0b', width: 2, label: 'Future' }
+      { data, generator: totalLine, color: '#FFFFFF', width: 3, label: 'Total' }, // White for Total
+      { data, generator: livingLine, color: '#06b6d4', width: 2, label: 'Living' },
+      { data, generator: presentLine, color: '#f59e0b', width: 2, label: 'Present' },
+      { data, generator: futureLine, color: '#22c55e', width: 2, label: 'Future' }
     ];
     
     lines.forEach(({ data: lineData, generator, color, width }) => {
@@ -177,9 +177,9 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
           .html(`
             <strong>${formatDate(d.date)}</strong><br/>
             Total: ${formatCurrency(d.total)}<br/>
-            <span style="color: #10b981">●</span> Living: ${formatCurrency(d.living)}<br/>
-            <span style="color: #3b82f6">●</span> Present: ${formatCurrency(d.present)}<br/>
-            <span style="color: #f59e0b">●</span> Future: ${formatCurrency(d.future)}
+            <span style="color: #06b6d4">●</span> Living: ${formatCurrency(d.living)}<br/>
+            <span style="color: #f59e0b">●</span> Present: ${formatCurrency(d.present)}<br/>
+            <span style="color: #22c55e">●</span> Future: ${formatCurrency(d.future)}
           `)
           .style('visibility', 'visible');
       })
@@ -202,10 +202,10 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
       .attr('transform', `translate(${width - 200}, 0)`);
     
     const legendItems = [
-      { label: 'Total', color: '#1f2937' },
-      { label: 'Living', color: '#10b981' },
-      { label: 'Present', color: '#3b82f6' },
-      { label: 'Future', color: '#f59e0b' }
+      { label: 'Total', color: '#FFFFFF' },
+      { label: 'Living', color: '#06b6d4' },
+      { label: 'Present', color: '#f59e0b' },
+      { label: 'Future', color: '#22c55e' }
     ];
     
     legendItems.forEach((item, i) => {

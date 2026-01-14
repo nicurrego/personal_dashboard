@@ -8,24 +8,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        // Liquid Glass Palette (New Standard)
-        'void-black': '#000000',
-        'glass-surface': '#1C1C1E', // Use with opacity
-        'card-surface': '#2C2C2E',
-        'acid-green': '#CCFF00', // Good/Future
-        'electric-orange': '#FF9F0A', // Warning/Present
-        'cobalt-blue': '#0A84FF', // Neutral/Living
-        'secondary-text': '#8E8E93',
+        // User Requested Palette
+        'trust-navy': '#171717',    // Backgrounds, Cards
+        'growth-green': '#22c55e',  // Future items, Text, Icons
+        'alert-amber': '#f59e0b',   // Present items, Warnings
+        'cyber-cyan': '#06b6d4',    // Living items, Info
+        'laser-magenta': '#d946ef', // Critical, Issues
+        'flux-violet': '#8B5CF6',   // Source, Income, Attention
         
-        // Legacy CP 2077 Palette (Supporting existing views)
-        'trust-navy': '#171717',
-        'growth-green': '#22c55e',
-        'alert-amber': '#f59e0b',
-        'cyber-cyan': '#06b6d4',
-        'laser-magenta': '#d946ef',
-        'flux-violet': '#8B5CF6',
-      },
+        // Legacy/Liquid Glass (remapped or kept for compatibility if needed)
+        'void-black': '#000000',
+        'glass-surface': '#1C1C1E',
+        'card-surface': '#2C2C2E',
+        'secondary-text': '#8E8E93',
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
       },
