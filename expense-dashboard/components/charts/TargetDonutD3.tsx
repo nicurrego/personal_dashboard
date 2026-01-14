@@ -129,7 +129,7 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
       .attr('text-anchor', 'middle')
       .attr('dy', '-0.5em')
       .style('font-size', '16px')
-      .style('fill', '#6b7280')
+      .style('fill', '#9ca3af') // Gray-400
       .text('Total');
       
     const centerTextValue = g.append('text')
@@ -137,7 +137,7 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
       .attr('dy', '1.0em')
       .style('font-size', '20px')
       .style('font-weight', 'bold')
-      .style('fill', '#1f2937')
+      .style('fill', '#ffffff') // White
       .text(formatCurrency(totalAmount));
       
     // Add Labels (if space permits)
@@ -157,14 +157,14 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
       })
       .attr('dy', '0.35em')
       .style('font-size', '12px')
-      .style('fill', '#4b5563')
+      .style('fill', '#d1d5db') // Gray-300
       .text(d => d.data.percentage > 5 ? d.data.target : ''); // Only show label if > 5%
       
   }, [data]);
   
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">Spending Distribution</h2>
+    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow-lg p-6">
+      <h2 className="text-xl font-bold mb-4 text-white">Spending Distribution</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"

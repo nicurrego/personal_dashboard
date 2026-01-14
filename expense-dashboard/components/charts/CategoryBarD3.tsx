@@ -94,7 +94,7 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
       .attr('dy', '0.35em')
       .text(d => formatCurrency(d.total))
       .style('font-size', '12px')
-      .style('fill', '#4b5563')
+      .style('fill', '#9ca3af') // Gray-400
       .style('opacity', 0)
       .transition()
       .delay((d, i) => i * 100 + 800)
@@ -140,8 +140,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
   }, [data]);
   
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">Top Spending Categories</h2>
+    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow-lg p-6">
+      <h2 className="text-xl font-bold mb-4 text-white">Top Spending Categories</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"

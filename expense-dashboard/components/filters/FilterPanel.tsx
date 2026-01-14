@@ -48,9 +48,9 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-8">
+    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow p-6 mb-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
+        <h2 className="text-lg font-semibold text-white">Filters</h2>
         <button 
           onClick={() => onChange({
             dateRange: { start: null, end: null },
@@ -59,7 +59,7 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
             locations: [],
             methods: []
           })}
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="text-sm text-blue-400 hover:text-blue-300"
         >
           Reset All
         </button>
@@ -68,9 +68,9 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Year Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Year</label>
           <select 
-            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2"
+            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2"
             onChange={handleYearChange}
             defaultValue=""
           >
@@ -83,7 +83,7 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
 
         {/* Target Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Target</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Target</label>
           <div className="flex flex-wrap gap-2">
             {['Living', 'Present', 'Future'].map(target => (
               <button
@@ -91,8 +91,8 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
                 onClick={() => handleMultiSelect('targets', target)}
                 className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                   filters.targets.includes(target)
-                    ? 'bg-blue-100 text-blue-800 border-blue-200'
-                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-blue-900/40 text-blue-300 border-blue-700'
+                    : 'bg-neutral-800 text-gray-400 border-neutral-700 hover:bg-neutral-700'
                 }`}
               >
                 {target}
@@ -103,10 +103,10 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
 
         {/* Category Filter - Dropdown for space */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
           <select 
             multiple
-            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
+            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
             value={filters.categories}
             onChange={(e) => {
               const selected = Array.from(e.target.selectedOptions, option => option.value);
@@ -122,10 +122,10 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
 
         {/* Location Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
           <select 
             multiple
-            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
+            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
             value={filters.locations}
             onChange={(e) => {
               const selected = Array.from(e.target.selectedOptions, option => option.value);

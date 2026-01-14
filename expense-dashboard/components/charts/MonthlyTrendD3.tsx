@@ -231,8 +231,8 @@ export default function MonthlyTrendD3({ data }: MonthlyTrendD3Props) {
   }, [data]);
   
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">Monthly Spending Trend</h2>
+    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow-lg p-6">
+      <h2 className="text-xl font-bold mb-4 text-white">Monthly Spending Trend</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"

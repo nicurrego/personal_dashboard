@@ -75,15 +75,15 @@ export function createTooltip(container: HTMLElement) {
     .append('div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
-    .style('background-color', 'rgba(0, 0, 0, 0.8)')
-    .style('color', 'white')
+    .style('background-color', 'rgba(20, 20, 20, 0.9)') // Darker, almost black
+    .style('color', '#e5e7eb') // Light gray text
+    .style('border', '1px solid #333')
     .style('padding', '8px 12px')
     .style('border-radius', '4px')
     .style('font-size', '12px')
     .style('pointer-events', 'none')
     .style('z-index', '1000');
 }
-
 /**
  * Animate path drawing
  */
@@ -101,7 +101,6 @@ export function animatePath(
     .ease(d3.easeQuadInOut)
     .attr('stroke-dashoffset', 0);
 }
-
 /**
  * Create axis with custom styling
  */
@@ -119,12 +118,12 @@ export function createStyledAxis(
     axisGroup.attr('transform', transform);
   }
   
-  // Style the axis
+  // Style the axis for Dark Mode
   axisGroup.selectAll('path, line')
-    .style('stroke', '#e5e7eb');
+    .style('stroke', '#333333'); // Dark gray axis lines
   
   axisGroup.selectAll('text')
-    .style('fill', '#6b7280')
+    .style('fill', '#9ca3af') // Gray-400 text
     .style('font-size', '12px');
   
   return axisGroup;

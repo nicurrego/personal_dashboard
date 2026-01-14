@@ -11,21 +11,21 @@ function KPICard({ label, value, subtext, trend, trendValue }: {
   trendValue?: string;
 }) {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">{label}</h3>
+    <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-5">
+      <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">{label}</h3>
       <div className="mt-2 flex items-baseline">
-        <p className="text-3xl font-semibold text-gray-900">{value}</p>
+        <p className="text-2xl font-semibold text-white">{value}</p>
         
         {trend && (
-          <span className={`ml-2 flex items-baseline text-sm font-semibold ${
-            trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-500'
+          <span className={`ml-2 flex items-baseline text-xs font-semibold ${
+            trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-500'
           }`}>
             {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '-'}
             {trendValue}
           </span>
         )}
       </div>
-      {subtext && <p className="mt-1 text-sm text-gray-500">{subtext}</p>}
+      {subtext && <p className="mt-1 text-xs text-gray-500">{subtext}</p>}
     </div>
   );
 }

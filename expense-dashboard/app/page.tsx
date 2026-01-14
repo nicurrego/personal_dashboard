@@ -99,11 +99,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-black font-sans text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Expense Dashboard</h1>
-          <p className="mt-2 text-lg text-gray-600">
+          <h1 className="text-3xl font-bold text-white tracking-tight">Expense Dashboard</h1>
+          <p className="mt-2 text-sm text-gray-400">
             Analysis of {filteredExpenses.length} transactions
           </p>
         </div>
@@ -133,7 +133,7 @@ export default function Dashboard() {
           <div>
             <CategoryBarD3 data={categoryTotals} />
           </div>
-          <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 flex flex-col justify-center items-center text-gray-400 border-2 border-dashed border-gray-200">
+          <div className="lg:col-span-2 bg-neutral-900/50 rounded-lg border border-neutral-800 p-6 flex flex-col justify-center items-center text-gray-500 border-2 border-dashed border-neutral-800">
             <p>Future D3 Chart: Spending Heatmap or Payee Analysis</p>
             <p className="text-sm mt-2">Coming soon in Phase 2</p>
           </div>
@@ -142,7 +142,7 @@ export default function Dashboard() {
         {/* Detailed Table */}
         <TransactionTable expenses={filteredExpenses} />
         
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-xs text-gray-600 pb-8">
           Generated with Next.js & D3.js • {new Date().getFullYear()}
         </div>
       </div>
