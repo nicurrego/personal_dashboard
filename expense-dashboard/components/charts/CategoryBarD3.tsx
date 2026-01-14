@@ -15,9 +15,12 @@ import {
 
 interface CategoryBarD3Props {
   data: CategoryTotal[];
+  onExpand?: () => void;
+  onInfo?: () => void;
+  isExpanded?: boolean;
 }
 
-export default function CategoryBarD3({ data }: CategoryBarD3Props) {
+export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = false }: CategoryBarD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -27,12 +30,13 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
     d3.select(containerRef.current).selectAll('*').remove();
     
     const container = containerRef.current;
-    const { svg, g, width, height } = createResponsiveSVG(container, {
-      top: 20,
-      right: 50,
-      bottom: 20,
-      left: 120 // More space for category names
-    });
+    
+    // Adjust margins for expanded view
+    const margin = isExpanded
+      ? { top: 10, right: 30, bottom: 20, left: 140 } // More space for names on left
+      : { top: 20, right: 50, bottom: 20, left: 120 };
+
+    const { svg, g, width, height } = createResponsiveSVG(container, margin);
     
     // Create scales
     const yScale = d3.scaleBand()
@@ -138,15 +142,46 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
         tooltip.style('visibility', 'hidden');
       });
       
-  }, [data]);
+  }, [data, isExpanded]);
   
   return (
-    <div className="liquid-card p-5">
-      <h2 className="text-label text-secondary-text mb-4">Top Spending Categories</h2>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+      {!isExpanded && (
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-label text-secondary-text">Top Categories</h2>
+          {onExpand && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onInfo}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Chart Info"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+              <button 
+                onClick={onExpand}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Expand Chart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div 
         ref={containerRef} 
-        className="w-full relative"
-        style={{ height: '400px' }}
+        className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
+        style={{ height: isExpanded ? '100%' : '400px' }}
       />
     </div>
   );

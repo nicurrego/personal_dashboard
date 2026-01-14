@@ -14,10 +14,11 @@ import {
 interface MonthlyTrendD3Props {
   data: MonthlyData[];
   onExpand?: () => void;
+  onInfo?: () => void;
   isExpanded?: boolean;
 }
 
-export default function MonthlyTrendD3({ data, onExpand, isExpanded = false }: MonthlyTrendD3Props) {
+export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = false }: MonthlyTrendD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -207,18 +208,31 @@ export default function MonthlyTrendD3({ data, onExpand, isExpanded = false }: M
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Monthly Spending Trend</h2>
           {onExpand && (
-            <button 
-              onClick={onExpand}
-              className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
-              aria-label="Expand Chart"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <polyline points="9 21 3 21 3 15"></polyline>
-                <line x1="21" y1="3" x2="14" y2="10"></line>
-                <line x1="3" y1="21" x2="10" y2="14"></line>
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onInfo}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Chart Info"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+              <button 
+                onClick={onExpand}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Expand Chart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+              </button>
+            </div>
           )}
         </div>
       )}

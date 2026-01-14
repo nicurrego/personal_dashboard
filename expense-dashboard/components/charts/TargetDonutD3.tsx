@@ -13,9 +13,12 @@ import {
 
 interface TargetDonutD3Props {
   data: TargetDistribution[];
+  onExpand?: () => void;
+  onInfo?: () => void;
+  isExpanded?: boolean;
 }
 
-export default function TargetDonutD3({ data }: TargetDonutD3Props) {
+export default function TargetDonutD3({ data, onExpand, onInfo, isExpanded = false }: TargetDonutD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -27,7 +30,8 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
     const container = containerRef.current;
     // Use a square aspect ratio for donut
     const containerWidth = container.clientWidth;
-    const height = 400; // Fixed height
+    const containerHeight = container.clientHeight || 400;
+    const height = isExpanded ? containerHeight : 400; // Dynamic height when expanded
     
     const svg = d3.select(container)
       .append('svg')
@@ -37,8 +41,6 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
     // Center the chart
     const g = svg.append('g')
       .attr('transform', `translate(${containerWidth / 2},${height / 2})`);
-      
-    const radius = Math.min(containerWidth, height) / 2 - 40;
     
     // Color scale mapping
     const colorMap: Record<string, string> = {
@@ -46,6 +48,10 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
       'Present': '#f59e0b',  // Alert Amber
       'Future': '#22c55e'    // Growth Green
     };
+
+    // Responsive Radius
+    const minDim = Math.min(containerWidth, height);
+    const radius = isExpanded ? (minDim / 2) - 20 : (minDim / 2) - 40;
     
     // Pie generator
     const pie = d3.pie<TargetDistribution>()
@@ -160,16 +166,91 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
       .style('fill', '#d1d5db') // Gray-300
       .text(d => d.data.percentage > 5 ? d.data.target : ''); // Only show label if > 5%
       
-  }, [data]);
+  }, [data, isExpanded]);
   
   return (
-    <div className="liquid-card p-5">
-      <h2 className="text-label text-secondary-text mb-4">Spending Distribution</h2>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+      {!isExpanded && (
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-label text-secondary-text">Target Distribution</h2>
+          {onExpand && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onInfo}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Chart Info"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+              <button 
+                onClick={onExpand}
+                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                aria-label="Expand Chart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div 
         ref={containerRef} 
-        className="w-full relative"
-        style={{ height: '400px' }}
-      />
+        className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
+        style={{ height: isExpanded ? '100%' : '400px' }}
+      >
+        {/* Center Text (Total) using absolute positioning to avoid D3 complexity */}
+        {data.length > 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-secondary-text text-sm font-medium">Total</span>
+            <span className="text-white text-xl font-bold">
+              {formatCurrency(data.reduce((acc, curr) => acc + curr.amount, 0))}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Legend - Floating in Expanded Mode */}
+      {isExpanded && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: '0px',
+            right: '0px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            padding: '12px',
+            borderRadius: '12px',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            zIndex: 10
+          }}
+        >
+          {data.map(item => (
+            <div key={item.target} className="flex items-center gap-2">
+              <div 
+                style={{ width: '8px', height: '8px', backgroundColor: 
+                  item.target === 'Living' ? '#06b6d4' : 
+                  item.target === 'Present' ? '#f59e0b' : '#22c55e', 
+                  borderRadius: '50%' 
+                }}
+              />
+              <span className="text-xs font-medium text-secondary-text">{item.target}</span>
+              <span className="text-xs font-bold text-white ml-auto">{formatPercentage(item.percentage)}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

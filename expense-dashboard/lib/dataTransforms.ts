@@ -46,6 +46,11 @@ export function filterExpenses(expenses: Expense[], filters: FilterState): Expen
     if (filters.methods.length > 0 && !filters.methods.includes(expense.method)) {
       return false;
     }
+
+    // Shop filter
+    if (filters.shops && filters.shops.length > 0 && !filters.shops.includes(expense.shop)) {
+      return false;
+    }
     
     return true;
   });

@@ -43,8 +43,44 @@ import KPICards from '@/components/KPICards';
 import MonthlyTrendD3 from '@/components/charts/MonthlyTrendD3';
 import TargetDonutD3 from '@/components/charts/TargetDonutD3';
 import CategoryBarD3 from '@/components/charts/CategoryBarD3';
+import BurnRateGaugeD3 from '@/components/charts/BurnRateGaugeD3';
+import DayOfWeekD3 from '@/components/charts/DayOfWeekD3';
+import TopShopsD3 from '@/components/charts/TopShopsD3';
 import TransactionTable from '@/components/TransactionTable';
 import FloatingFilterButton from '@/components/FloatingFilterButton';
+import InfoModal from '@/components/InfoModal';
+import SpendingHeatmapD3 from '@/components/charts/SpendingHeatmapD3';
+
+const CHART_INFO = {
+  monthly: {
+    title: 'Monthly Spending Trend',
+    description: 'Tracks your total spending over time compared to previous months.\n\nThe colored lines break down spending to help you visualize your balance:\n• Living (Cyan): Essential needs.\n• Present (Amber): Wants and short-term enjoyment.\n• Future (Green): Savings and investments.'
+  },
+  burn: {
+    title: 'Burn Rate Gauge',
+    description: 'A speedometer for your budget.\n\n• Blue Arc: How much of the month has passed.\n• Colored Arc: How much budget you have used.\n\nIf the colored arc is longer than the blue one, you are "Burning Fast" (spending faster than time is passing).'
+  },
+  donut: {
+    title: 'Target Distribution',
+    description: 'See the balance of your financial life. Ideally, you might aim for a 50/30/20 split:\n\n• 50% Living (Needs)\n• 30% Present (Wants)\n• 20% Future (Savings)\n\nThis donut chart shows your actual current split.'
+  },
+  bar: {
+    title: 'Top Categories',
+    description: 'Your biggest money sinks.\n\nThis bar chart ranks your expenses by category so you can instantly spot what is eating up your budget—whether it is Housing, Food, or Entertainment.'
+  },
+  dayOfWeek: {
+    title: 'Day of Week Analysis',
+    description: 'Discover your weekly spending rhythm.\n\n• Bars show total spending for each day (Sun-Sat).\n• Use this to identify if you tend to overspend on weekends or specific weekdays.'
+  },
+  topShops: {
+    title: 'Top Shops',
+    description: 'Your most frequented merchants.\n\n• Bars represent total spending at each shop.\n• Identifies where your money goes most often (e.g., specific supermarkets, cafes, or subscriptions).'
+  },
+  heatmap: {
+    title: 'Spending Heatmap (Daily)',
+    description: 'A calendar view of your spending habits.\n\n• Rows: Days of the week (Sun to Sat).\n• Columns: Weeks of the year.\n• Intensity: Brighter/Pinker cells mean higher spending on that specific day.\n\n💡 Ways to use this chart:\n1. Single Month: See exactly which days you splurged.\n2. One Category: Track habits (e.g., "Do I buy coffee every Tuesday?").\n3. Current Year: Get a bird\'s-eye view of your entire year\'s density.\n4. Location: See if specific places trigger spending streaks.\n5. Living vs. Wants: Filter by Target to see if "Needs" are consistent vs. erratic "Wants".'
+  }
+};
 
 interface MainDashboardProps {
   showTransactions?: boolean;
@@ -55,14 +91,18 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [filterOrder, setFilterOrder] = useState(['location', 'category', 'target', 'month', 'year']);
+  const [expandedChart, setExpandedChart] = useState<string | null>(null);
+  const [infoChart, setInfoChart] = useState<string | null>(null);
+  
+  const [filterOrder, setFilterOrder] = useState(['location', 'category', 'shop', 'target', 'month', 'year']);
 
   const [filters, setFilters] = useState<FilterState>({
     dateRange: { start: null, end: null },
     targets: [],
     categories: [],
     locations: [],
-    methods: []
+    methods: [],
+    shops: []
   });
 
   const [uniqueValues, setUniqueValues] = useState({
@@ -70,11 +110,11 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
     targets: [] as string[],
     categories: [] as string[],
     locations: [] as string[],
-    methods: [] as string[]
+    methods: [] as string[],
+    shops: [] as string[]
   });
 
   // Load Data
-  const [expandedChart, setExpandedChart] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -92,7 +132,8 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           targets: getUniqueValues(parsedData, 'target'),
           categories: getUniqueValues(parsedData, 'category'),
           locations: getUniqueValues(parsedData, 'location'),
-          methods: getUniqueValues(parsedData, 'method')
+          methods: getUniqueValues(parsedData, 'method'),
+          shops: getUniqueValues(parsedData, 'shop')
         });
         
         setLoading(false);
@@ -140,7 +181,8 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       categories: getUniqueValues(dateFiltered, 'category'),
       locations: getUniqueValues(dateFiltered, 'location'),
       targets: getUniqueValues(dateFiltered, 'target'),
-      methods: getUniqueValues(dateFiltered, 'method')
+      methods: getUniqueValues(dateFiltered, 'method'),
+      shops: getUniqueValues(dateFiltered, 'shop')
     }));
   }, [filters.dateRange, filters.months, expenses]);
 
@@ -156,6 +198,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
     (filters.months?.length || 0) + 
     filters.categories.length + 
     filters.locations.length + 
+    filters.shops.length + 
     filters.targets.length;
 
   if (loading) {
@@ -182,18 +225,54 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
         
         {/* Charts Grid - Mobile Optimized */}
         <div className="space-y-4">
-          {/* Monthly Trend - Full Width */}
-          {/* Monthly Trend - Full Width */}
-          <MonthlyTrendD3 
-            data={monthlyData} 
-            onExpand={() => setExpandedChart('monthly')}
-          />
+            {/* Monthly Trend - Full Width */}
+            <MonthlyTrendD3 
+              data={monthlyData} 
+              onExpand={() => setExpandedChart('monthly')}
+              onInfo={() => setInfoChart('monthly')}
+            />
           
-          {/* Distribution & Categories - Side by Side on Desktop */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <TargetDonutD3 data={targetDistribution} />
-            <CategoryBarD3 data={categoryTotals} />
+          
+          {/* Distribution, Burn Rate, & Categories - Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <BurnRateGaugeD3 
+              spent={kpiMetrics.totalSpent}
+              budget={500000} // TODO: Make this dynamic/setting
+              onExpand={() => setExpandedChart('burn')}
+              onInfo={() => setInfoChart('burn')}
+            />
+            <TargetDonutD3 
+              data={targetDistribution} 
+              onExpand={() => setExpandedChart('donut')}
+              onInfo={() => setInfoChart('donut')}
+            />
+            <CategoryBarD3 
+              data={categoryTotals} 
+              onExpand={() => setExpandedChart('bar')}
+              onInfo={() => setInfoChart('bar')}
+            />
           </div>
+
+          {/* New Grid: Day of Week & Top Shops */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <DayOfWeekD3 
+              expenses={filteredExpenses} 
+              onExpand={() => setExpandedChart('dayOfWeek')}
+              onInfo={() => setInfoChart('dayOfWeek')}
+            />
+            <TopShopsD3 
+              expenses={filteredExpenses} 
+              onExpand={() => setExpandedChart('topShops')}
+              onInfo={() => setInfoChart('topShops')}
+            />
+          </div>
+
+          {/* Heatmap - Full Width */}
+          <SpendingHeatmapD3 
+            expenses={filteredExpenses} // Use filtered expenses for dynamic updates
+            onExpand={() => setExpandedChart('heatmap')}
+            onInfo={() => setInfoChart('heatmap')}
+          />
         </div>
         
         {/* Detailed Table (Conditional) */}
@@ -219,7 +298,8 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
             categories: [],
             locations: [],
             targets: [],
-            months: []
+            months: [],
+            shops: []
           })}
           className="liquid-button"
           style={{
@@ -263,10 +343,36 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       {expandedChart && (
         <ExpandedChartOverlay onClose={() => setExpandedChart(null)}>
           {expandedChart === 'monthly' && (
-            <MonthlyTrendD3 data={monthlyData} isExpanded />
+            <MonthlyTrendD3 data={monthlyData} isExpanded onInfo={() => setInfoChart('monthly')} />
+          )}
+          {expandedChart === 'donut' && (
+            <TargetDonutD3 data={targetDistribution} isExpanded onInfo={() => setInfoChart('donut')} />
+          )}
+          {expandedChart === 'bar' && (
+            <CategoryBarD3 data={categoryTotals} isExpanded onInfo={() => setInfoChart('bar')} />
+          )}
+          {expandedChart === 'burn' && (
+            <BurnRateGaugeD3 spent={kpiMetrics.totalSpent} budget={500000} isExpanded onInfo={() => setInfoChart('burn')} />
+          )}
+          {expandedChart === 'dayOfWeek' && (
+            <DayOfWeekD3 expenses={filteredExpenses} isExpanded onInfo={() => setInfoChart('dayOfWeek')} />
+          )}
+          {expandedChart === 'topShops' && (
+            <TopShopsD3 expenses={filteredExpenses} isExpanded onInfo={() => setInfoChart('topShops')} />
+          )}
+          {expandedChart === 'heatmap' && (
+            <SpendingHeatmapD3 expenses={filteredExpenses} isExpanded onInfo={() => setInfoChart('heatmap')} />
           )}
         </ExpandedChartOverlay>
       )}
+
+      {/* Info Modal */}
+      <InfoModal 
+        isOpen={!!infoChart}
+        onClose={() => setInfoChart(null)}
+        title={infoChart ? CHART_INFO[infoChart as keyof typeof CHART_INFO].title : ''}
+        description={infoChart ? CHART_INFO[infoChart as keyof typeof CHART_INFO].description : ''}
+      />
     </div>
   );
 }
@@ -396,7 +502,7 @@ function FilterAccordion({
 }: { 
   filters: FilterState; 
   setFilters: (f: FilterState) => void;
-  uniqueValues: { years: number[]; categories: string[]; locations: string[]; targets: string[]; methods: string[] };
+  uniqueValues: { years: number[]; categories: string[]; locations: string[]; targets: string[]; methods: string[]; shops: string[] };
   order: string[];
   setOrder: (order: string[]) => void;
   onClose: () => void;
@@ -463,6 +569,12 @@ function FilterAccordion({
     return filters.locations.join(', ');
   };
 
+  const getShopDisplay = () => {
+    if (!filters.shops || filters.shops.length === 0) return 'All';
+    if (filters.shops.length > 2) return `${filters.shops.length} selected`;
+    return filters.shops.join(', ');
+  };
+
   const toggleSection = (section: string) => {
     setExpandedFilter(expandedFilter === section ? null : section);
   };
@@ -471,6 +583,89 @@ function FilterAccordion({
 
   const renderFilter = (id: string) => {
     switch (id) {
+      case 'shop':
+        return (
+          <div style={{ backgroundColor: '#000000' }}>
+            {expandedFilter === 'shop' && (
+              <div style={{ padding: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap', maxHeight: '250px', overflowY: 'auto' }}>
+                {uniqueValues.shops.map(shop => {
+                  const isSelected = filters.shops?.includes(shop);
+                  return (
+                    <button
+                      key={shop}
+                      onClick={() => {
+                        const current = filters.shops || [];
+                        setFilters({
+                          ...filters,
+                          shops: current.includes(shop) ? current.filter(s => s !== shop) : [...current, shop]
+                        });
+                      }}
+                      style={{
+                        padding: '10px 16px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        border: isSelected ? '2px solid #8B5CF6' : '2px solid #3A3A3C',
+                        backgroundColor: isSelected ? '#8B5CF6' : 'transparent',
+                        color: isSelected ? '#FFFFFF' : '#8E8E93',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {shop}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {expandedFilter === 'shop' && (
+              <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '0 16px' }} />
+            )}
+            <button 
+              onClick={() => toggleSection('shop')}
+              style={{ 
+                width: '100%', 
+                padding: '16px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                backgroundColor: '#000000',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shop</span>
+                {expandedFilter === 'shop' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilters({...filters, shops: []});
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      border: '1px solid rgba(255,159,10,0.5)',
+                      backgroundColor: 'transparent',
+                      color: '#FF9F0A',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#8B5CF6', fontSize: '14px', fontWeight: 700, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getShopDisplay()}</span>
+                <span style={{ color: '#8E8E93', fontSize: '12px', transform: expandedFilter === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
+              </div>
+            </button>
+            <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+          </div>
+        );
+
       case 'location':
         return (
           <div style={{ backgroundColor: '#000000' }}>

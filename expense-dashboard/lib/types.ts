@@ -26,6 +26,7 @@ export interface FilterState {
   categories: string[];
   locations: string[];
   methods: string[];
+  shops: string[];
 }
 
 export interface MonthlyData {
