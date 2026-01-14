@@ -163,8 +163,8 @@ export default function TargetDonutD3({ data }: TargetDonutD3Props) {
   }, [data]);
   
   return (
-    <div className="bg-trust-navy rounded-xl border border-neutral-800 shadow-xl p-5">
-      <h2 className="text-lg font-bold mb-4 text-cyber-cyan tracking-wide uppercase">Spending Distribution</h2>
+    <div className="liquid-card p-5">
+      <h2 className="text-label text-secondary-text mb-4">Spending Distribution</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"

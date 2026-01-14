@@ -47,54 +47,109 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
     });
   };
 
+  const toggleMonth = (month: number) => {
+    const current = filters.months || [];
+    const newMonths = current.includes(month)
+      ? current.filter(m => m !== month)
+      : [...current, month];
+    onChange({ ...filters, months: newMonths });
+  };
+
+  const applyQuarter = (quarter: number) => {
+    // Q1: 1,2,3 - Q2: 4,5,6 etc.
+    const start = (quarter - 1) * 3 + 1;
+    const qMonths = [start, start + 1, start + 2];
+    onChange({ ...filters, months: qMonths });
+  };
+
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
   return (
-    <div className="bg-trust-navy rounded-xl border border-neutral-800 shadow-xl p-5 mb-8">
+    <div className="liquid-card p-6 mb-8 relative">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-bold text-cyber-cyan tracking-wide uppercase">Filters</h2>
+        <h2 className="text-label text-secondary-text">Data Filters</h2>
         <button 
           onClick={() => onChange({
             dateRange: { start: null, end: null },
+            years: [],
+            months: [],
             targets: [],
             categories: [],
             locations: [],
             methods: []
           })}
-          className="text-xs font-semibold text-laser-magenta hover:text-white transition-colors"
+          className="text-xs font-bold text-electric-orange hover:text-white uppercase tracking-wider transition-colors"
         >
-          RESET ALL
+          Reset All
         </button>
       </div>
       
       <div className="space-y-6">
         {/* Year Filter */}
         <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Year</label>
+          <label className="block text-label mb-3">Year</label>
           <select 
-            className="w-full bg-neutral-900 text-white border-neutral-800 rounded-lg shadow-sm focus:ring-cyber-cyan focus:border-cyber-cyan border p-3 appearance-none"
+            className="w-full bg-glass-surface text-white border border-white/10 rounded-xl shadow-inner focus:ring-cobalt-blue focus:border-cobalt-blue p-3 appearance-none font-mono"
             onChange={handleYearChange}
-            defaultValue=""
           >
-            <option value="">All Time</option>
+            <option value="">ALL TIME</option>
             {uniqueValues.years.sort((a, b) => b - a).map(year => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>
         </div>
 
+        {/* Month Filter */}
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-label">Months</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map(q => (
+                 <button 
+                   key={q} 
+                   onClick={() => applyQuarter(q)}
+                   className="text-[10px] font-bold text-secondary-text hover:text-white bg-white/5 px-2 py-1 rounded"
+                 >
+                   Q{q}
+                 </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-6 gap-2">
+            {MONTHS.map((m, idx) => {
+              const monthNum = idx + 1;
+              const isSelected = (filters.months || []).includes(monthNum);
+              return (
+                <button
+                  key={m}
+                  onClick={() => toggleMonth(monthNum)}
+                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                    isSelected 
+                      ? 'bg-white text-black shadow-lg shadow-white/20' 
+                      : 'bg-glass-surface text-secondary-text hover:bg-white/10'
+                  }`}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Target Filter - Chips */}
         <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target</label>
-          <div className="flex flex-wrap gap-2">
+          <label className="block text-label mb-3">Target</label>
+          <div className="flex flex-wrap gap-3">
             {['Living', 'Present', 'Future'].map(target => (
               <button
                 key={target}
                 onClick={() => handleMultiSelect('targets', target)}
-                className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
+                className={`liquid-button px-5 py-2 text-sm ${
                   filters.targets.includes(target)
-                    ? target === 'Living' ? 'bg-cyber-cyan text-black border-cyber-cyan shadow-[0_0_15px_rgba(6,182,212,0.4)]' :
-                      target === 'Present' ? 'bg-alert-amber text-black border-alert-amber shadow-[0_0_15px_rgba(245,158,11,0.4)]' :
-                      'bg-growth-green text-black border-growth-green shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:bg-neutral-800'
+                    ? target === 'Living' ? 'bg-cobalt-blue text-white shadow-[0_0_15px_rgba(10,132,255,0.4)]' :
+                      target === 'Present' ? 'bg-electric-orange text-black shadow-[0_0_15px_rgba(255,159,10,0.4)]' :
+                      'bg-acid-green text-black shadow-[0_0_15px_rgba(204,255,0,0.4)]'
+                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
                 }`}
               >
                 {target}
@@ -105,16 +160,16 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
 
         {/* Category Filter - Horizontal Scroll */}
         <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Category ({filters.categories.length})</label>
-          <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
+          <label className="block text-label mb-3">Category ({filters.categories.length})</label>
+          <div className="flex overflow-x-auto gap-3 pb-2 -mx-2 px-2 no-scrollbar">
             {uniqueValues.categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => handleMultiSelect('categories', cat)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${
                   filters.categories.includes(cat)
-                    ? 'bg-cyber-cyan text-black border-cyber-cyan shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:border-gray-600'
+                    ? 'bg-cobalt-blue text-white shadow-[0_0_15px_rgba(10,132,255,0.3)]'
+                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
                 }`}
               >
                 {cat}
@@ -125,16 +180,16 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
 
         {/* Location Filter - Horizontal Scroll */}
         <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Location</label>
-          <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
+          <label className="block text-label mb-3">Location</label>
+          <div className="flex overflow-x-auto gap-3 pb-2 -mx-2 px-2 no-scrollbar">
             {uniqueValues.locations.map(loc => (
               <button
                 key={loc}
                 onClick={() => handleMultiSelect('locations', loc)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${
                   filters.locations.includes(loc)
-                    ? 'bg-flux-violet text-white border-flux-violet shadow-[0_0_10px_rgba(139,92,246,0.3)]'
-                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:border-gray-600'
+                    ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]'
+                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
                 }`}
               >
                 {loc}

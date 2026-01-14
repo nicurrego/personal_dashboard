@@ -20,6 +20,12 @@ export function filterExpenses(expenses: Expense[], filters: FilterState): Expen
       if (filters.dateRange.start && expenseDate < filters.dateRange.start) return false;
       if (filters.dateRange.end && expenseDate > filters.dateRange.end) return false;
     }
+
+    // Month filter (1-12)
+    if (filters.months && filters.months.length > 0) {
+      const expenseMonth = new Date(expense.date).getMonth() + 1;
+      if (!filters.months.includes(expenseMonth)) return false;
+    }
     
     // Target filter
     if (filters.targets.length > 0 && !filters.targets.includes(expense.target)) {

@@ -9,6 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Liquid Glass Palette (New Standard)
+        'void-black': '#000000',
+        'glass-surface': '#1C1C1E', // Use with opacity
+        'card-surface': '#2C2C2E',
+        'acid-green': '#CCFF00', // Good/Future
+        'electric-orange': '#FF9F0A', // Warning/Present
+        'cobalt-blue': '#0A84FF', // Neutral/Living
+        'secondary-text': '#8E8E93',
+        
+        // Legacy CP 2077 Palette (Supporting existing views)
         'trust-navy': '#171717',
         'growth-green': '#22c55e',
         'alert-amber': '#f59e0b',

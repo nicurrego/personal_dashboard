@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --foreground-rgb: 255, 255, 255;
@@ -51,4 +49,25 @@ div[style*="visibility: visible"] {
 div[style*="visibility: hidden"] {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
+}
+
+/* Liquid Glass Design System */
+@layer components {
+  .liquid-card {
+    @apply bg-[rgba(28,28,30,0.8)] backdrop-blur-[20px] rounded-[24px] border border-[rgba(255,255,255,0.1)];
+  }
+  
+  .liquid-button {
+    @apply rounded-full font-bold transition-all duration-200 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.3)];
+  }
+
+  /* Typography */
+  .text-label {
+    @apply text-xs font-semibold uppercase tracking-[0.15em];
+    color: #8E8E93;
+  }
+  
+  .text-value {
+    @apply text-4xl font-bold tracking-tight text-white font-mono;
+  }
 }

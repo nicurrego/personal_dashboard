@@ -1,150 +1,75 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { 
-  Expense, 
-  FilterState, 
-} from '@/lib/types';
-import { 
-  parseCSV, 
-  getUniqueValues 
-} from '@/lib/csvParser';
-import { 
-  filterExpenses, 
-  aggregateByMonth, 
-  calculateKPIs,
-  getTargetDistribution,
-  getTopCategories,
-} from '@/lib/dataTransforms';
+import Link from 'next/link';
 
-// Components
-import KPICards from '@/components/KPICards';
-import FilterPanel from '@/components/filters/FilterPanel';
-import MonthlyTrendD3 from '@/components/charts/MonthlyTrendD3';
-import TargetDonutD3 from '@/components/charts/TargetDonutD3';
-import CategoryBarD3 from '@/components/charts/CategoryBarD3';
-import TransactionTable from '@/components/TransactionTable';
-
-export default function Dashboard() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  const [filters, setFilters] = useState<FilterState>({
-    dateRange: { start: null, end: null },
-    targets: [],
-    categories: [],
-    locations: [],
-    methods: []
-  });
-
-  const [uniqueValues, setUniqueValues] = useState({
-    years: [] as number[],
-    targets: [] as string[],
-    categories: [] as string[],
-    locations: [] as string[],
-    methods: [] as string[]
-  });
-
-  // Load Data
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const response = await fetch('/expenses_combined_english.csv');
-        const csvText = await response.text();
-        const parsedData = parseCSV(csvText);
-        
-        setExpenses(parsedData);
-        setFilteredExpenses(parsedData);
-        
-        // Extract unique values for filters
-        setUniqueValues({
-          years: Array.from(new Set(parsedData.map(e => e.year))).sort(),
-          targets: getUniqueValues(parsedData, 'target'),
-          categories: getUniqueValues(parsedData, 'category'),
-          locations: getUniqueValues(parsedData, 'location'),
-          methods: getUniqueValues(parsedData, 'method')
-        });
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading data:', error);
-        setLoading(false);
-      }
-    }
-    
-    loadData();
-  }, []);
-
-  // Filter Data
-  useEffect(() => {
-    if (expenses.length > 0) {
-      const filtered = filterExpenses(expenses, filters);
-      setFilteredExpenses(filtered);
-    }
-  }, [filters, expenses]);
-
-  // Derived Data
-  const monthlyData = aggregateByMonth(filteredExpenses);
-  const kpiMetrics = calculateKPIs(filteredExpenses);
-  const targetDistribution = getTargetDistribution(filteredExpenses);
-  const categoryTotals = getTopCategories(filteredExpenses, 10);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-black font-sans text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Expense Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-400">
-            Analysis of {filteredExpenses.length} transactions
-          </p>
-        </div>
-        
-        {/* Filters */}
-        <FilterPanel 
-          filters={filters} 
-          onChange={setFilters} 
-          uniqueValues={uniqueValues} 
-        />
-        
-        {/* KPI Cards */}
-        <KPICards metrics={kpiMetrics} />
-        
-        {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2">
-            <MonthlyTrendD3 data={monthlyData} />
+    <div className="min-h-screen bg-void-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyber-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-flux-violet/10 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Hero Section */}
+      <div className="text-center mb-12 relative z-10">
+        <h2 className="text-label mb-2 text-cyber-cyan">Restricted Area</h2>
+        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tighter shadow-lg">
+          EXPENSE<span className="text-gray-500">.OS</span>
+        </h1>
+        <p className="mt-4 text-secondary-text font-mono text-sm tracking-wide">
+          SYSTEM V1.2 // READY FOR ANALYSIS
+        </p>
+      </div>
+
+      {/* Navigation Modules */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl relative z-10">
+        {/* Module 1: Dashboard */}
+        <Link href="/dashboard" className="group">
+          <div className="liquid-card p-8 h-64 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-acid-green">
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-label text-acid-green">MODULE 01</span>
+                <div className="w-2 h-2 rounded-full bg-acid-green animate-pulse" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">Dashboard</h3>
+              <p className="text-secondary-text text-sm max-w-[80%]">
+                Visual analytics and high-level KPI monitoring. Transaction list hidden for clarity.
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <span className="liquid-button bg-acid-green text-black px-6 py-2 text-sm uppercase tracking-wider group-hover:shadow-[0_0_20px_rgba(204,255,0,0.4)] transition-all">
+                Launch
+              </span>
+            </div>
           </div>
-          <div>
-            <TargetDonutD3 data={targetDistribution} />
-          </div>
-        </div>
+        </Link>
         
-        {/* Charts Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div>
-            <CategoryBarD3 data={categoryTotals} />
+        {/* Module 2: Basic View */}
+        <Link href="/basic" className="group">
+          <div className="liquid-card p-8 h-64 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-cobalt-blue">
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                 <span className="text-label text-cobalt-blue">MODULE 02</span>
+                 <div className="w-2 h-2 rounded-full bg-cobalt-blue opacity-50" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">Data Grid</h3>
+              <p className="text-secondary-text text-sm max-w-[80%]">
+                Full data access with responsive transaction tables and raw records.
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <span className="liquid-button bg-glass-surface text-white border border-neutral-700 px-6 py-2 text-sm uppercase tracking-wider group-hover:bg-neutral-800 transition-all">
+                Access
+              </span>
+            </div>
           </div>
-          <div className="lg:col-span-2 bg-neutral-900/50 rounded-lg border border-neutral-800 p-6 flex flex-col justify-center items-center text-gray-500 border-2 border-dashed border-neutral-800">
-            <p>Future D3 Chart: Spending Heatmap or Payee Analysis</p>
-            <p className="text-sm mt-2">Coming soon in Phase 2</p>
-          </div>
-        </div>
-        
-        {/* Detailed Table */}
-        <TransactionTable expenses={filteredExpenses} />
-        
-        <div className="mt-8 text-center text-xs text-gray-600 pb-8">
-          Generated with Next.js & D3.js • {new Date().getFullYear()}
-        </div>
+        </Link>
+      </div>
+
+      {/* Footer Status */}
+      <div className="mt-16 relative z-10 font-mono text-xs text-secondary-text flex items-center gap-4">
+         <span>STATUS: <span className="text-acid-green">OPERATIONAL</span></span>
+         <span className="opacity-30">|</span>
+         <span>SECURE CONNECTION</span>
       </div>
     </div>
   );

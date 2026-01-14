@@ -21,6 +21,7 @@ export interface FilterState {
     start: Date | null;
     end: Date | null;
   };
+  months: number[];
   targets: string[];
   categories: string[];
   locations: string[];

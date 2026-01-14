@@ -62,10 +62,10 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
     // Optional: Hide bottom axis for cleaner look if value labels are used
     // createStyledAxis(g, xAxis, 'bottom', `translate(0,${height})`);
     
-    // Color scale (Cyberpunk Gradient: Cyan -> Violet)
+    // Color scale (Liquid Gradient: Cobalt -> Acid Green)
     const colorScale = d3.scaleSequential()
       .domain([0, data.length])
-      .interpolator(d3.interpolateRgb('#06b6d4', '#8B5CF6'));
+      .interpolator(d3.interpolateRgb('#0A84FF', '#CCFF00'));
       
     // Draw Bars
     g.selectAll('.bar')
@@ -95,7 +95,7 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
       .text(d => formatCurrency(d.total))
       .style('font-size', '12px')
       .style('font-weight', 'bold')
-      .style('fill', '#e5e7eb') // Light Gray
+      .style('fill', '#FFFFFF') // White
       .style('opacity', 0)
       .transition()
       .delay((d, i) => i * 100 + 800)
@@ -108,8 +108,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', '#d946ef') // Laser Magenta Highlight
-          .attr('filter', 'drop-shadow(0 0 8px #d946ef)');
+          .attr('fill', '#FF9F0A') // Electric Orange Highlight
+          .attr('filter', 'drop-shadow(0 0 8px #FF9F0A)');
           
         tooltip
           .html(`
@@ -141,8 +141,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
   }, [data]);
   
   return (
-    <div className="bg-trust-navy rounded-xl border border-neutral-800 shadow-xl p-5">
-      <h2 className="text-lg font-bold mb-4 text-cyber-cyan tracking-wide uppercase">Top Spending Categories</h2>
+    <div className="liquid-card p-5">
+      <h2 className="text-label text-secondary-text mb-4">Top Spending Categories</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"
