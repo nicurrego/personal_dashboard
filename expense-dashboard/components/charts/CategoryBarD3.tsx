@@ -62,10 +62,10 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
     // Optional: Hide bottom axis for cleaner look if value labels are used
     // createStyledAxis(g, xAxis, 'bottom', `translate(0,${height})`);
     
-    // Color scale (Blue palette)
+    // Color scale (Cyberpunk Gradient: Cyan -> Violet)
     const colorScale = d3.scaleSequential()
-      .domain([0, data.length - 1])
-      .interpolator(d3.interpolateBlues);
+      .domain([0, data.length])
+      .interpolator(d3.interpolateRgb('#06b6d4', '#8B5CF6'));
       
     // Draw Bars
     g.selectAll('.bar')
@@ -75,7 +75,7 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
       .attr('x', 0)
       .attr('y', d => yScale(d.category) || 0)
       .attr('height', yScale.bandwidth())
-      .attr('fill', (d, i) => colorScale(data.length - i + 2)) // Lighter to darker
+      .attr('fill', (d, i) => colorScale(i)) // Gradient by rank
       .attr('rx', 4) // Rounded corners
       .attr('width', 0) // Start at width 0 for animation
       .transition()
@@ -89,12 +89,13 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
       .data(data)
       .join('text')
       .attr('class', 'label')
-      .attr('x', d => xScale(d.total) + 5)
+      .attr('x', d => xScale(d.total) + 8)
       .attr('y', d => (yScale(d.category) || 0) + yScale.bandwidth() / 2)
       .attr('dy', '0.35em')
       .text(d => formatCurrency(d.total))
       .style('font-size', '12px')
-      .style('fill', '#9ca3af') // Gray-400
+      .style('font-weight', 'bold')
+      .style('fill', '#e5e7eb') // Light Gray
       .style('opacity', 0)
       .transition()
       .delay((d, i) => i * 100 + 800)
@@ -107,7 +108,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', '#f59e0b'); // Highlight color orange
+          .attr('fill', '#d946ef') // Laser Magenta Highlight
+          .attr('filter', 'drop-shadow(0 0 8px #d946ef)');
           
         tooltip
           .html(`
@@ -124,15 +126,14 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
           .style('left', (event.pageX + 10) + 'px');
       })
       .on('mouseout', function(event, d: any, i) {
-        // Restore gradient color (getting index is tricky in v6+, d3.select(this).datum() helps, but index requires logic)
-        // Simplest to just re-apply the color logic or a default color
-        // But we can actually use the original data array to find index
+        // Restore gradient color
         const index = data.findIndex(item => item.category === d.category);
         
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', colorScale(data.length - index + 2));
+          .attr('fill', colorScale(index))
+          .attr('filter', 'none');
           
         tooltip.style('visibility', 'hidden');
       });
@@ -140,8 +141,8 @@ export default function CategoryBarD3({ data }: CategoryBarD3Props) {
   }, [data]);
   
   return (
-    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4 text-white">Top Spending Categories</h2>
+    <div className="bg-trust-navy rounded-xl border border-neutral-800 shadow-xl p-5">
+      <h2 className="text-lg font-bold mb-4 text-cyber-cyan tracking-wide uppercase">Top Spending Categories</h2>
       <div 
         ref={containerRef} 
         className="w-full relative"

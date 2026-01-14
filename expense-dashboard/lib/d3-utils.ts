@@ -165,12 +165,12 @@ export function truncateText(text: string, maxWidth: number, fontSize = 12): str
 }
 
 /**
- * Get color scale for targets
+ * Get color scale for targets (Updated for Cyberpunk Theme)
  */
 export function getTargetColorScale() {
   return d3.scaleOrdinal<string>()
     .domain(['Living', 'Present', 'Future'])
-    .range(['#10b981', '#3b82f6', '#f59e0b']);
+    .range(['#06b6d4', '#f59e0b', '#22c55e']); // Cyber Cyan, Alert Amber, Growth Green
 }
 
 /**
@@ -179,5 +179,5 @@ export function getTargetColorScale() {
 export function getSequentialColorScale(domain: [number, number]) {
   return d3.scaleSequential()
     .domain(domain)
-    .interpolator(d3.interpolateBlues);
+    .interpolator(d3.interpolateRgb('#06b6d4', '#22c55e')); // Cyan to Green gradient
 }

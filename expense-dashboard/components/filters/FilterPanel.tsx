@@ -48,9 +48,9 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
   };
 
   return (
-    <div className="bg-neutral-900 rounded-lg border border-neutral-800 shadow p-6 mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-white">Filters</h2>
+    <div className="bg-trust-navy rounded-xl border border-neutral-800 shadow-xl p-5 mb-8">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-bold text-cyber-cyan tracking-wide uppercase">Filters</h2>
         <button 
           onClick={() => onChange({
             dateRange: { start: null, end: null },
@@ -59,18 +59,18 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
             locations: [],
             methods: []
           })}
-          className="text-sm text-blue-400 hover:text-blue-300"
+          className="text-xs font-semibold text-laser-magenta hover:text-white transition-colors"
         >
-          Reset All
+          RESET ALL
         </button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="space-y-6">
         {/* Year Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Year</label>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Year</label>
           <select 
-            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2"
+            className="w-full bg-neutral-900 text-white border-neutral-800 rounded-lg shadow-sm focus:ring-cyber-cyan focus:border-cyber-cyan border p-3 appearance-none"
             onChange={handleYearChange}
             defaultValue=""
           >
@@ -81,18 +81,20 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
           </select>
         </div>
 
-        {/* Target Filter */}
+        {/* Target Filter - Chips */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Target</label>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target</label>
           <div className="flex flex-wrap gap-2">
             {['Living', 'Present', 'Future'].map(target => (
               <button
                 key={target}
                 onClick={() => handleMultiSelect('targets', target)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
                   filters.targets.includes(target)
-                    ? 'bg-blue-900/40 text-blue-300 border-blue-700'
-                    : 'bg-neutral-800 text-gray-400 border-neutral-700 hover:bg-neutral-700'
+                    ? target === 'Living' ? 'bg-cyber-cyan text-black border-cyber-cyan shadow-[0_0_15px_rgba(6,182,212,0.4)]' :
+                      target === 'Present' ? 'bg-alert-amber text-black border-alert-amber shadow-[0_0_15px_rgba(245,158,11,0.4)]' :
+                      'bg-growth-green text-black border-growth-green shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:bg-neutral-800'
                 }`}
               >
                 {target}
@@ -101,41 +103,44 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
           </div>
         </div>
 
-        {/* Category Filter - Dropdown for space */}
+        {/* Category Filter - Horizontal Scroll */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
-          <select 
-            multiple
-            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
-            value={filters.categories}
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions, option => option.value);
-              onChange({ ...filters, categories: selected });
-            }}
-          >
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Category ({filters.categories.length})</label>
+          <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
             {uniqueValues.categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+              <button
+                key={cat}
+                onClick={() => handleMultiSelect('categories', cat)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                  filters.categories.includes(cat)
+                    ? 'bg-cyber-cyan text-black border-cyber-cyan shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:border-gray-600'
+                }`}
+              >
+                {cat}
+              </button>
             ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+          </div>
         </div>
 
-        {/* Location Filter */}
+        {/* Location Filter - Horizontal Scroll */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
-          <select 
-            multiple
-            className="w-full bg-neutral-800 text-white border-neutral-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2 h-32"
-            value={filters.locations}
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions, option => option.value);
-              onChange({ ...filters, locations: selected });
-            }}
-          >
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Location</label>
+          <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
             {uniqueValues.locations.map(loc => (
-              <option key={loc} value={loc}>{loc}</option>
+              <button
+                key={loc}
+                onClick={() => handleMultiSelect('locations', loc)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                  filters.locations.includes(loc)
+                    ? 'bg-flux-violet text-white border-flux-violet shadow-[0_0_10px_rgba(139,92,246,0.3)]'
+                    : 'bg-neutral-900 text-gray-400 border-neutral-800 hover:border-gray-600'
+                }`}
+              >
+                {loc}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       </div>
     </div>
