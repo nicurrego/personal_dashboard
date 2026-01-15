@@ -28,6 +28,7 @@ interface FilterAccordionProps {
   order: string[];
   setOrder: (order: string[]) => void;
   onClose: () => void;
+  setTimeRangePreset: (preset: 'month' | 'year' | 'all') => void;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -69,7 +70,8 @@ export default function FilterAccordion({
   uniqueValues,
   order,
   setOrder,
-  onClose
+  onClose,
+  setTimeRangePreset
 }: FilterAccordionProps) {
   const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -303,6 +305,7 @@ export default function FilterAccordion({
                     <button key={q} onClick={() => {
                       const start = (q-1)*3+1;
                       setFilters({...filters, months: [start, start+1, start+2]});
+                      setTimeRangePreset('all');
                     }} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid #3A3A3C', backgroundColor: 'transparent', color: '#8E8E93', cursor: 'pointer' }}>Q{q}</button>
                   ))}
                   <button onClick={() => setFilters({...filters, months: []})} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid rgba(255,159,10,0.3)', backgroundColor: 'transparent', color: '#FF9F0A', cursor: 'pointer' }}>Clear</button>
@@ -315,6 +318,7 @@ export default function FilterAccordion({
                       <button key={m} onClick={() => {
                         const current = filters.months || [];
                         setFilters({ ...filters, months: isSelected ? current.filter(x => x !== monthNum) : [...current, monthNum] });
+                        setTimeRangePreset('all');
                       }} style={{ padding: '10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, border: isSelected ? '2px solid #8B5CF6' : '2px solid #3A3A3C', backgroundColor: isSelected ? '#8B5CF6' : 'transparent', color: isSelected ? '#FFFFFF' : '#8E8E93', cursor: 'pointer', transition: 'all 0.2s ease' }}>{m}</button>
                     );
                   })}
@@ -345,7 +349,10 @@ export default function FilterAccordion({
                 {uniqueValues.years.sort((a,b) => b-a).map(year => {
                   const isSelected = filters.dateRange.start?.getFullYear() === year;
                   return (
-                    <button key={year} onClick={() => setFilters({ ...filters, dateRange: { start: new Date(year, 0, 1), end: new Date(year, 11, 31) } })} style={chipStyle(isSelected)}>{year}</button>
+                    <button key={year} onClick={() => {
+                      setFilters({ ...filters, dateRange: { start: new Date(year, 0, 1), end: new Date(year, 11, 31) } });
+                      setTimeRangePreset('all');
+                    }} style={chipStyle(isSelected)}>{year}</button>
                   );
                 })}
               </div>

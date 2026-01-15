@@ -1,5 +1,6 @@
 import { 
   Expense, 
+  Budget,
   FilterState, 
   MonthlyData,
   TrendDataPoint,
@@ -9,6 +10,48 @@ import {
   DayOfWeekData,
   KPIMetrics 
 } from './types';
+
+/**
+ * Filter budget based on filter state
+ */
+export function filterBudget(budgetItems: Budget[], filters: FilterState): Budget[] {
+  return budgetItems.filter(item => {
+    // Year filter (from date range or explicit year if logic existed, but usually implied by filters)
+    // Here we need to map DateRange to years/months.
+    
+    // Simplification: Check if the budget month/year falls within dateRange
+    if (filters.dateRange.start || filters.dateRange.end) {
+      // Construct a date for the budget item (1st of the month)
+      const budgetDate = new Date(item.year, item.month - 1, 1);
+      
+      if (filters.dateRange.start) {
+        // Compare with start of month vs specific date might be tricky, but usually dateRange is 1st of month
+        // Let's be lenient: if budget month overlaps with range
+        if (budgetDate < new Date(filters.dateRange.start.getFullYear(), filters.dateRange.start.getMonth(), 1)) return false;
+      }
+      if (filters.dateRange.end) {
+         if (budgetDate > filters.dateRange.end) return false;
+      }
+    }
+
+    // Month filter
+    if (filters.months && filters.months.length > 0) {
+      if (!filters.months.includes(item.month)) return false;
+    }
+
+    // Target filter
+    if (filters.targets.length > 0 && !filters.targets.includes(item.target)) {
+      return false;
+    }
+
+    // Category filter
+    if (filters.categories.length > 0 && !filters.categories.includes(item.category)) {
+      return false;
+    }
+    
+    return true;
+  });
+}
 
 /**
  * Filter expenses based on filter state
@@ -171,9 +214,9 @@ export function getTargetDistribution(expenses: Expense[]): TargetDistribution[]
   });
   
   const colors = {
-    Living: '#10b981',   // Green
-    Present: '#3b82f6',  // Blue  
-    Future: '#f59e0b'    // Orange
+    Living: '#06b6d4',   // Cyan
+    Present: '#f59e0b',  // Amber
+    Future: '#22c55e'    // Green
   };
   
   return Array.from(targetMap.entries()).map(([target, amount]) => ({
@@ -305,4 +348,51 @@ export function calculateKPIs(expenses: Expense[]): KPIMetrics {
     monthOverMonth,
     totalTransactions: expenses.length
   };
+}
+
+export interface BudgetProgress {
+  total: { spent: number; budget: number; remaining: number; percentage: number };
+  living: { spent: number; budget: number; remaining: number; percentage: number };
+  present: { spent: number; budget: number; remaining: number; percentage: number };
+  future: { spent: number; budget: number; remaining: number; percentage: number };
+}
+
+export function getBudgetProgress(expenses: Expense[], budgetItems: Budget[]): BudgetProgress {
+  const progress: BudgetProgress = {
+    total: { spent: 0, budget: 0, remaining: 0, percentage: 0 },
+    living: { spent: 0, budget: 0, remaining: 0, percentage: 0 },
+    present: { spent: 0, budget: 0, remaining: 0, percentage: 0 },
+    future: { spent: 0, budget: 0, remaining: 0, percentage: 0 }
+  };
+
+  // Calculate spent
+  expenses.forEach(e => {
+    progress.total.spent += e.value;
+    const target = e.target.toLowerCase() as keyof Omit<BudgetProgress, 'total'>;
+    if (progress[target]) {
+      progress[target].spent += e.value;
+    }
+  });
+
+  // Calculate budget
+  budgetItems.forEach(b => {
+    progress.total.budget += b.amount;
+    const target = b.target.toLowerCase() as keyof Omit<BudgetProgress, 'total'>;
+    if (progress[target]) {
+      progress[target].budget += b.amount;
+    }
+  });
+
+  // Calculate remaining and percentage
+  function calc(item: { spent: number; budget: number; remaining: number; percentage: number }) {
+    item.remaining = item.budget - item.spent;
+    item.percentage = item.budget > 0 ? (item.spent / item.budget) * 100 : 0;
+  }
+
+  calc(progress.total);
+  calc(progress.living);
+  calc(progress.present);
+  calc(progress.future);
+
+  return progress;
 }

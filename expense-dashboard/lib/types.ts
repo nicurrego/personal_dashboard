@@ -16,6 +16,14 @@ export interface Expense {
   location: string;
 }
 
+export interface Budget {
+  year: number;
+  month: number;
+  target: 'Living' | 'Present' | 'Future';
+  category: string;
+  amount: number;
+}
+
 export interface FilterState {
   dateRange: {
     start: Date | null;

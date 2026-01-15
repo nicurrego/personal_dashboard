@@ -7,3 +7,4 @@ export { default as BurnRateGaugeD3 } from './BurnRateGaugeD3';
 export { default as DayOfWeekD3 } from './DayOfWeekD3';
 export { default as TopShopsD3 } from './TopShopsD3';
 export { default as SpendingHeatmapD3 } from './SpendingHeatmapD3';
+export { default as BudgetProgressRings } from './BudgetProgressRings';

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Expense, FilterState } from '@/lib/types';
-import { parseCSV, getUniqueValues } from '@/lib/csvParser';
+import { Expense, FilterState, Budget } from '@/lib/types';
+import { parseCSV, parseBudgetCSV, getUniqueValues } from '@/lib/csvParser';
 import { filterExpenses } from '@/lib/dataTransforms';
 
 export interface UniqueFilterValues {
@@ -41,6 +41,7 @@ const initialUniqueValues: UniqueFilterValues = {
  */
 export function useExpenseData() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [budget, setBudget] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
@@ -55,10 +56,21 @@ export function useExpenseData() {
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await fetch('/expenses_combined_english.csv');
-        if (!response.ok) throw new Error('Failed to load expense data');
-        
-        const csvText = await response.text();
+        const [expensesResponse, budgetResponse] = await Promise.all([
+          fetch('/expenses_combined_english.csv'),
+          fetch('/monthly_budget.csv')
+        ]);
+
+        if (!expensesResponse.ok) throw new Error('Failed to load expense data');
+        // Budget is optional, don't crash if missing but try to read
+        let parsedBudget: Budget[] = [];
+        if (budgetResponse.ok) {
+           const budgetText = await budgetResponse.text();
+           parsedBudget = parseBudgetCSV(budgetText);
+           setBudget(parsedBudget);
+        }
+
+        const csvText = await expensesResponse.text();
         const parsedData = parseCSV(csvText);
         
         setExpenses(parsedData);
@@ -169,9 +181,53 @@ export function useExpenseData() {
     }));
   }, [filters.dateRange, filters.months, expenses, timeRangePreset, referenceYear, referenceMonth]);
 
-  // Reset all filters
+  // Save current state as default
+  const saveDefaultView = useCallback(() => {
+    const viewSettings = {
+      filters,
+      timeRangePreset
+    };
+    localStorage.setItem('expense_dashboard_default_view', JSON.stringify(viewSettings));
+    // Optional: Visual feedback could be handled by the UI component
+  }, [filters, timeRangePreset]);
+
+  // Load default on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('expense_dashboard_default_view');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Rehydrate dates
+        if (parsed.filters?.dateRange?.start) parsed.filters.dateRange.start = new Date(parsed.filters.dateRange.start);
+        if (parsed.filters?.dateRange?.end) parsed.filters.dateRange.end = new Date(parsed.filters.dateRange.end);
+        
+        if (parsed.filters) setFilters(parsed.filters);
+        if (parsed.timeRangePreset) setTimeRangePreset(parsed.timeRangePreset);
+      } catch (e) {
+        console.error("Failed to load saved view", e);
+      }
+    }
+  }, []);
+
+  // Reset all filters - now resets to Saved Default if present, otherwise Initial
   const resetFilters = useCallback(() => {
-    setFilters(initialFilters);
+    const saved = localStorage.getItem('expense_dashboard_default_view');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.filters?.dateRange?.start) parsed.filters.dateRange.start = new Date(parsed.filters.dateRange.start);
+        if (parsed.filters?.dateRange?.end) parsed.filters.dateRange.end = new Date(parsed.filters.dateRange.end);
+        
+        setFilters(parsed.filters || initialFilters);
+        setTimeRangePreset(parsed.timeRangePreset || 'month');
+      } catch (e) {
+        setFilters(initialFilters);
+        setTimeRangePreset('month');
+      }
+    } else {
+      setFilters(initialFilters);
+      setTimeRangePreset('month');
+    }
   }, []);
 
   // Count active filters
@@ -194,6 +250,7 @@ export function useExpenseData() {
     filters,
     setFilters,
     resetFilters,
+    saveDefaultView,
     uniqueValues,
     activeFilterCount,
     
@@ -201,6 +258,7 @@ export function useExpenseData() {
     timeRangePreset,
     setTimeRangePreset,
     currentYear: referenceYear,
-    currentMonth: referenceMonth
+    currentMonth: referenceMonth,
+    budget
   };
 }

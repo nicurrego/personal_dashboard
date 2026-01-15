@@ -46,6 +46,40 @@ export function parseCSV(csvText: string): Expense[] {
 }
 
 /**
+ * Parse Budget CSV string into Budget objects
+ */
+export function parseBudgetCSV(csvText: string): import('./types').Budget[] {
+  const lines = csvText.trim().split('\n');
+  const budgetItems: import('./types').Budget[] = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    const values = parseCSVLine(line);
+    if (values.length < 5) continue;
+    
+    try {
+      const budget: import('./types').Budget = {
+        year: parseInt(values[0]) || 0,
+        month: parseInt(values[1]) || 0,
+        target: (values[2] as 'Living' | 'Present' | 'Future') || 'Living',
+        category: values[3] || '',
+        amount: parseFloat(values[4]) || 0 // Assuming budget numbers don't have commas, but if they do: parseFloat(values[4].replace(/,/g, ''))
+      };
+      
+      if (budget.year > 2000 && budget.amount >= 0) {
+        budgetItems.push(budget);
+      }
+    } catch (error) {
+      console.warn(`Failed to parse budget line ${i}:`, error);
+    }
+  }
+  
+  return budgetItems;
+}
+
+/**
  * Parse a single CSV line handling quoted fields
  */
 function parseCSVLine(line: string): string[] {

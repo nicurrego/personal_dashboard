@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 // Lib
 import { 
@@ -8,6 +8,8 @@ import {
   calculateKPIs,
   getTargetDistribution,
   getTopCategories,
+  filterBudget,
+  getBudgetProgress
 } from '@/lib/dataTransforms';
 import { useExpenseData, TimeRangePreset } from '@/lib/hooks/useExpenseData';
 import { CHART_INFO, ChartKey } from '@/lib/constants/chartInfo';
@@ -21,12 +23,14 @@ import { InfoModal, FloatingFilterButton } from '@/components/ui';
 import {
   TargetDonutD3,
   CategoryBarD3,
+  MonthlyTrendD3,
+  SpendingTrendD3,
   BurnRateGaugeD3,
   DayOfWeekD3,
   TopShopsD3,
   SpendingHeatmapD3,
+  BudgetProgressRings
 } from '@/components/charts';
-import SpendingTrendD3 from '@/components/charts/SpendingTrendD3';
 
 interface MainDashboardProps {
   showTransactions?: boolean;
@@ -50,7 +54,9 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
     timeRangePreset,
     setTimeRangePreset,
     currentYear,
-    currentMonth
+    currentMonth,
+    budget,
+    saveDefaultView
   } = useExpenseData();
 
   // UI State
@@ -64,6 +70,22 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const kpiMetrics = calculateKPIs(filteredExpenses);
   const targetDistribution = getTargetDistribution(filteredExpenses);
   const categoryTotals = getTopCategories(filteredExpenses, 10);
+  
+  // Calculate Budget Progress
+  const budgetProgress = useMemo(() => {
+    let baseBudget = budget;
+    // Apply time range filter to budget 
+    // (Note: This mimics the logic in useExpenseData for expenses)
+    if (timeRangePreset === 'month') {
+       baseBudget = budget.filter(b => b.year === currentYear && b.month === currentMonth);
+    } else if (timeRangePreset === 'year') {
+       baseBudget = budget.filter(b => b.year === currentYear);
+    }
+    // Apply other filters if necessary (e.g. Category/Target filters from the filter menu)
+    const filteredBudget = filterBudget(baseBudget, filters);
+    
+    return getBudgetProgress(filteredExpenses, filteredBudget);
+  }, [budget, filteredExpenses, filters, timeRangePreset, currentYear, currentMonth]);
 
   // Loading State
   if (loading) {
@@ -93,57 +115,18 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
               </div>
             </div>
             
-            {/* Time Range Toggle - Full Width Pill Style */}
-            <div className="bg-glass-surface/50 backdrop-blur-sm p-1 rounded-xl border border-white/5">
-              <div className="grid grid-cols-3 gap-1">
-                <button
-                  onClick={() => setTimeRangePreset('month')}
-                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
-                    timeRangePreset === 'month'
-                      ? 'bg-cyber-cyan text-void-black shadow-[0_0_20px_rgba(0,255,255,0.3)]'
-                      : 'text-secondary-text hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {timeRangePreset === 'month' && (
-                    <span className="absolute inset-0 rounded-lg bg-cyber-cyan/20 animate-pulse" />
-                  )}
-                  <span className="relative z-10">Month</span>
-                </button>
-                
-                <button
-                  onClick={() => setTimeRangePreset('year')}
-                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
-                    timeRangePreset === 'year'
-                      ? 'bg-flux-violet text-white shadow-[0_0_20px_rgba(139,92,246,0.4)]'
-                      : 'text-secondary-text hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {timeRangePreset === 'year' && (
-                    <span className="absolute inset-0 rounded-lg bg-flux-violet/20 animate-pulse" />
-                  )}
-                  <span className="relative z-10">Year</span>
-                </button>
-                
-                <button
-                  onClick={() => setTimeRangePreset('all')}
-                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
-                    timeRangePreset === 'all'
-                      ? 'bg-growth-green text-void-black shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                      : 'text-secondary-text hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {timeRangePreset === 'all' && (
-                    <span className="absolute inset-0 rounded-lg bg-growth-green/20 animate-pulse" />
-                  )}
-                  <span className="relative z-10">All</span>
-                </button>
-              </div>
-            </div>
+            {/* Time Range Toggle - Removed as per request */}
+            <div className="h-4" />
           </div>
         </header>
 
         {/* KPI Cards */}
         <KPICards metrics={kpiMetrics} />
+
+        {/* Budget Progress Rings */}
+        <div className="my-4">
+           <BudgetProgressRings progress={budgetProgress} />
+        </div>
         
         {/* Charts Grid */}
         <div className="space-y-4">
@@ -214,33 +197,62 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       />
       
       {/* Reset All Button (visible when filters open) */}
+      {/* Action Buttons (visible when filters open) */}
       {isFilterOpen && (
-        <button
-          onClick={resetFilters}
-          className="liquid-button"
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '96px',
-            zIndex: 9998,
-            padding: '0 20px',
-            height: '56px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(217, 70, 239, 0.2)',
-            border: '2px solid rgba(217, 70, 239, 0.5)',
-            color: '#d946ef',
-            backdropFilter: 'blur(12px)',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '13px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-          }}
-        >
-          Reset all
-        </button>
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '96px',
+          zIndex: 9998,
+          display: 'flex',
+          gap: '12px'
+        }}>
+          <button
+            onClick={saveDefaultView}
+            className="liquid-button"
+            style={{
+              padding: '0 20px',
+              height: '56px',
+              borderRadius: '16px',
+              backgroundColor: 'rgba(34, 197, 94, 0.2)', // Greenish
+              border: '2px solid rgba(34, 197, 94, 0.5)',
+              color: '#22c55e',
+              backdropFilter: 'blur(12px)',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '13px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+            }}
+          >
+            Save View
+          </button>
+          
+          <button
+            onClick={resetFilters}
+            className="liquid-button"
+            style={{
+              padding: '0 20px',
+              height: '56px',
+              borderRadius: '16px',
+              backgroundColor: 'rgba(217, 70, 239, 0.2)',
+              border: '2px solid rgba(217, 70, 239, 0.5)',
+              color: '#d946ef',
+              backdropFilter: 'blur(12px)',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '13px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+            }}
+          >
+            Reset all
+          </button>
+        </div>
       )}
 
       {/* Filter Accordion */}
@@ -252,6 +264,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           order={filterOrder}
           setOrder={setFilterOrder}
           onClose={() => setIsFilterOpen(false)}
+          setTimeRangePreset={setTimeRangePreset}
         />
       )}
 
