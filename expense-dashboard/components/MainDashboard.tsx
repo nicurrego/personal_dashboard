@@ -4,12 +4,12 @@ import { useState } from 'react';
 
 // Lib
 import { 
-  aggregateByMonth, 
+  aggregateTrendData, 
   calculateKPIs,
   getTargetDistribution,
   getTopCategories,
 } from '@/lib/dataTransforms';
-import { useExpenseData } from '@/lib/hooks/useExpenseData';
+import { useExpenseData, TimeRangePreset } from '@/lib/hooks/useExpenseData';
 import { CHART_INFO, ChartKey } from '@/lib/constants/chartInfo';
 
 // Components
@@ -19,7 +19,6 @@ import ExpandedChartOverlay from '@/components/dashboard/ExpandedChartOverlay';
 import { FilterAccordion } from '@/components/filters';
 import { InfoModal, FloatingFilterButton } from '@/components/ui';
 import {
-  MonthlyTrendD3,
   TargetDonutD3,
   CategoryBarD3,
   BurnRateGaugeD3,
@@ -27,6 +26,7 @@ import {
   TopShopsD3,
   SpendingHeatmapD3,
 } from '@/components/charts';
+import SpendingTrendD3 from '@/components/charts/SpendingTrendD3';
 
 interface MainDashboardProps {
   showTransactions?: boolean;
@@ -39,7 +39,6 @@ interface MainDashboardProps {
  * Uses the useExpenseData hook for all data management.
  */
 export default function MainDashboard({ showTransactions = true }: MainDashboardProps) {
-  // Data & Filters from custom hook
   const {
     filteredExpenses,
     loading,
@@ -47,7 +46,11 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
     setFilters,
     resetFilters,
     uniqueValues,
-    activeFilterCount
+    activeFilterCount,
+    timeRangePreset,
+    setTimeRangePreset,
+    currentYear,
+    currentMonth
   } = useExpenseData();
 
   // UI State
@@ -57,7 +60,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const [filterOrder, setFilterOrder] = useState(['location', 'category', 'shop', 'target', 'month', 'year']);
 
   // Derived Data (computed from filtered expenses)
-  const monthlyData = aggregateByMonth(filteredExpenses);
+  const { data: trendData, granularity } = aggregateTrendData(filteredExpenses);
   const kpiMetrics = calculateKPIs(filteredExpenses);
   const targetDistribution = getTargetDistribution(filteredExpenses);
   const categoryTotals = getTopCategories(filteredExpenses, 10);
@@ -76,11 +79,67 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Header */}
-        <header className="mb-4">
-          <h1 className="text-xl font-bold text-white tracking-wide uppercase">Dashboard</h1>
-          <p className="text-xs text-secondary-text font-mono">
-            {filteredExpenses.length} records
-          </p>
+        <header className="mb-6">
+          <div className="flex flex-col gap-4">
+            {/* Title Row */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold text-white tracking-wide uppercase">Dashboard</h1>
+                <p className="text-xs text-secondary-text font-mono">
+                  {filteredExpenses.length} records
+                  {timeRangePreset === 'month' && ` • ${currentYear}/${String(currentMonth).padStart(2, '0')}`}
+                  {timeRangePreset === 'year' && ` • ${currentYear}`}
+                </p>
+              </div>
+            </div>
+            
+            {/* Time Range Toggle - Full Width Pill Style */}
+            <div className="bg-glass-surface/50 backdrop-blur-sm p-1 rounded-xl border border-white/5">
+              <div className="grid grid-cols-3 gap-1">
+                <button
+                  onClick={() => setTimeRangePreset('month')}
+                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
+                    timeRangePreset === 'month'
+                      ? 'bg-cyber-cyan text-void-black shadow-[0_0_20px_rgba(0,255,255,0.3)]'
+                      : 'text-secondary-text hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {timeRangePreset === 'month' && (
+                    <span className="absolute inset-0 rounded-lg bg-cyber-cyan/20 animate-pulse" />
+                  )}
+                  <span className="relative z-10">Month</span>
+                </button>
+                
+                <button
+                  onClick={() => setTimeRangePreset('year')}
+                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
+                    timeRangePreset === 'year'
+                      ? 'bg-flux-violet text-white shadow-[0_0_20px_rgba(139,92,246,0.4)]'
+                      : 'text-secondary-text hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {timeRangePreset === 'year' && (
+                    <span className="absolute inset-0 rounded-lg bg-flux-violet/20 animate-pulse" />
+                  )}
+                  <span className="relative z-10">Year</span>
+                </button>
+                
+                <button
+                  onClick={() => setTimeRangePreset('all')}
+                  className={`relative py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
+                    timeRangePreset === 'all'
+                      ? 'bg-growth-green text-void-black shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                      : 'text-secondary-text hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {timeRangePreset === 'all' && (
+                    <span className="absolute inset-0 rounded-lg bg-growth-green/20 animate-pulse" />
+                  )}
+                  <span className="relative z-10">All</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </header>
 
         {/* KPI Cards */}
@@ -89,9 +148,10 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
         {/* Charts Grid */}
         <div className="space-y-4">
           
-          {/* Monthly Trend - Full Width */}
-          <MonthlyTrendD3 
-            data={monthlyData} 
+          {/* Spending Trend - Full Width (adaptive: daily for 1 month, monthly for longer) */}
+          <SpendingTrendD3 
+            data={trendData}
+            granularity={granularity}
             onExpand={() => setExpandedChart('monthly')}
             onInfo={() => setInfoChart('monthly')}
           />
@@ -198,7 +258,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       {/* Expanded Chart Overlay */}
       {expandedChart && (
         <ExpandedChartOverlay onClose={() => setExpandedChart(null)}>
-          {expandedChart === 'monthly' && <MonthlyTrendD3 data={monthlyData} isExpanded onInfo={() => setInfoChart('monthly')} />}
+          {expandedChart === 'monthly' && <SpendingTrendD3 data={trendData} granularity={granularity} isExpanded onInfo={() => setInfoChart('monthly')} />}
           {expandedChart === 'donut' && <TargetDonutD3 data={targetDistribution} isExpanded onInfo={() => setInfoChart('donut')} />}
           {expandedChart === 'bar' && <CategoryBarD3 data={categoryTotals} isExpanded onInfo={() => setInfoChart('bar')} />}
           {expandedChart === 'burn' && <BurnRateGaugeD3 spent={kpiMetrics.totalSpent} budget={500000} isExpanded onInfo={() => setInfoChart('burn')} />}

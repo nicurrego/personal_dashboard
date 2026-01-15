@@ -38,6 +38,16 @@ export interface MonthlyData {
   future: number;
 }
 
+// Unified trend data point that works for both daily and monthly views
+export interface TrendDataPoint {
+  label: string;
+  date: Date;
+  total: number;
+  living: number;
+  present: number;
+  future: number;
+}
+
 export interface CategoryTotal {
   category: string;
   total: number;

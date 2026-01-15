@@ -47,16 +47,16 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
     const tooltip = createTooltip(container);
 
     // --- COLORS (Gradient) ---
-    // User wants bars to "reveal" the gradient based on their height.
-    // userSpaceOnUse allows the gradient to span the full chart height.
+    // Use objectBoundingBox so each bar gets its own gradient from bottom to top
+    // This works correctly even after CSS rotation since it's relative to each shape
     const defs = svg.append('defs');
     const gradient = defs.append('linearGradient')
       .attr('id', 'dayHeatGradient')
-      .attr('gradientUnits', 'userSpaceOnUse')
-      .attr('x1', 0)
-      .attr('y1', height) // Start at bottom (0 value)
-      .attr('x2', 0)
-      .attr('y2', 0);     // End at top (Max value)
+      .attr('gradientUnits', 'objectBoundingBox')
+      .attr('x1', '0%')
+      .attr('y1', '100%')  // Start at bottom of each bar
+      .attr('x2', '0%')
+      .attr('y2', '0%');   // End at top of each bar
 
     gradient.append('stop').attr('offset', '0%').attr('stop-color', '#1f2937');
     gradient.append('stop').attr('offset', '20%').attr('stop-color', '#06b6d4');
