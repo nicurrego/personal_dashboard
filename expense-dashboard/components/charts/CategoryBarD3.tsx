@@ -129,9 +129,9 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function(event, d: any, i) {
+      .on('mouseout', function(event, d) {
         // Restore gradient color
-        const index = data.findIndex(item => item.category === d.category);
+        const index = data.findIndex(item => item.category === (d as { category: string }).category);
         
         d3.select(this)
           .transition()

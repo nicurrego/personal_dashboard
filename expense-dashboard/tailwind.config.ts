@@ -8,6 +8,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
         // User Requested Palette
         'trust-navy': '#171717',    // Backgrounds, Cards
         'growth-green': '#22c55e',  // Future items, Text, Icons
@@ -16,11 +17,12 @@ const config: Config = {
         'laser-magenta': '#d946ef', // Critical, Issues
         'flux-violet': '#8B5CF6',   // Source, Income, Attention
         
-        // Legacy/Liquid Glass (remapped or kept for compatibility if needed)
+        // Legacy/Liquid Glass (remapped or kept for compatibility)
         'void-black': '#000000',
         'glass-surface': '#1C1C1E',
         'card-surface': '#2C2C2E',
         'secondary-text': '#8E8E93',
+      },
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
       },

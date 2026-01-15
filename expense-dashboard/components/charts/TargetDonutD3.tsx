@@ -96,7 +96,7 @@ export default function TargetDonutD3({ data, onExpand, onInfo, isExpanded = fal
       d3.select(this)
         .transition()
         .duration(200)
-        .attr('d', arcHover);
+        .attr('d', arcHover as any);
         
       tooltip
         .html(`
@@ -119,7 +119,7 @@ export default function TargetDonutD3({ data, onExpand, onInfo, isExpanded = fal
       d3.select(this)
         .transition()
         .duration(200)
-        .attr('d', arc);
+        .attr('d', arc as any);
         
       tooltip.style('visibility', 'hidden');
       

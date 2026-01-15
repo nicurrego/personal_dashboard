@@ -35,8 +35,8 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
     }
   };
 
-  const handleMultiSelect = (field: keyof Omit<FilterState, 'dateRange'>, value: string) => {
-    const current = filters[field];
+  const handleMultiSelect = (field: keyof Omit<FilterState, 'dateRange' | 'months'>, value: string) => {
+    const current = filters[field] as string[];
     const newValues = current.includes(value)
       ? current.filter(v => v !== value)
       : [...current, value];
@@ -71,12 +71,12 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
         <button 
           onClick={() => onChange({
             dateRange: { start: null, end: null },
-            years: [],
             months: [],
             targets: [],
             categories: [],
             locations: [],
-            methods: []
+            methods: [],
+            shops: []
           })}
           className="text-xs font-bold text-electric-orange hover:text-white uppercase tracking-wider transition-colors"
         >

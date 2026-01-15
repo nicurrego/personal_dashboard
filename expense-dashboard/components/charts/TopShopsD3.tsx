@@ -110,9 +110,9 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
       .style('fill', '#e5e7eb')
       .style('font-size', '11px')
       .style('text-anchor', 'end')
-      .text((d: string) => {
-        // Truncate logic
-        return d.length > 15 && !isExpanded ? d.substring(0, 14) + '...' : d;
+      .text((d: unknown) => {
+        const shop = d as string;
+        return shop.length > 15 && !isExpanded ? shop.substring(0, 14) + '...' : shop;
       });
 
     // Label Values (on the right of bar)
