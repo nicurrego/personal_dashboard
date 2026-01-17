@@ -46,33 +46,33 @@ export const BUDGET_GROUPS: Record<BudgetGroupType, {
 
 export const DEFAULT_CATEGORIES: BudgetCategoryDef[] = [
   // FUTURE (Green)
-  { id: 'emergency', name: 'Emergency Fund', group: 'FUTURE', word: 'Safety', emoji: '🚨💰🏦' },
-  { id: 'retirement', name: 'Retirement Accounts', group: 'FUTURE', word: 'Future', emoji: '👴⏳📈' },
-  { id: 'investments', name: 'Other Investments', group: 'FUTURE', word: 'Growth', emoji: '🪴📊🚀' },
-  { id: 'debt', name: 'Debt Repayment', group: 'FUTURE', word: 'Freedom', emoji: '⛓️✂️🎉' },
-  { id: 'goals', name: 'Goals Fund', group: 'FUTURE', word: 'Target', emoji: '🎯⛰️🏆' },
-  { id: 'insurance', name: 'Insurance', group: 'FUTURE', word: 'Protection', emoji: '🛡️📑☂️' },
-  { id: 'skills', name: 'Skill-Building', group: 'FUTURE', word: 'Mastery', emoji: '🧠🛠️💎' },
+  { id: 'emergency', name: '🚨 Emergency Fund', group: 'FUTURE', word: 'Emergency Fund', emoji: '🚨' },
+  { id: 'retirement', name: '🧓 Retirement Accounts', group: 'FUTURE', word: 'Retirement', emoji: '🧓' },
+  { id: 'investments', name: '📈 Other Investments', group: 'FUTURE', word: 'Investments', emoji: '📈' },
+  { id: 'debt', name: '🔗 Debt Repayment', group: 'FUTURE', word: 'Debt Repayment', emoji: '🔗' },
+  { id: 'goals', name: '🎯 Goals Fund', group: 'FUTURE', word: 'Goals', emoji: '🎯' },
+  { id: 'insurance', name: '🛡️ Insurance', group: 'FUTURE', word: 'Insurance', emoji: '🛡️' },
+  { id: 'skills', name: '🧠 Skill-Building', group: 'FUTURE', word: 'Skills', emoji: '🧠' },
 
   // LIVING (Blue)
-  { id: 'housing', name: 'Housing', group: 'LIVING', word: 'Shelter', emoji: '🏠🔑🕯️' },
-  { id: 'utilities', name: 'Utilities & Services', group: 'LIVING', word: 'Basics', emoji: '⚡🚰🌐' },
-  { id: 'food', name: 'Food', group: 'LIVING', word: 'Fuel', emoji: '🛒🍎🍱' },
-  { id: 'transport', name: 'Transportation', group: 'LIVING', word: 'Transit', emoji: '🚗⛽🚇' },
-  { id: 'health', name: 'Healthcare', group: 'LIVING', word: 'Wellness', emoji: '🩺💊🩹' },
-  { id: 'personal_care', name: 'Basic Personal Care', group: 'LIVING', word: 'Hygiene', emoji: '🧼🪒🧴' },
+  { id: 'housing', name: '🏠 Housing', group: 'LIVING', word: 'Housing', emoji: '🏠' },
+  { id: 'utilities', name: '🔌 Utilities & Services', group: 'LIVING', word: 'Utilities', emoji: '🔌' },
+  { id: 'food', name: '🍽️ Food', group: 'LIVING', word: 'Food', emoji: '🍽️' },
+  { id: 'transport', name: '🚆 Transportation', group: 'LIVING', word: 'Transportation', emoji: '🚆' },
+  { id: 'health', name: '⚕️ Healthcare', group: 'LIVING', word: 'Healthcare', emoji: '⚕️' },
+  { id: 'personal_care', name: '🧼 Basic Personal Care', group: 'LIVING', word: 'Personal Care', emoji: '🧼' },
 
   // PRESENT (Red)
-  { id: 'enjoyment', name: 'Enjoyment & Social Life', group: 'PRESENT', word: 'Fun', emoji: '🥂🍕🎊' },
-  { id: 'development', name: 'Personal Development', group: 'PRESENT', word: 'Evolution', emoji: '📖🌱🧘' },
-  { id: 'travel', name: 'Travel & Experiences', group: 'PRESENT', word: 'Adventure', emoji: '✈️🗺️📸' },
-  { id: 'hobbies', name: 'Hobbies & Leisure', group: 'PRESENT', word: 'Play', emoji: '🎨🎸🕹️' },
-  { id: 'subscriptions', name: 'Subscriptions', group: 'PRESENT', word: 'Access', emoji: '🔄📱🍿' },
-  { id: 'life_happens', name: '"Life Happens" Fund', group: 'PRESENT', word: 'Buffer', emoji: '🩹🌊🧘' },
+  { id: 'enjoyment', name: '🥂 Enjoyment & Social Life', group: 'PRESENT', word: 'Social Life', emoji: '🥂' },
+  { id: 'development', name: '🌱 Personal Development', group: 'PRESENT', word: 'Development', emoji: '🌱' },
+  { id: 'travel', name: '✈️ Travel & Experiences', group: 'PRESENT', word: 'Travel', emoji: '✈️' },
+  { id: 'hobbies', name: '🎨 Hobbies & Leisure', group: 'PRESENT', word: 'Hobbies', emoji: '🎨' },
+  { id: 'subscriptions', name: '📦 Subscriptions', group: 'PRESENT', word: 'Subscriptions', emoji: '📦' },
+  { id: 'life_happens', name: '🌧️ “Life Happens” Fund', group: 'PRESENT', word: 'Life Fund', emoji: '🌧️' },
 ];
 
 export const INCOME_CATEGORIES: BudgetCategoryDef[] = [
-  { id: 'salary', name: 'Main Income / Salary', group: 'INCOME', word: 'Salary', emoji: '💸💼👔' },
-  { id: 'freelance', name: 'Freelance / Side Gig', group: 'INCOME', word: 'Hustle', emoji: '💻⚡🔋' },
-  { id: 'extra', name: 'Extra / Bonus', group: 'INCOME', word: 'Bonus', emoji: '🎁✨💰' },
+  { id: 'salary', name: 'Main Income / Salary', group: 'INCOME', word: 'Main Income', emoji: '💸' },
+  { id: 'freelance', name: 'Freelance / Side Gig', group: 'INCOME', word: 'Freelance', emoji: '💻' },
+  { id: 'extra', name: 'Extra / Bonus', group: 'INCOME', word: 'Extra', emoji: '🎁' },
 ];

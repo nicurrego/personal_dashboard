@@ -44,7 +44,7 @@ export function ToolsFab({
   return (
     <div
       className="fixed z-50 pointer-events-auto transition-all duration-200 right-6"
-      style={{ bottom: bottomOffset > 0 ? `${bottomOffset + 64}px` : '1.5rem' }}
+      style={{ bottom: bottomOffset > 0 ? `${bottomOffset + 80}px` : '6rem' }}
     >
       <Popover>
         <PopoverTrigger asChild>

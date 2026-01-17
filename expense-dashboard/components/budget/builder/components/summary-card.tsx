@@ -74,7 +74,7 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
   };
 
   return (
-    <div className="bg-black/40 backdrop-blur-xl border border-white/10 -mx-4 sm:-mx-6 lg:-mx-8 -mt-4 sm:-mt-6 lg:-mt-8 px-6 sm:px-10 pt-8 pb-8 rounded-b-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] sticky top-[64px] z-40 relative overflow-hidden">
+    <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-6 sm:px-10 pt-8 pb-8 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
       {/* Ambient Background Glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2 opacity-100" />
 

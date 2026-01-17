@@ -1,18 +1,8 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Save, Undo, Redo, RotateCcw, Check, Lightbulb, BarChart3, GripVertical, ChevronDown, History, Settings, Eye } from 'lucide-react';
+import { Save, Undo, Redo, RotateCcw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import { useHeader } from '@/components/header-context';
 
 // Local imports
 import { BUDGET_GROUPS } from './constants';
@@ -20,7 +10,7 @@ import { useBudgetData } from './hooks/use-budget-data';
 import { useCategories } from './hooks/use-categories';
 import { useMobileEdit } from './hooks/use-mobile-edit';
 import { formatMoney, triggerHaptic, parseCurrencyInput } from './utils/formatters';
-import type { AlertModalState, SelectedCell } from './types';
+import type { AlertModalState } from './types';
 import type { ChartType } from './components/charts/types';
 import type { BudgetPercentages } from './components/summary-card';
 
@@ -39,12 +29,12 @@ import {
 } from './components';
 
 interface BudgetSpreadsheetProps {
-  onSave: (data: any) => void;
+  onSave: (payload: { data: Record<string, number>, viewMode: string }) => void;
   isLoading: boolean;
   headerActions?: React.ReactNode;
 }
 
-export default function BudgetSpreadsheet({ onSave, isLoading }: BudgetSpreadsheetProps) {
+export default function BudgetSpreadsheet({ onSave, isLoading, headerActions }: BudgetSpreadsheetProps) {
   // Core data management
   const budgetData = useBudgetData();
   const {
@@ -118,7 +108,6 @@ export default function BudgetSpreadsheet({ onSave, isLoading }: BudgetSpreadshe
   const isResizingRef = useRef(false);
   const resizeStartXRef = useRef(0);
   const resizeStartWidthRef = useRef(0);
-  const { setActions, setCenterContent } = useHeader();
   
   const startDate = useMemo(() => new Date(), []);
 
@@ -194,202 +183,75 @@ export default function BudgetSpreadsheet({ onSave, isLoading }: BudgetSpreadshe
   }, []);
 
   // Header actions
-  useEffect(() => {
-    // Handler for Auto-Fill Toggle
-    const handleAutoCompleteToggle = () => {
-      const newValue = !isAutoComplete;
-      const action = newValue ? 'enable' : 'disable';
-      
-      handleConfirmAction(
-        `${newValue ? 'Enable' : 'Disable'} Auto-Fill for All Rows?`,
-        `This will ${action} auto-fill for ALL budget categories.`,
-        () => {
-          setAllRowsAutoComplete(newValue);
-          triggerHaptic();
-        }
-      );
-    };
+  // Header actions - Local Implementation
 
-
-
-    // 1. Center Content (The Toolbar - Now includes Save)
-    setCenterContent(
-      <div className="hidden lg:flex items-center gap-4">
-        {/* === WIDE SCREEN VIEW (XL+) - Full Inline Toolbar === */}
-        <div className="hidden xl:flex items-center gap-1">
-          {/* History Group */}
-          <div className="flex items-center gap-0.5 pr-2 border-r border-white/10">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button onClick={handleUndo} disabled={!canUndo} className={`p-2 rounded transition-colors ${!canUndo ? 'text-slate-700' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
-                    <Undo className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent><p>Undo (Ctrl+Z)</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button onClick={handleRedo} disabled={!canRedo} className={`p-2 rounded transition-colors ${!canRedo ? 'text-slate-700' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
-                    <Redo className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent><p>Redo (Ctrl+Y)</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button onClick={handleReset} className="p-2 rounded text-slate-400 hover:text-red-400 hover:bg-white/5 transition-colors">
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent><p>Start Again</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          {/* Settings Group */}
-          <div className="flex items-center gap-1 px-2 border-r border-white/10">
-            <button onClick={handleAutoCompleteToggle} className={`h-8 px-2 gap-2 text-xs font-medium rounded flex items-center transition-colors ${isAutoComplete ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
-              <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${isAutoComplete ? 'border-purple-500 text-purple-500' : 'border-slate-500'}`}>
-                {isAutoComplete && <Check className="w-2.5 h-2.5" />}
-              </div>
-              Auto-Fill
+  // Render the Toolbar (previously in global header)
+  const Toolbar = (
+    <div className="flex items-center gap-1">
+      {/* History Actions - Icons Only */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button onClick={handleUndo} disabled={!canUndo} className={`p-2 rounded-full transition-colors ${!canUndo ? 'text-slate-700' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}>
+              <Undo className="w-5 h-5" />
             </button>
-            <button onClick={() => { setIsTotalFixed(!isTotalFixed); triggerHaptic(); }} className={`h-8 px-2 gap-2 text-xs font-medium rounded flex items-center transition-colors ${isTotalFixed ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
-              <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${isTotalFixed ? 'border-purple-500 text-purple-500' : 'border-slate-500'}`}>
-                {isTotalFixed && <Check className="w-2.5 h-2.5" />}
-              </div>
-              Sticky Total
+          </TooltipTrigger>
+          <TooltipContent><p>Undo (Ctrl+Z)</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button onClick={handleRedo} disabled={!canRedo} className={`p-2 rounded-full transition-colors ${!canRedo ? 'text-slate-700' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}>
+              <Redo className="w-5 h-5" />
             </button>
-          </div>
+          </TooltipTrigger>
+          <TooltipContent><p>Redo (Ctrl+Y)</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-          {/* View Group */}
-          <div className="flex items-center gap-1 pl-1">
-            <button onClick={() => { setViewModeOpen(true); triggerHaptic(); }} className="h-8 px-2 gap-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded flex items-center transition-colors">
-              <BarChart3 className="h-4 w-4" /> View Mode
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button onClick={handleReset} className="p-2 rounded-full text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors">
+              <RotateCcw className="w-5 h-5" />
             </button>
-            <button onClick={() => { setTipsOpen(true); triggerHaptic(); }} className="h-8 px-2 gap-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded flex items-center transition-colors">
-              <Lightbulb className="h-4 w-4" /> Tips
+          </TooltipTrigger>
+          <TooltipContent><p>Reset Budget</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      {/* Save Button - Icon Only */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => {
+                triggerHaptic();
+                onSave({ data, viewMode });
+                setHasChanges(false);
+              }}
+              disabled={isLoading}
+              className={`p-2 rounded-full transition-all flex items-center justify-center ml-2 ${
+                  hasChanges 
+                      ? 'text-black bg-growth-green hover:bg-growth-green/90 shadow-[0_0_15px_rgba(34,197,94,0.3)]' 
+                      : 'text-slate-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save className="w-5 h-5" />
+              )}
             </button>
-          </div>
-        </div>
+          </TooltipTrigger>
+          <TooltipContent><p>{hasChanges ? 'Save Changes' : 'Saved'}</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
 
-        {/* === COMPACT DESKTOP VIEW (LG to <XL) - Dropdowns === */}
-        <div className="flex xl:hidden items-center gap-2">
-          {/* History Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition-colors">
-                <History className="w-3.5 h-3.5" />
-                History
-                <ChevronDown className="w-3 h-3 opacity-50" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-48 bg-zinc-900 border-white/10">
-              <DropdownMenuLabel>History Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem onClick={handleUndo} disabled={!canUndo} className="gap-2 cursor-pointer">
-                <Undo className="w-4 h-4" /> Undo <span className="ml-auto text-xs text-muted-foreground">Ctrl+Z</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRedo} disabled={!canRedo} className="gap-2 cursor-pointer">
-                <Redo className="w-4 h-4" /> Redo <span className="ml-auto text-xs text-muted-foreground">Ctrl+Y</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem onClick={handleReset} className="gap-2 text-red-400 focus:text-red-400 cursor-pointer">
-                <RotateCcw className="w-4 h-4" /> Reset Budget
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Settings Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition-colors">
-                <Settings className="w-3.5 h-3.5" />
-                Settings
-                <ChevronDown className="w-3 h-3 opacity-50" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-56 bg-zinc-900 border-white/10">
-              <DropdownMenuLabel>Editor Settings</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuCheckboxItem 
-                checked={isAutoComplete} 
-                onCheckedChange={handleAutoCompleteToggle}
-                className="gap-2 cursor-pointer"
-              >
-                <span className="flex-1">Auto-Fill All Rows</span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={isTotalFixed} 
-                onCheckedChange={() => { setIsTotalFixed(!isTotalFixed); triggerHaptic(); }}
-                className="gap-2 cursor-pointer"
-              >
-                 <span className="flex-1">Sticky Total Column</span>
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* View Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition-colors">
-                <Eye className="w-3.5 h-3.5" />
-                View
-                <ChevronDown className="w-3 h-3 opacity-50" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-48 bg-zinc-900 border-white/10">
-              <DropdownMenuLabel>View Options</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem onClick={() => { setViewModeOpen(true); triggerHaptic(); }} className="gap-2 cursor-pointer">
-                <BarChart3 className="w-4 h-4" /> Change View Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { setTipsOpen(true); triggerHaptic(); }} className="gap-2 cursor-pointer">
-                <Lightbulb className="w-4 h-4" /> Budget Tips
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Save Button - Always Visible at the end of the group */}
-        <div className="h-6 w-px bg-white/10 mx-2" />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => {
-                  triggerHaptic();
-                  onSave({ data, viewMode });
-                  setHasChanges(false);
-                }}
-                disabled={isLoading}
-                className={`p-2 transition-colors rounded hover:bg-white/5 ${hasChanges ? 'text-flux-violet' : 'text-slate-400 hover:text-white'} ${isLoading ? 'animate-pulse' : ''}`}
-              >
-                {isLoading ? <span className="animate-spin text-flux-violet mr-2">⏳</span> : <Save className="w-5 h-5" />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent><p>{isLoading ? 'Saving...' : 'Save Changes'}</p></TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    );
-
-    // Clear right-side actions
-    setActions(null);
-
-  }, [
-    data, viewMode, hasChanges, isLoading, onSave, setActions, setCenterContent, canUndo, canRedo, 
-    handleUndo, handleRedo, handleReset, setHasChanges, 
-    isAutoComplete, isTotalFixed, handleConfirmAction, setAllRowsAutoComplete, 
-    setIsTotalFixed, setViewModeOpen, setTipsOpen
-  ]);
 
   // Handle cell value changes
   const handleCellChange = useCallback((categoryId: string, colIndex: number, span: number, newValue: string) => {
@@ -559,18 +421,43 @@ export default function BudgetSpreadsheet({ onSave, isLoading }: BudgetSpreadshe
   );
 
   return (
-    <div className={`relative min-h-screen space-y-10 animate-in fade-in duration-500 pb-4 ${isAnyModalOpen ? 'pointer-events-none select-none' : ''}`}>
+    <div className={`relative space-y-10 pb-48 ${isAnyModalOpen ? 'pointer-events-none select-none' : ''}`}>
       
-      {/* Summary Card */}
-      <SummaryCard
-        totals={summaryTotals}
-        onExplanationOpen={(percentages) => {
-          setExplanationPercentages(percentages);
-          setExplanationOpen(true);
-        }}
-        onGraphOpen={() => setGraphOpen(true)}
-        selectedChartType={selectedChartType}
-      />
+      {/* Fixed Header + Summary Card */}
+      <div className="fixed top-0 left-0 right-0 z-[90] bg-void-black/95 backdrop-blur-xl border-b border-white/5">
+        {/* Header Bar */}
+        <div className="flex flex-row items-center justify-between gap-4 px-4 py-2">
+          <div className="flex items-center gap-4 w-auto max-w-[1600px] mx-auto flex-1">
+            <div className="flex items-center gap-4">
+              {headerActions && <div>{headerActions}</div>}
+            </div>
+            <div className="flex-1" />
+            <div className="flex justify-end">
+              {Toolbar}
+            </div>
+          </div>
+        </div>
+        
+        {/* Summary Card - Attached to header */}
+        <div className="px-4 pb-4 max-w-[1600px] mx-auto">
+          <SummaryCard
+            totals={summaryTotals}
+            onExplanationOpen={(percentages) => {
+              triggerHaptic();
+              setExplanationPercentages(percentages);
+              setExplanationOpen(true);
+            }}
+            onGraphOpen={() => {
+              triggerHaptic();
+              setGraphOpen(true);
+            }}
+            selectedChartType={selectedChartType}
+          />
+        </div>
+      </div>
+
+      {/* Spacer for fixed header + summary card */}
+      <div className="h-[220px] sm:h-[200px]" />
 
 
       {/* Budget Sections */}

@@ -1,28 +1,28 @@
 export const DEFAULT_CATEGORIES = {
   Future: [
-    'Emergency Fund',
-    'Retirement Accounts',
-    'Other Investments',
-    'Debt Repayment',
-    'Goals Fund',
-    'Insurance',
-    'Skill-Building'
+    '🚨 Emergency Fund',
+    '🧓 Retirement Accounts',
+    '📈 Other Investments',
+    '🔗 Debt Repayment',
+    '🎯 Goals Fund',
+    '🛡️ Insurance',
+    '🧠 Skill-Building'
   ],
   Living: [
-    'Housing',
-    'Utilities & Services',
-    'Food',
-    'Transportation',
-    'Healthcare',
-    'Basic Personal Care'
+    '🏠 Housing',
+    '🔌 Utilities & Services',
+    '🍽️ Food',
+    '🚆 Transportation',
+    '⚕️ Healthcare',
+    '🧼 Basic Personal Care'
   ],
   Present: [
-    'Enjoyment & Social Life',
-    'Personal Development',
-    'Travel & Experiences',
-    'Hobbies & Leisure',
-    'Subscriptions',
-    '“Life Happens” Fund'
+    '🥂 Enjoyment & Social Life',
+    '🌱 Personal Development',
+    '✈️ Travel & Experiences',
+    '🎨 Hobbies & Leisure',
+    '📦 Subscriptions',
+    '🌧️ “Life Happens” Fund'
   ]
 } as const;
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
+import { Edit } from 'lucide-react';
 
 interface BudgetRow {
   Year: number;
@@ -16,6 +17,7 @@ const TARGET_COLORS: Record<string, { bg: string; text: string; border: string }
   Future: { bg: 'bg-growth-green/10', text: 'text-growth-green', border: 'border-growth-green' },
   Living: { bg: 'bg-cyber-cyan/10', text: 'text-cyber-cyan', border: 'border-cyber-cyan' },
   Present: { bg: 'bg-alert-amber/10', text: 'text-alert-amber', border: 'border-alert-amber' },
+  Income: { bg: 'bg-flux-violet/10', text: 'text-white', border: 'border-white/20' }, 
 };
 
 const TARGET_ORDER: TargetType[] = ['Future', 'Living', 'Present'];
@@ -23,7 +25,6 @@ const TARGET_ORDER: TargetType[] = ['Future', 'Living', 'Present'];
 export default function BudgetPage() {
   const [data, setData] = useState<BudgetRow[]>([]);
   const [loading, setLoading] = useState(true);
-  // Default to current year
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [expandedTargets, setExpandedTargets] = useState<Record<string, boolean>>({
     Future: true,
@@ -48,7 +49,6 @@ export default function BudgetPage() {
         }));
         
         setData(parsed);
-        // If we have data, we might want to switch year, but defaulting to current is safer for empty state
         if (parsed.length > 0) {
           const years = [...new Set(parsed.map(d => d.Year))].sort();
           if (years.includes(new Date().getFullYear())) {
@@ -66,12 +66,10 @@ export default function BudgetPage() {
     loadData();
   }, []);
 
-  // Use available years from data OR just current year if empty
   const dataYears = [...new Set(data.map(d => d.Year))].sort();
   const years = dataYears.length > 0 ? dataYears : [new Date().getFullYear()];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  // Filter data for selected year
   const filteredData = data.filter(d => d.Year === selectedYear);
   
   const getCategoryRowData = (category: string) => {
@@ -85,21 +83,42 @@ export default function BudgetPage() {
     return row;
   };
 
-  // Calculate totals based on DEFAULT categories + actual data
-  // Logic: Iterate default categories, find their values.
-  const getTargetTotal = (target: TargetType) => {
-    const categories = DEFAULT_CATEGORIES[target];
-    return categories.reduce((total, category) => {
-        const rowData = getCategoryRowData(category);
-        return total + rowData.Total;
-    }, 0);
+  const getTargetTotal = (target: string) => {
+    // If it's a standard target, use DEFAULT_CATEGORIES to ensure order, but also check data for custom ones?
+    // For now, rely on filteredData matching the target string.
+    return filteredData
+      .filter(d => d.Target === target)
+      .reduce((sum, d) => sum + d.Budget, 0);
   };
 
-  const formatCurrency = (val: number) => `¥${val.toLocaleString()}`;
+  const formatCurrency = (val: number) => `¥${Math.round(val).toLocaleString()}`; // Removed decimals for cleaner look
 
   const toggleTarget = (target: string) => {
     setExpandedTargets(prev => ({ ...prev, [target]: !prev[target] }));
   };
+
+  // Calculations for Summary Cards
+  const totalIncome = getTargetTotal('Income');
+  const livingTotal = getTargetTotal('Living');
+  const futureTotal = getTargetTotal('Future');
+  const presentTotal = getTargetTotal('Present');
+  
+  // Logic: 
+  // Fixed Costs = Living
+  // Discretionary Income = Total Income - Fixed Costs (If Income exists). 
+  // IF Income is 0 (not set), maybe assume Discretionary = Future + Present?
+  // Let's stick to the visual: "Available for categories".
+  const fixedCosts = livingTotal;
+  const discretionaryIncome = totalIncome > 0 ? (totalIncome - fixedCosts) : (futureTotal + presentTotal);
+  
+  // For Allocation bars:
+  const allAllocationCategories = [
+    ...DEFAULT_CATEGORIES.Future.map(c => ({ name: c, target: 'Future' })),
+    ...DEFAULT_CATEGORIES.Present.map(c => ({ name: c, target: 'Present' })),
+    // Add Living too? Only if user wants to see all allocations. 
+    // The previous app showed allocations for discretionary spending usually.
+    // Let's show specific categories from Future & Present as "Allocations".
+  ];
 
   if (loading) {
     return (
@@ -111,9 +130,9 @@ export default function BudgetPage() {
 
   return (
     <div className="min-h-screen bg-void-black text-white p-6 pb-32">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <Link href="/" className="text-secondary-text text-sm hover:text-white transition-colors mb-2 inline-block">
               ← Back to Home
@@ -122,41 +141,101 @@ export default function BudgetPage() {
             <p className="text-secondary-text text-sm font-mono">{selectedYear} Plan</p>
           </div>
           
-          {/* Year Selector */}
-          <div className="flex gap-2">
-            {years.map(year => (
-              <button
-                key={year}
-                onClick={() => setSelectedYear(year)}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                  selectedYear === year
-                    ? 'bg-cyber-cyan text-black'
-                    : 'bg-glass-surface text-secondary-text hover:bg-neutral-800'
-                }`}
-              >
-                {year}
-              </button>
-            ))}
+          <div className="flex items-center gap-4">
+            {/* Year Selector */}
+            <div className="flex gap-2">
+                {years.map(year => (
+                <button
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                    selectedYear === year
+                        ? 'bg-cyber-cyan text-black'
+                        : 'bg-glass-surface text-secondary-text hover:bg-neutral-800'
+                    }`}
+                >
+                    {year}
+                </button>
+                ))}
+            </div>
+
+            {/* Edit Budget Button */}
+            <Link href="/budget/builder">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium">
+                    <Edit className="w-4 h-4" />
+                    Edit Budget
+                </button>
+            </Link>
           </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {TARGET_ORDER.map(target => {
-            const colors = TARGET_COLORS[target];
-            const total = getTargetTotal(target);
-            return (
-              <div key={target} className={`${colors.bg} border ${colors.border} rounded-xl p-4`}>
-                <p className={`text-sm font-bold ${colors.text} mb-1`}>{target}</p>
-                <p className="text-2xl font-bold text-white">{formatCurrency(total)}</p>
-                <p className="text-secondary-text text-xs">/year</p>
-              </div>
-            );
-          })}
+        {/* Pro Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Discretionary Income */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                <p className="text-sm font-medium text-secondary-text mb-1">Discretionary Income</p>
+                <div className="text-2xl font-bold text-growth-green">
+                    {formatCurrency(discretionaryIncome)}
+                </div>
+                <p className="text-xs text-secondary-text mt-1">Available for Future & Present</p>
+            </div>
+            
+            {/* Total Income */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                <p className="text-sm font-medium text-secondary-text mb-1">Total Income</p>
+                <div className="text-2xl font-bold text-white">
+                    {formatCurrency(totalIncome > 0 ? totalIncome : (fixedCosts + discretionaryIncome))}
+                </div>
+                <p className="text-xs text-secondary-text mt-1">
+                    {totalIncome > 0 ? 'Based on Income Budget' : 'Sum of all Expenses'}
+                </p>
+            </div>
+
+            {/* Fixed Costs */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                 <p className="text-sm font-medium text-secondary-text mb-1">Fixed Costs</p>
+                <div className="text-2xl font-bold text-alert-amber">
+                    {formatCurrency(fixedCosts)}
+                </div>
+                <p className="text-xs text-secondary-text mt-1">Living Expenses</p>
+            </div>
         </div>
 
-        {/* Budget Tables by Target */}
+        {/* Category Allocations Summary */}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h2 className="text-xl font-bold mb-1">Category Allocations</h2>
+            <p className="text-secondary-text text-sm mb-6">Annual planned spending by category (Future & Present)</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                {allAllocationCategories.map(({ name, target }) => {
+                    const total = getCategoryRowData(name).Total;
+                    if (total === 0) return null;
+                    
+                    // Calculate percent of Discretionary
+                    const percent = discretionaryIncome > 0 ? (total / discretionaryIncome) * 100 : 0;
+                    const colors = TARGET_COLORS[target];
+
+                    return (
+                        <div key={name} className="space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className={colors.text}>{name}</span>
+                                <span className="font-mono">{formatCurrency(total)}</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                                <div 
+                                    className={`h-full ${target === 'Future' ? 'bg-growth-green' : 'bg-alert-amber'}`}
+                                    style={{ width: `${Math.min(percent, 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+
+        {/* Detailed Breakdown (Tables) */}
         <div className="space-y-6">
+            <h2 className="text-xl font-bold pt-4">Monthly Breakdown</h2>
           {TARGET_ORDER.map((target) => {
             const categories = DEFAULT_CATEGORIES[target];
             const colors = TARGET_COLORS[target];
@@ -230,17 +309,8 @@ export default function BudgetPage() {
             );
           })}
         </div>
-
-        {/* Grand Total */}
-        <div className="mt-8 liquid-card p-6">
-          <div className="flex justify-between items-center">
-            <span className="text-xl font-bold">Annual Total Budget</span>
-            <span className="text-3xl font-mono font-bold text-flux-violet">
-              {formatCurrency(TARGET_ORDER.reduce((sum, t) => sum + getTargetTotal(t), 0))}
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
 }
+
