@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout";
@@ -16,12 +16,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Expense.OS - Personal Finance Tracker",
   description: "Track expenses, manage budgets, and gain financial insights",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+};
+
+// Viewport configuration (moved from metadata per Next.js 16 requirements)
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

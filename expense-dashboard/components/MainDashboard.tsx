@@ -12,21 +12,25 @@ import {
   getTopCategories,
   filterBudget,
   getBudgetProgress
-} from '@/lib/dataTransforms';
-import { useExpenseData, TimeRangePreset } from '@/lib/hooks/useExpenseData';
+} from '@/lib/analytics';
+import { useExpenseData } from '@/hooks';
 import { CHART_INFO, ChartKey } from '@/lib/constants/chartInfo';
 
 // Components
 import KPICards from '@/components/KPICards';
 import TransactionTable from '@/components/TransactionTable';
-import ExpandedChartOverlay from '@/components/dashboard/ExpandedChartOverlay';
+import { 
+  ExpandedChartOverlay, 
+  DashboardHeader, 
+  DashboardActions 
+} from '@/components/dashboard';
 import { FilterAccordion } from '@/components/filters';
 import { InfoModal, FloatingFilterButton, EmptyState } from '@/components/ui';
 import { Onboarding } from '@/components/onboarding';
 import {
   TargetDonutD3,
   CategoryBarD3,
-  MonthlyTrendD3,
+  MonthlyTrendD3, // Keep import even if unused in current view
   SpendingTrendD3,
   BurnRateGaugeD3,
   DayOfWeekD3,
@@ -100,13 +104,12 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const [filterOrder, setFilterOrder] = useState(['location', 'category', 'shop', 'target', 'month', 'year']);
 
   // Derived Data (computed from filtered expenses)
-  // These are standard functions, not hooks, but nice to keep together.
   const { data: trendData, granularity } = aggregateTrendData(filteredExpenses);
   const kpiMetrics = calculateKPIs(filteredExpenses);
   const targetDistribution = getTargetDistribution(filteredExpenses);
   const categoryTotals = getTopCategories(filteredExpenses, 10);
   
-  // Calculate Budget Progress (useMemo is a Hook!)
+  // Calculate Budget Progress
   const budgetProgress = useMemo(() => {
     let baseBudget = budget;
     // Apply time range filter to budget 
@@ -124,7 +127,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   if (loading) {
     return (
       <div className="min-h-screen bg-void-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-acid-green"></div>
+        <div className="loading-spinner loading-spinner--lg border-growth-green"></div>
       </div>
     );
   }
@@ -139,24 +142,12 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Header */}
-        <header className="mb-6">
-          <div className="flex flex-col gap-4">
-            {/* Title Row */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-wide uppercase">Dashboard</h1>
-                <p className="text-xs text-secondary-text font-mono">
-                  {filteredExpenses.length} records
-                  {timeRangePreset === 'month' && ` • ${currentYear}/${String(currentMonth).padStart(2, '0')}`}
-                  {timeRangePreset === 'year' && ` • ${currentYear}`}
-                </p>
-              </div>
-            </div>
-            
-            {/* Time Range Toggle - Removed as per request */}
-            <div className="h-4" />
-          </div>
-        </header>
+        <DashboardHeader 
+          recordCount={filteredExpenses.length}
+          timeRangePreset={timeRangePreset}
+          currentYear={currentYear}
+          currentMonth={currentMonth}
+        />
 
         {/* Empty State - Show when no data matches filters */}
         {filteredExpenses.length === 0 ? (
@@ -245,64 +236,12 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
         isOpen={isFilterOpen}
       />
       
-      {/* Reset All Button (visible when filters open) */}
-      {/* Action Buttons (visible when filters open) */}
-      {isFilterOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: '120px',
-          right: '96px',
-          zIndex: 9998,
-          display: 'flex',
-          gap: '12px'
-        }}>
-          <button
-            onClick={saveDefaultView}
-            className="liquid-button"
-            style={{
-              padding: '0 20px',
-              height: '56px',
-              borderRadius: '16px',
-              backgroundColor: 'rgba(34, 197, 94, 0.2)', // Greenish
-              border: '2px solid rgba(34, 197, 94, 0.5)',
-              color: '#22c55e',
-              backdropFilter: 'blur(12px)',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '13px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-            }}
-          >
-            Save View
-          </button>
-          
-          <button
-            onClick={resetFilters}
-            className="liquid-button"
-            style={{
-              padding: '0 20px',
-              height: '56px',
-              borderRadius: '16px',
-              backgroundColor: 'rgba(217, 70, 239, 0.2)',
-              border: '2px solid rgba(217, 70, 239, 0.5)',
-              color: '#d946ef',
-              backdropFilter: 'blur(12px)',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '13px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-            }}
-          >
-            Reset all
-          </button>
-        </div>
-      )}
+      {/* Action Buttons (Save/Reset) */}
+      <DashboardActions 
+        isVisible={isFilterOpen}
+        onSave={saveDefaultView}
+        onReset={resetFilters}
+      />
 
       {/* Filter Accordion */}
       {isFilterOpen && (

@@ -1,30 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Expense, FilterState, Budget } from '@/lib/types';
-import { parseCSV, parseBudgetCSV, getUniqueValues } from '@/lib/csvParser';
-import { filterExpenses } from '@/lib/dataTransforms';
-
-export interface UniqueFilterValues {
-  years: number[];
-  targets: string[];
-  categories: string[];
-  locations: string[];
-  methods: string[];
-  shops: string[];
-}
-
-export type TimeRangePreset = 'month' | 'year' | 'all';
-
-const initialFilters: FilterState = {
-  dateRange: { start: null, end: null },
-  months: [],
-  targets: [],
-  categories: [],
-  locations: [],
-  methods: [],
-  shops: []
-};
+import type { Expense, FilterState, Budget, UniqueFilterValues, TimeRangePreset } from '@/types';
+import { INITIAL_FILTER_STATE } from '@/types';
+import { getUniqueValues } from '@/lib/csvParser';
+import { filterExpenses } from '@/lib/analytics';
 
 const initialUniqueValues: UniqueFilterValues = {
   years: [],
@@ -44,7 +24,7 @@ export function useExpenseData() {
   const [budget, setBudget] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [filters, setFilters] = useState<FilterState>(INITIAL_FILTER_STATE);
   const [uniqueValues, setUniqueValues] = useState<UniqueFilterValues>(initialUniqueValues);
   const [timeRangePreset, setTimeRangePreset] = useState<TimeRangePreset>('month'); // Default to this month
   
@@ -244,14 +224,14 @@ export function useExpenseData() {
         if (parsed.filters?.dateRange?.start) parsed.filters.dateRange.start = new Date(parsed.filters.dateRange.start);
         if (parsed.filters?.dateRange?.end) parsed.filters.dateRange.end = new Date(parsed.filters.dateRange.end);
         
-        setFilters(parsed.filters || initialFilters);
+        setFilters(parsed.filters || INITIAL_FILTER_STATE);
         setTimeRangePreset(parsed.timeRangePreset || 'month');
       } catch (e) {
-        setFilters(initialFilters);
+        setFilters(INITIAL_FILTER_STATE);
         setTimeRangePreset('month');
       }
     } else {
-      setFilters(initialFilters);
+      setFilters(INITIAL_FILTER_STATE);
       setTimeRangePreset('month');
     }
   }, []);

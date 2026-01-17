@@ -18,8 +18,7 @@ import {
   useSortable 
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FilterState } from '@/lib/types';
-import { UniqueFilterValues } from '@/lib/hooks/useExpenseData';
+import { FilterState, UniqueFilterValues } from '@/types';
 
 interface FilterAccordionProps {
   filters: FilterState;

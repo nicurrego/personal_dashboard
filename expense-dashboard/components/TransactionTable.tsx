@@ -1,7 +1,7 @@
 'use client';
 
-import { Expense } from '@/lib/types';
-import { formatCurrency } from '@/lib/d3-utils';
+import { Expense } from '@/types';
+import { formatCurrency } from '@/lib/formatters';
 
 interface TransactionTableProps {
   expenses: Expense[];
@@ -40,7 +40,7 @@ export default function TransactionTable({ expenses }: TransactionTableProps) {
               </div>
             </div>
             <div className="flex justify-between items-center text-xs text-secondary-text">
-              <span className="truncate max-w-[60%]">{expense.detail}</span>
+              <span className="truncate max-w-[60%]">{expense.item}</span>
               <span className="font-medium">{expense.shop}</span>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function TransactionTable({ expenses }: TransactionTableProps) {
               <tr key={idx} className="hover:bg-white/5 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-text font-mono">{expense.date}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-cobalt-blue font-medium">{expense.category}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 truncate max-w-xs">{expense.detail}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 truncate max-w-xs">{expense.item}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-text">{expense.shop}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-white text-right font-mono tracking-wide">{formatCurrency(expense.value)}</td>
                 <td className="px-6 py-4 whitespace-nowrap">

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { BudgetProgress } from '@/lib/dataTransforms';
+import { BudgetProgress } from '@/types';
 import { formatCurrency } from '@/lib/d3-utils';
 
 interface BudgetProgressRingsProps {

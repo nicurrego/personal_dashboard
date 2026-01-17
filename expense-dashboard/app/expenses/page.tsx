@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import type { Expense } from '@/types';
+import { formatCurrency } from '@/lib/formatters';
 
-interface Expense {
+/**
+ * Extended expense interface for display purposes
+ * Uses PascalCase to match legacy table rendering
+ */
+interface ExpenseDisplay {
   Year: number;
   Month: number;
   Date: string;
@@ -17,8 +23,27 @@ interface Expense {
   Location: string;
 }
 
+/**
+ * Transform API expense to display format
+ */
+function toDisplayExpense(e: Expense): ExpenseDisplay {
+  return {
+    Year: e.year,
+    Month: e.month,
+    Date: e.date,
+    Target: e.target,
+    Category: e.category,
+    Value: e.value,
+    Detail: e.item || '',
+    Context: e.context || '',
+    Method: e.method || '',
+    Shop: e.shop || '',
+    Location: e.location || ''
+  };
+}
+
 export default function ExpensesPage() {
-  const [data, setData] = useState<Expense[]>([]);
+  const [data, setData] = useState<ExpenseDisplay[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
@@ -31,21 +56,7 @@ export default function ExpensesPage() {
         if (!response.ok) throw new Error('Failed to load expenses');
         
         const rawData = await response.json();
-        
-        // Transform API data to match component state
-        const parsed: Expense[] = rawData.map((e: any) => ({
-          Year: Number(e.year),
-          Month: Number(e.month),
-          Date: e.date,
-          Target: e.target,
-          Category: e.category,
-          Value: Number(e.value),
-          Detail: e.item || '',
-          Context: e.context || '',
-          Method: e.method || '',
-          Shop: e.shop || '',
-          Location: e.location || ''
-        }));
+        const parsed = rawData.map((e: Expense) => toDisplayExpense(e));
         
         setData(parsed);
         setLoading(false);

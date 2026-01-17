@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { createResponsiveSVG, formatCurrency, createTooltip } from '@/lib/d3-utils';
 import { Expense } from '@/lib/types';
-import { getTopShops } from '@/lib/dataTransforms';
+import { getTopShops } from '@/lib/analytics';
 
 interface TopShopsD3Props {
   expenses: Expense[];
