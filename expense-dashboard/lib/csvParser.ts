@@ -26,7 +26,7 @@ export function parseCSV(csvText: string): Expense[] {
         target: (values[3] as 'Living' | 'Present' | 'Future') || 'Living',
         category: values[4] || '',
         value: parseFloat(values[5].replace(/,/g, '')) || 0,
-        detail: values[6] || '',
+        item: values[6] || '',  // Renamed from 'detail'
         context: values[7] || '',
         method: values[8] || '',
         shop: values[9] || '',

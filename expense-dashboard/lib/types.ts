@@ -9,7 +9,7 @@ export interface Expense {
   target: 'Living' | 'Present' | 'Future';
   category: string;
   value: number;
-  detail: string;
+  item: string;
   context: string;
   method: string;
   shop: string;
@@ -98,4 +98,47 @@ export interface KPIMetrics {
   futurePercentage: number;
   monthOverMonth: number;
   totalTransactions: number;
+}
+
+// ============================================
+// Quick Entry Types
+// Quick Entry Types - Dynamic from database
+// ============================================
+
+export type QuickEntryContext = 'Daily' | 'Travel' | 'Work' | 'Gift' | 'Personal';
+
+export interface QuickEntryData {
+  value: number | null;
+  category: string;
+  target: string | null; // Dynamic from database (Living, Present, Saving, Investment, etc.)
+  shop: string;
+  method: string;
+  location: string;
+  item: string; // Renamed from 'detail' - what was purchased
+  context: string; // Free-form input (Daily, Travel, Work, Gift, Personal, etc.)
+  date: Date;
+}
+
+export type QuickEntryStep = 
+  | 'amount'
+  | 'category'
+  | 'target'
+  | 'shop'
+  | 'method'
+  | 'location'
+  | 'item'  // Renamed from 'detail'
+  | 'context'
+  | 'review';
+
+export interface QuickEntryOption {
+  id: string;
+  label: string;
+  recentCount?: number;
+}
+
+export interface AutocompleteData {
+  categories: QuickEntryOption[];
+  shops: QuickEntryOption[];
+  methods: QuickEntryOption[];
+  locations: QuickEntryOption[];
 }

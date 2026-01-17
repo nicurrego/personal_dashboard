@@ -105,7 +105,47 @@ export default function Home() {
             </div>
           </div>
         </Link>
+
+        {/* Module 5: Quick Entry */}
+        <Link href="/quick-entry" className="group md:col-span-2">
+          <div className="liquid-card p-8 h-48 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-laser-magenta bg-gradient-to-r from-laser-magenta/5 to-transparent">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                   <span className="text-label text-laser-magenta">MODULE 05 • NEW</span>
+                   <div className="w-2 h-2 rounded-full bg-laser-magenta animate-pulse ml-2" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-2">Quick Entry</h3>
+                <p className="text-secondary-text text-sm max-w-[80%]">
+                  Fast mobile-first transaction input. Card-based flow with autocomplete.
+                </p>
+              </div>
+              <span className="text-5xl opacity-80">➕</span>
+            </div>
+            <div className="flex justify-end">
+              <span className="liquid-button bg-gradient-to-r from-laser-magenta to-flux-violet text-white px-6 py-2 text-sm uppercase tracking-wider group-hover:shadow-[0_0_20px_rgba(217,70,239,0.4)] transition-all">
+                Add Transaction
+              </span>
+            </div>
+          </div>
+        </Link>
       </div>
+
+      {/* Floating Action Button for Quick Entry (Mobile) */}
+      <Link 
+        href="/quick-entry" 
+        className="fixed bottom-6 right-6 z-50 md:hidden
+                   w-16 h-16 rounded-full 
+                   bg-gradient-to-r from-laser-magenta to-flux-violet
+                   flex items-center justify-center
+                   shadow-[0_4px_20px_rgba(217,70,239,0.5)]
+                   hover:shadow-[0_4px_30px_rgba(217,70,239,0.7)]
+                   active:scale-95 transition-all duration-200"
+      >
+        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </Link>
 
       {/* Quick Links */}
       <div className="mt-10 relative z-10 flex items-center gap-6">
