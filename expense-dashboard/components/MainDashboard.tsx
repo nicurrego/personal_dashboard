@@ -19,7 +19,7 @@ import KPICards from '@/components/KPICards';
 import TransactionTable from '@/components/TransactionTable';
 import ExpandedChartOverlay from '@/components/dashboard/ExpandedChartOverlay';
 import { FilterAccordion } from '@/components/filters';
-import { InfoModal, FloatingFilterButton } from '@/components/ui';
+import { InfoModal, FloatingFilterButton, EmptyState } from '@/components/ui';
 import {
   TargetDonutD3,
   CategoryBarD3,
@@ -120,72 +120,83 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           </div>
         </header>
 
-        {/* KPI Cards */}
-        <KPICards metrics={kpiMetrics} />
-
-        {/* Budget Progress Rings */}
-        <div className="my-4">
-           <BudgetProgressRings progress={budgetProgress} />
-        </div>
-        
-        {/* Charts Grid */}
-        <div className="space-y-4">
-          
-          {/* Spending Trend - Full Width (adaptive: daily for 1 month, monthly for longer) */}
-          <SpendingTrendD3 
-            data={trendData}
-            granularity={granularity}
-            onExpand={() => setExpandedChart('monthly')}
-            onInfo={() => setInfoChart('monthly')}
+        {/* Empty State - Show when no data matches filters */}
+        {filteredExpenses.length === 0 ? (
+          <EmptyState 
+            title="No Expenses Found"
+            message="No expenses match your current filter selection. Try selecting a different time period or adjusting your filters."
+            onReset={resetFilters}
           />
-          
-          {/* Row 1: Burn Rate, Distribution, Categories */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <BurnRateGaugeD3 
-              spent={kpiMetrics.totalSpent}
-              budget={500000}
-              onExpand={() => setExpandedChart('burn')}
-              onInfo={() => setInfoChart('burn')}
-            />
-            <TargetDonutD3 
-              data={targetDistribution} 
-              onExpand={() => setExpandedChart('donut')}
-              onInfo={() => setInfoChart('donut')}
-            />
-            <CategoryBarD3 
-              data={categoryTotals} 
-              onExpand={() => setExpandedChart('bar')}
-              onInfo={() => setInfoChart('bar')}
-            />
-          </div>
+        ) : (
+          <>
+            {/* KPI Cards */}
+            <KPICards metrics={kpiMetrics} />
 
-          {/* Row 2: Day of Week & Top Shops */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <DayOfWeekD3 
-              expenses={filteredExpenses} 
-              onExpand={() => setExpandedChart('dayOfWeek')}
-              onInfo={() => setInfoChart('dayOfWeek')}
-            />
-            <TopShopsD3 
-              expenses={filteredExpenses} 
-              onExpand={() => setExpandedChart('topShops')}
-              onInfo={() => setInfoChart('topShops')}
-            />
-          </div>
+            {/* Budget Progress Rings */}
+            <div className="my-4">
+              <BudgetProgressRings progress={budgetProgress} />
+            </div>
+            
+            {/* Charts Grid */}
+            <div className="space-y-4">
+              
+              {/* Spending Trend - Full Width (adaptive: daily for 1 month, monthly for longer) */}
+              <SpendingTrendD3 
+                data={trendData}
+                granularity={granularity}
+                onExpand={() => setExpandedChart('monthly')}
+                onInfo={() => setInfoChart('monthly')}
+              />
+              
+              {/* Row 1: Burn Rate, Distribution, Categories */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <BurnRateGaugeD3 
+                  spent={kpiMetrics.totalSpent}
+                  budget={500000}
+                  onExpand={() => setExpandedChart('burn')}
+                  onInfo={() => setInfoChart('burn')}
+                />
+                <TargetDonutD3 
+                  data={targetDistribution} 
+                  onExpand={() => setExpandedChart('donut')}
+                  onInfo={() => setInfoChart('donut')}
+                />
+                <CategoryBarD3 
+                  data={categoryTotals} 
+                  onExpand={() => setExpandedChart('bar')}
+                  onInfo={() => setInfoChart('bar')}
+                />
+              </div>
 
-          {/* Heatmap - Full Width */}
-          <SpendingHeatmapD3 
-            expenses={filteredExpenses}
-            onExpand={() => setExpandedChart('heatmap')}
-            onInfo={() => setInfoChart('heatmap')}
-          />
-        </div>
-        
-        {/* Transaction Table */}
-        {showTransactions && (
-          <section className="mt-6">
-            <TransactionTable expenses={filteredExpenses} />
-          </section>
+              {/* Row 2: Day of Week & Top Shops */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <DayOfWeekD3 
+                  expenses={filteredExpenses} 
+                  onExpand={() => setExpandedChart('dayOfWeek')}
+                  onInfo={() => setInfoChart('dayOfWeek')}
+                />
+                <TopShopsD3 
+                  expenses={filteredExpenses} 
+                  onExpand={() => setExpandedChart('topShops')}
+                  onInfo={() => setInfoChart('topShops')}
+                />
+              </div>
+
+              {/* Heatmap - Full Width */}
+              <SpendingHeatmapD3 
+                expenses={filteredExpenses}
+                onExpand={() => setExpandedChart('heatmap')}
+                onInfo={() => setInfoChart('heatmap')}
+              />
+            </div>
+            
+            {/* Transaction Table */}
+            {showTransactions && (
+              <section className="mt-6">
+                <TransactionTable expenses={filteredExpenses} />
+              </section>
+            )}
+          </>
         )}
       </div>
 
@@ -265,6 +276,9 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           setOrder={setFilterOrder}
           onClose={() => setIsFilterOpen(false)}
           setTimeRangePreset={setTimeRangePreset}
+          timeRangePreset={timeRangePreset}
+          currentMonth={currentMonth}
+          currentYear={currentYear}
         />
       )}
 

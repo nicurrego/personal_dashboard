@@ -29,6 +29,9 @@ interface FilterAccordionProps {
   setOrder: (order: string[]) => void;
   onClose: () => void;
   setTimeRangePreset: (preset: 'month' | 'year' | 'all') => void;
+  timeRangePreset: 'month' | 'year' | 'all';
+  currentMonth: number;
+  currentYear: number;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -71,9 +74,12 @@ export default function FilterAccordion({
   order,
   setOrder,
   onClose,
-  setTimeRangePreset
+  setTimeRangePreset,
+  timeRangePreset,
+  currentMonth,
+  currentYear
 }: FilterAccordionProps) {
-  const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
+  const [expandedFilters, setExpandedFilters] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
 
   const sensors = useSensors(
@@ -100,14 +106,30 @@ export default function FilterAccordion({
 
   // Display helpers
   const getYearDisplay = () => {
-    if (!filters.dateRange.start) return 'All';
-    return filters.dateRange.start.getFullYear().toString();
+    // If explicit date range is set, show that year
+    if (filters.dateRange.start) {
+      return filters.dateRange.start.getFullYear().toString();
+    }
+    // If timeRangePreset is 'month' or 'year', we're filtering by current year
+    if (timeRangePreset === 'month' || timeRangePreset === 'year') {
+      return currentYear.toString();
+    }
+    // Otherwise, showing all years
+    return 'All';
   };
 
   const getMonthDisplay = () => {
-    if (!filters.months || filters.months.length === 0) return 'All';
-    if (filters.months.length > 4) return `${filters.months.length} selected`;
-    return filters.months.map(m => MONTHS[m - 1]).join(', ');
+    // If explicit months are selected, show them
+    if (filters.months && filters.months.length > 0) {
+      if (filters.months.length > 4) return `${filters.months.length} selected`;
+      return filters.months.map(m => MONTHS[m - 1]).join(', ');
+    }
+    // If timeRangePreset is 'month', we're filtering by current month
+    if (timeRangePreset === 'month') {
+      return MONTHS[currentMonth - 1];
+    }
+    // Otherwise, showing all months
+    return 'All';
   };
 
   const getTargetDisplay = () => {
@@ -134,7 +156,15 @@ export default function FilterAccordion({
   };
 
   const toggleSection = (section: string) => {
-    setExpandedFilter(expandedFilter === section ? null : section);
+    setExpandedFilters(prev => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
   };
 
   if (!mounted) return null;
@@ -175,7 +205,7 @@ export default function FilterAccordion({
       case 'shop':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'shop' && (
+            {expandedFilters.has('shop') && (
               <div style={{ padding: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap', maxHeight: '250px', overflowY: 'auto' }}>
                 {uniqueValues.shops.map(shop => (
                   <button key={shop} onClick={() => {
@@ -185,15 +215,15 @@ export default function FilterAccordion({
                 ))}
               </div>
             )}
-            {expandedFilter === 'shop' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('shop') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('shop')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Shop</span>
-                {expandedFilter === 'shop' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, shops: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('shop') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, shops: []}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getShopDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'shop')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('shop'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
@@ -203,7 +233,7 @@ export default function FilterAccordion({
       case 'location':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'location' && (
+            {expandedFilters.has('location') && (
               <div style={{ padding: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap', maxHeight: '250px', overflowY: 'auto' }}>
                 {uniqueValues.locations.map(loc => (
                   <button key={loc} onClick={() => {
@@ -213,15 +243,15 @@ export default function FilterAccordion({
                 ))}
               </div>
             )}
-            {expandedFilter === 'location' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('location') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('location')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Location</span>
-                {expandedFilter === 'location' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, locations: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('location') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, locations: []}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getLocationDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'location')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('location'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
@@ -231,7 +261,7 @@ export default function FilterAccordion({
       case 'category':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'category' && (
+            {expandedFilters.has('category') && (
               <div style={{ padding: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {uniqueValues.categories.map(cat => (
                   <button key={cat} onClick={() => {
@@ -241,15 +271,15 @@ export default function FilterAccordion({
                 ))}
               </div>
             )}
-            {expandedFilter === 'category' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('category') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('category')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Category</span>
-                {expandedFilter === 'category' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, categories: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('category') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, categories: []}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getCategoryDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'category')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('category'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
@@ -259,7 +289,7 @@ export default function FilterAccordion({
       case 'target':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'target' && (
+            {expandedFilters.has('target') && (
               <div style={{ padding: '16px', display: 'flex', gap: '8px' }}>
                 {['Living', 'Present', 'Future'].map(target => {
                   const isSelected = filters.targets.includes(target);
@@ -280,15 +310,15 @@ export default function FilterAccordion({
                 })}
               </div>
             )}
-            {expandedFilter === 'target' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('target') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('target')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Target</span>
-                {expandedFilter === 'target' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, targets: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('target') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, targets: []}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getTargetDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'target')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('target'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
@@ -298,7 +328,7 @@ export default function FilterAccordion({
       case 'month':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'month' && (
+            {expandedFilters.has('month') && (
               <div style={{ padding: '16px' }}>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                   {[1, 2, 3, 4].map(q => (
@@ -313,7 +343,9 @@ export default function FilterAccordion({
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                   {MONTHS.map((m, i) => {
                     const monthNum = i + 1;
-                    const isSelected = (filters.months || []).includes(monthNum);
+                    // Highlight if in explicit filters.months, OR if timeRangePreset is 'month' and it's the current month
+                    const isSelected = (filters.months || []).includes(monthNum) || 
+                                     (timeRangePreset === 'month' && (!filters.months || filters.months.length === 0) && monthNum === currentMonth);
                     return (
                       <button key={m} onClick={() => {
                         const current = filters.months || [];
@@ -325,15 +357,15 @@ export default function FilterAccordion({
                 </div>
               </div>
             )}
-            {expandedFilter === 'month' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('month') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('month')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Month</span>
-                {expandedFilter === 'month' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, months: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('month') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, months: []}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getMonthDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'month')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('month'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
@@ -343,11 +375,16 @@ export default function FilterAccordion({
       case 'year':
         return (
           <div style={sectionStyle}>
-            {expandedFilter === 'year' && (
+            {expandedFilters.has('year') && (
               <div style={{ padding: '16px 16px 12px 16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <button onClick={() => setFilters({...filters, dateRange: { start: null, end: null }})} style={chipStyle(!filters.dateRange.start)}>All</button>
+                <button onClick={() => {
+                  setFilters({...filters, dateRange: { start: null, end: null }});
+                  setTimeRangePreset('all');
+                }} style={chipStyle(timeRangePreset === 'all' && !filters.dateRange.start)}>All</button>
                 {uniqueValues.years.sort((a,b) => b-a).map(year => {
-                  const isSelected = filters.dateRange.start?.getFullYear() === year;
+                  // Highlight if explicit dateRange matches, OR if timeRangePreset is active and year matches currentYear
+                  const isSelected = filters.dateRange.start?.getFullYear() === year || 
+                                   ((timeRangePreset === 'month' || timeRangePreset === 'year') && year === currentYear);
                   return (
                     <button key={year} onClick={() => {
                       setFilters({ ...filters, dateRange: { start: new Date(year, 0, 1), end: new Date(year, 11, 31) } });
@@ -357,15 +394,15 @@ export default function FilterAccordion({
                 })}
               </div>
             )}
-            {expandedFilter === 'year' && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
+            {expandedFilters.has('year') && <div style={{ ...dividerStyle, margin: '0 16px' }} />}
             <button onClick={() => toggleSection('year')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Year</span>
-                {expandedFilter === 'year' && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, dateRange: { start: null, end: null }}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('year') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, dateRange: { start: null, end: null }}); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getYearDisplay()}</span>
-                <span style={arrowStyle(expandedFilter === 'year')}>▼</span>
+                <span style={arrowStyle(expandedFilters.has('year'))}>▼</span>
               </div>
             </button>
             <div style={dividerStyle} />
