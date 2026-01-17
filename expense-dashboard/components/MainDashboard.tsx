@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 // Lib
 import { 
@@ -20,6 +22,7 @@ import TransactionTable from '@/components/TransactionTable';
 import ExpandedChartOverlay from '@/components/dashboard/ExpandedChartOverlay';
 import { FilterAccordion } from '@/components/filters';
 import { InfoModal, FloatingFilterButton, EmptyState } from '@/components/ui';
+import { Onboarding } from '@/components/onboarding';
 import {
   TargetDonutD3,
   CategoryBarD3,
@@ -43,7 +46,12 @@ interface MainDashboardProps {
  * Uses the useExpenseData hook for all data management.
  */
 export default function MainDashboard({ showTransactions = true }: MainDashboardProps) {
+  const searchParams = useSearchParams();
+  const skipOnboarding = searchParams.get('skip-onboarding') === 'true';
+  const [userName, setUserName] = useState<string>('');
+
   const {
+    expenses, // Raw expenses list (unfiltered)
     filteredExpenses,
     loading,
     filters,
@@ -59,6 +67,32 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
     saveDefaultView
   } = useExpenseData();
 
+  // Fetch user profile for welcome message
+  useEffect(() => {
+    async function getUserProfile() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Try to get display name from profiles first, then metadata
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+          
+        if (profile?.display_name) {
+          setUserName(profile.display_name);
+        } else if (user.user_metadata?.display_name) {
+          setUserName(user.user_metadata.display_name);
+        } else {
+          // Fallback to email username
+          setUserName(user.email?.split('@')[0] || '');
+        }
+      }
+    }
+    getUserProfile();
+  }, []);
+
   // UI State
   const [expandedChart, setExpandedChart] = useState<ChartKey | null>(null);
   const [infoChart, setInfoChart] = useState<ChartKey | null>(null);
@@ -66,22 +100,21 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const [filterOrder, setFilterOrder] = useState(['location', 'category', 'shop', 'target', 'month', 'year']);
 
   // Derived Data (computed from filtered expenses)
+  // These are standard functions, not hooks, but nice to keep together.
   const { data: trendData, granularity } = aggregateTrendData(filteredExpenses);
   const kpiMetrics = calculateKPIs(filteredExpenses);
   const targetDistribution = getTargetDistribution(filteredExpenses);
   const categoryTotals = getTopCategories(filteredExpenses, 10);
   
-  // Calculate Budget Progress
+  // Calculate Budget Progress (useMemo is a Hook!)
   const budgetProgress = useMemo(() => {
     let baseBudget = budget;
     // Apply time range filter to budget 
-    // (Note: This mimics the logic in useExpenseData for expenses)
     if (timeRangePreset === 'month') {
        baseBudget = budget.filter(b => b.year === currentYear && b.month === currentMonth);
     } else if (timeRangePreset === 'year') {
        baseBudget = budget.filter(b => b.year === currentYear);
     }
-    // Apply other filters if necessary (e.g. Category/Target filters from the filter menu)
     const filteredBudget = filterBudget(baseBudget, filters);
     
     return getBudgetProgress(filteredExpenses, filteredBudget);
@@ -94,6 +127,11 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-acid-green"></div>
       </div>
     );
+  }
+
+  // Onboarding Check: If no expenses (total) and not skipped
+  if (expenses.length === 0 && !skipOnboarding) {
+    return <Onboarding userName={userName} />;
   }
 
   return (

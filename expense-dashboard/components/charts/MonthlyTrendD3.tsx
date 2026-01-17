@@ -35,12 +35,27 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
     const { svg, g, width, height } = createResponsiveSVG(container, margin);
     
     // Create scales
+    // Create scales
+    // Handle single data point case
+    const extent = d3.extent(data, d => d.date) as [Date, Date];
+    let domain = extent;
+    if (domain[0] && domain[1] && domain[0].getTime() === domain[1].getTime()) {
+        const d = domain[0];
+        // ±1 month for domain
+        domain = [
+            new Date(d.getFullYear(), d.getMonth() - 1, 1),
+            new Date(d.getFullYear(), d.getMonth() + 1, 1)
+        ];
+    }
+
     const xScale = d3.scaleTime()
-      .domain(d3.extent(data, d => d.date) as [Date, Date])
+      .domain(domain)
       .range([0, width]);
     
+    // Y Scale with headroom
+    const maxVal = d3.max(data, d => d.total) || 0;
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.total) || 0])
+      .domain([0, maxVal === 0 ? 1000 : maxVal * 1.1])
       .nice()
       .range([height, 0]);
     

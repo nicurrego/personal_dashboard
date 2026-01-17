@@ -27,28 +27,25 @@ export default function ExpensesPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await fetch('/expenses_combined_english.csv');
-        const text = await response.text();
+        const response = await fetch('/api/expenses');
+        if (!response.ok) throw new Error('Failed to load expenses');
         
-        const lines = text.split('\n').filter(line => line.trim());
-        const headers = lines[0].split(',');
+        const rawData = await response.json();
         
-        const parsed: Expense[] = lines.slice(1).map(line => {
-          const values = line.split(',');
-          return {
-            Year: parseInt(values[0]),
-            Month: parseInt(values[1]),
-            Date: values[2],
-            Target: values[3],
-            Category: values[4],
-            Value: parseInt(values[5]),
-            Detail: values[6] || '',
-            Context: values[7] || '',
-            Method: values[8] || '',
-            Shop: values[9] || '',
-            Location: values[10] || ''
-          };
-        }).filter(row => !isNaN(row.Year));
+        // Transform API data to match component state
+        const parsed: Expense[] = rawData.map((e: any) => ({
+          Year: Number(e.year),
+          Month: Number(e.month),
+          Date: e.date,
+          Target: e.target,
+          Category: e.category,
+          Value: Number(e.value),
+          Detail: e.item || '',
+          Context: e.context || '',
+          Method: e.method || '',
+          Shop: e.shop || '',
+          Location: e.location || ''
+        }));
         
         setData(parsed);
         setLoading(false);

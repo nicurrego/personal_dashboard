@@ -4,11 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { QuickEntryFlow } from '@/components/quick-entry';
 import { QuickEntryData, AutocompleteData, QuickEntryOption, Expense } from '@/lib/types';
-import { parseCSV, getUniqueValues } from '@/lib/csvParser';
+import { getUniqueValues } from '@/lib/csvParser';
+import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
 
 export default function QuickEntryPage() {
   const router = useRouter();
-  const [autocompleteData, setAutocompleteData] = useState<AutocompleteData | null>(null);
+  const [autocompleteData, setAutocompleteData] = useState<AutocompleteData>({
+    categories: [], shops: [], methods: [], locations: []
+  });
   const [targetCategories, setTargetCategories] = useState<Map<string, string[]>>(new Map());
   const [targets, setTargets] = useState<string[]>([]);
   const [contexts, setContexts] = useState<string[]>([]);
@@ -16,127 +19,119 @@ export default function QuickEntryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load existing data for autocomplete
   useEffect(() => {
-    async function loadAutocompleteData() {
+    async function initialize() {
       try {
-        const response = await fetch('/expenses_combined_english.csv');
-        if (!response.ok) throw new Error('Failed to load expense data');
+        // 1. Initialize Structure from Defaults
+        const targetMap = new Map<string, string[]>();
+        const allDefaultCategories: string[] = [];
         
-        const csvText = await response.text();
-        const expenses = parseCSV(csvText);
-        
-        // Build target -> categories mapping from actual data
-        const targetCategoryMap = new Map<string, Set<string>>();
-        expenses.forEach(expense => {
-          const target = expense.target;
-          const category = expense.category;
-          if (!targetCategoryMap.has(target)) {
-            targetCategoryMap.set(target, new Set());
-          }
-          targetCategoryMap.get(target)!.add(category);
+        Object.entries(DEFAULT_CATEGORIES).forEach(([target, categories]) => {
+           targetMap.set(target, [...categories]);
+           allDefaultCategories.push(...categories);
         });
+        setTargetCategories(targetMap);
+        setTargets(Object.keys(DEFAULT_CATEGORIES));
+
+        // 2. Fetch existing data for autocomplete suggestions
+        const response = await fetch('/api/expenses');
+        let expenses: Expense[] = [];
         
-        // Convert Sets to Arrays
-        const targetCategoryArrayMap = new Map<string, string[]>();
-        targetCategoryMap.forEach((categories, target) => {
-          targetCategoryArrayMap.set(target, Array.from(categories));
-        });
-        setTargetCategories(targetCategoryArrayMap);
-        
-        // Get unique targets
-        const uniqueTargets = getUniqueValues(expenses, 'target');
-        setTargets(uniqueTargets);
-        
-        // Get unique contexts for suggestions
-        const uniqueContexts = getUniqueValues(expenses, 'context');
-        setContexts(uniqueContexts);
-        
-        // Get unique items for suggestions (filter out generic ones)
-        const uniqueItems = getUniqueValues(expenses, 'item')
-          .filter(item => !item.toLowerCase().startsWith('expense item'))
-          .slice(0, 20); // Limit to 20 most common
-        setItems(uniqueItems);
-        
-        // Build autocomplete options with frequency counts
-        const buildOptions = (
-          items: string[], 
-          expenses: Expense[], 
-          field: keyof Expense
-        ): QuickEntryOption[] => {
-          const counts = new Map<string, number>();
-          expenses.forEach(e => {
-            const value = String(e[field]);
-            counts.set(value, (counts.get(value) || 0) + 1);
-          });
-          
-          return items.map(item => ({
-            id: item,
-            label: item,
-            recentCount: counts.get(item) || 0
-          })).sort((a, b) => (b.recentCount || 0) - (a.recentCount || 0));
+        if (response.ok) {
+           const rawData = await response.json();
+           expenses = rawData.map((e: any) => ({
+             year: Number(e.year),
+             month: Number(e.month),
+             date: e.date,
+             target: e.target,
+             category: e.category,
+             value: Number(e.value),
+             item: e.item || '',
+             context: e.context || '',
+             method: e.method || '',
+             shop: e.shop || '',
+             location: e.location || ''
+           }));
+        }
+
+        // 3. Build Options
+        // Helper to count frequencies
+        const buildOptions = (items: string[], field: keyof Expense, defaults: string[] = []): QuickEntryOption[] => {
+            const counts = new Map<string, number>();
+            expenses.forEach(e => {
+              const value = String(e[field]);
+              counts.set(value, (counts.get(value) || 0) + 1);
+            });
+            
+            // Merge defaults and existing items unique
+            const allItems = Array.from(new Set([...defaults, ...items]));
+            
+            return allItems.map(item => ({
+              id: item,
+              label: item,
+              recentCount: counts.get(item) || 0
+            })).sort((a, b) => (b.recentCount || 0) - (a.recentCount || 0));
         };
 
-        const categories = getUniqueValues(expenses, 'category');
-        const methods = getUniqueValues(expenses, 'method');
-        const shops = getUniqueValues(expenses, 'shop');
-        const locations = getUniqueValues(expenses, 'location');
+        setContexts(['Daily', 'Travel', 'Work', 'Gift', 'Personal']); 
+        setItems(getUniqueValues(expenses, 'item').slice(0, 20));
 
         setAutocompleteData({
-          categories: buildOptions(categories, expenses, 'category'),
-          shops: buildOptions(shops, expenses, 'shop'),
-          methods: buildOptions(methods, expenses, 'method'),
-          locations: buildOptions(locations, expenses, 'location'),
+            // Important: Pass allDefaultCategories here so they exist in the options list
+            categories: buildOptions(getUniqueValues(expenses, 'category'), 'category', allDefaultCategories),
+            shops: buildOptions(getUniqueValues(expenses, 'shop'), 'shop'),
+            methods: buildOptions(getUniqueValues(expenses, 'method'), 'method', ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Mobile Payment']),
+            locations: buildOptions(getUniqueValues(expenses, 'location'), 'location'),
         });
         
         setLoading(false);
       } catch (err) {
-        console.error('Error loading autocomplete data:', err);
+        console.error('Error initializing quick entry:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
         setLoading(false);
       }
     }
     
-    loadAutocompleteData();
+    initialize();
   }, []);
 
   // Handle save
   const handleSave = async (data: QuickEntryData) => {
-    // Format data for CSV
-    const csvRow = {
-      Year: data.date.getFullYear(),
-      Month: data.date.getMonth() + 1,
-      Date: data.date.toISOString().split('T')[0],
-      Target: data.target,
-      Category: data.category,
-      Value: data.value,
-      Item: data.item || `Quick entry ${new Date().toLocaleDateString()}`,
-      Context: data.context || 'Daily',
-      Method: data.method,
-      Shop: data.shop,
-      Location: data.location,
-    };
+    try {
+        const payload = {
+          year: data.date.getFullYear(),
+          month: data.date.getMonth() + 1,
+          date: data.date.toISOString().split('T')[0],
+          target: data.target,
+          category: data.category,
+          value: data.value,
+          item: data.item || 'Expense',
+          context: data.context || 'Daily',
+          method: data.method,
+          shop: data.shop,
+          location: data.location,
+        };
 
-    console.log('Saving transaction:', csvRow);
-    
-    // Store in localStorage (Phase 2 will add proper API endpoint)
-    const pendingTransactions = JSON.parse(
-      localStorage.getItem('pending_transactions') || '[]'
-    );
-    pendingTransactions.push({
-      ...csvRow,
-      _id: Date.now(),
-      _createdAt: new Date().toISOString()
-    });
-    localStorage.setItem('pending_transactions', JSON.stringify(pendingTransactions));
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await fetch('/api/expenses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save expense');
+        }
+
+        // Optionally update cache? router.refresh() handles it usually.
+    } catch (err) {
+        console.error('Save failed:', err);
+        throw err; // Propagate to component to show error
+    }
   };
 
   // Handle cancel
   const handleCancel = () => {
-    router.push('/');
+    router.push('/dashboard');
   };
 
   if (loading) {
@@ -144,7 +139,6 @@ export default function QuickEntryPage() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
-          <p className="text-secondary-text">Loading...</p>
         </div>
       </div>
     );
@@ -165,10 +159,6 @@ export default function QuickEntryPage() {
         </div>
       </div>
     );
-  }
-
-  if (!autocompleteData) {
-    return null;
   }
 
   return (

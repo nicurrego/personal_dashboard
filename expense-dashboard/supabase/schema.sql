@@ -1,11 +1,24 @@
 -- ============================================
--- Expense Tracker Database Schema
+-- Expense Tracker Database Schema (FIXED)
+-- Handles cases where tables/policies already exist
 -- Run this in your Supabase SQL Editor
--- Dashboard > SQL Editor > New Query
 -- ============================================
 
--- Enable UUID extension (usually already enabled)
+-- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================
+-- DROP EXISTING POLICIES (if any)
+-- ============================================
+DROP POLICY IF EXISTS "Users can view own expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can insert own expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can update own expenses" ON expenses;
+DROP POLICY IF EXISTS "Users can delete own expenses" ON expenses;
+
+DROP POLICY IF EXISTS "Users can view own budgets" ON budgets;
+DROP POLICY IF EXISTS "Users can insert own budgets" ON budgets;
+DROP POLICY IF EXISTS "Users can update own budgets" ON budgets;
+DROP POLICY IF EXISTS "Users can delete own budgets" ON budgets;
 
 -- ============================================
 -- EXPENSES TABLE
@@ -28,7 +41,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index for fast queries by user and date
+-- Index for fast queries
 CREATE INDEX IF NOT EXISTS idx_expenses_user_date ON expenses(user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_expenses_user_year_month ON expenses(user_id, year, month);
 
@@ -45,19 +58,14 @@ CREATE TABLE IF NOT EXISTS budgets (
   amount DECIMAL(12,2) NOT NULL CHECK (amount >= 0),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  -- Unique constraint: one budget per user/year/month/target/category
   UNIQUE(user_id, year, month, target, category)
 );
 
--- Index for fast queries
 CREATE INDEX IF NOT EXISTS idx_budgets_user_year_month ON budgets(user_id, year, month);
 
 -- ============================================
--- ROW LEVEL SECURITY (RLS)
--- Each user can only see/edit their own data
+-- ROW LEVEL SECURITY
 -- ============================================
-
--- Enable RLS on tables
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
 
@@ -89,9 +97,7 @@ CREATE POLICY "Users can delete own budgets" ON budgets
 
 -- ============================================
 -- UPDATED_AT TRIGGER
--- Automatically update the updated_at timestamp
 -- ============================================
-
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -100,11 +106,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_expenses_updated_at ON expenses;
 CREATE TRIGGER update_expenses_updated_at
   BEFORE UPDATE ON expenses
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_budgets_updated_at ON budgets;
 CREATE TRIGGER update_budgets_updated_at
   BEFORE UPDATE ON budgets
   FOR EACH ROW
@@ -112,14 +120,4 @@ CREATE TRIGGER update_budgets_updated_at
 
 -- ============================================
 -- SUCCESS!
--- ============================================
--- Your database is now ready!
--- 
--- Tables created:
--- - expenses (for transaction data)
--- - budgets (for monthly budgets)
---
--- Security:
--- - Row Level Security enabled
--- - Each user can only access their own data
 -- ============================================

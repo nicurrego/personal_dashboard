@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
 
 interface BudgetRow {
   Year: number;
@@ -17,12 +18,13 @@ const TARGET_COLORS: Record<string, { bg: string; text: string; border: string }
   Present: { bg: 'bg-alert-amber/10', text: 'text-alert-amber', border: 'border-alert-amber' },
 };
 
-const TARGET_ORDER = ['Future', 'Living', 'Present'];
+const TARGET_ORDER: TargetType[] = ['Future', 'Living', 'Present'];
 
 export default function BudgetPage() {
   const [data, setData] = useState<BudgetRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  // Default to current year
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [expandedTargets, setExpandedTargets] = useState<Record<string, boolean>>({
     Future: true,
     Living: true,
@@ -32,24 +34,29 @@ export default function BudgetPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await fetch('/monthly_budget.csv');
-        const text = await response.text();
+        const response = await fetch('/api/budgets');
+        if (!response.ok) throw new Error('Failed to load budget');
         
-        const lines = text.split('\n').filter(line => line.trim());
+        const rawData = await response.json();
         
-        const parsed: BudgetRow[] = lines.slice(1).map(line => {
-          const values = line.split(',');
-          return {
-            Year: parseInt(values[0]),
-            Month: parseInt(values[1]),
-            Target: values[2],
-            Category: values[3],
-            Budget: parseInt(values[4])
-          };
-        }).filter(row => !isNaN(row.Year));
+        const parsed: BudgetRow[] = rawData.map((b: any) => ({
+          Year: Number(b.year),
+          Month: Number(b.month),
+          Target: b.target,
+          Category: b.category,
+          Budget: Number(b.amount)
+        }));
         
         setData(parsed);
-        setSelectedYear(parsed[0]?.Year || null);
+        // If we have data, we might want to switch year, but defaulting to current is safer for empty state
+        if (parsed.length > 0) {
+          const years = [...new Set(parsed.map(d => d.Year))].sort();
+          if (years.includes(new Date().getFullYear())) {
+             setSelectedYear(new Date().getFullYear());
+          } else {
+             setSelectedYear(years[years.length - 1]);
+          }
+        }
         setLoading(false);
       } catch (error) {
         console.error('Error loading budget:', error);
@@ -59,17 +66,14 @@ export default function BudgetPage() {
     loadData();
   }, []);
 
-  const years = [...new Set(data.map(d => d.Year))].sort();
+  // Use available years from data OR just current year if empty
+  const dataYears = [...new Set(data.map(d => d.Year))].sort();
+  const years = dataYears.length > 0 ? dataYears : [new Date().getFullYear()];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  const filteredData = selectedYear ? data.filter(d => d.Year === selectedYear) : data;
+  // Filter data for selected year
+  const filteredData = data.filter(d => d.Year === selectedYear);
   
-  // Group by Target
-  const groupedByTarget = TARGET_ORDER.map(target => {
-    const categories = [...new Set(filteredData.filter(d => d.Target === target).map(d => d.Category))];
-    return { target, categories };
-  });
-
   const getCategoryRowData = (category: string) => {
     const row: Record<string, number> = {};
     months.forEach((_, idx) => {
@@ -81,14 +85,13 @@ export default function BudgetPage() {
     return row;
   };
 
-  const getTargetTotal = (target: string) => {
-    const categories = [...new Set(filteredData.filter(d => d.Target === target).map(d => d.Category))];
-    return months.reduce((total, _, idx) => {
-      const monthNum = idx + 1;
-      return total + categories.reduce((sum, cat) => {
-        const entry = filteredData.find(d => d.Category === cat && d.Month === monthNum);
-        return sum + (entry?.Budget || 0);
-      }, 0);
+  // Calculate totals based on DEFAULT categories + actual data
+  // Logic: Iterate default categories, find their values.
+  const getTargetTotal = (target: TargetType) => {
+    const categories = DEFAULT_CATEGORIES[target];
+    return categories.reduce((total, category) => {
+        const rowData = getCategoryRowData(category);
+        return total + rowData.Total;
     }, 0);
   };
 
@@ -116,7 +119,7 @@ export default function BudgetPage() {
               ← Back to Home
             </Link>
             <h1 className="text-3xl font-bold">Monthly Budget</h1>
-            <p className="text-secondary-text text-sm font-mono">{data.length} budget entries • 19 categories</p>
+            <p className="text-secondary-text text-sm font-mono">{selectedYear} Plan</p>
           </div>
           
           {/* Year Selector */}
@@ -138,7 +141,7 @@ export default function BudgetPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {TARGET_ORDER.map(target => {
             const colors = TARGET_COLORS[target];
             const total = getTargetTotal(target);
@@ -154,7 +157,8 @@ export default function BudgetPage() {
 
         {/* Budget Tables by Target */}
         <div className="space-y-6">
-          {groupedByTarget.map(({ target, categories }) => {
+          {TARGET_ORDER.map((target) => {
+            const categories = DEFAULT_CATEGORIES[target];
             const colors = TARGET_COLORS[target];
             const isExpanded = expandedTargets[target];
             
@@ -197,17 +201,22 @@ export default function BudgetPage() {
                       <tbody>
                         {categories.map((category, i) => {
                           const rowData = getCategoryRowData(category);
+                          const isZeroRow = rowData.Total === 0;
+                          
                           return (
-                            <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${isZeroRow ? 'opacity-60 hover:opacity-100' : ''}`}>
                               <td className="p-3 font-medium sticky left-0 bg-card-surface/80 backdrop-blur-sm">
                                 {category}
                               </td>
-                              {months.map(m => (
-                                <td key={m} className="text-right p-3 text-secondary-text font-mono text-xs">
-                                  {formatCurrency(rowData[m])}
-                                </td>
-                              ))}
-                              <td className={`text-right p-3 font-mono font-bold ${colors.text}`}>
+                              {months.map(m => {
+                                const val = rowData[m];
+                                return (
+                                  <td key={m} className={`text-right p-3 font-mono text-xs ${val === 0 ? 'text-secondary-text/30' : 'text-secondary-text'}`}>
+                                    {val === 0 ? '-' : formatCurrency(val)}
+                                  </td>
+                                );
+                              })}
+                              <td className={`text-right p-3 font-mono font-bold ${colors.text} ${rowData.Total === 0 ? 'opacity-50' : ''}`}>
                                 {formatCurrency(rowData.Total)}
                               </td>
                             </tr>

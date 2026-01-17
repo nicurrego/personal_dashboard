@@ -42,12 +42,27 @@ export default function SpendingTrendD3({
     const { svg, g, width, height } = createResponsiveSVG(container, margin);
     
     // Create scales
+    // Create scales
+    // Handle single data point case to safely render a line/dot
+    const extent = d3.extent(data, d => d.date) as [Date, Date];
+    let domain = extent;
+    if (domain[0] && domain[1] && domain[0].getTime() === domain[1].getTime()) {
+        // Expand domain by 1 day on each side if only 1 point
+        const d = domain[0];
+        domain = [
+            new Date(d.getTime() - 24 * 60 * 60 * 1000), 
+            new Date(d.getTime() + 24 * 60 * 60 * 1000)
+        ];
+    }
+
     const xScale = d3.scaleTime()
-      .domain(d3.extent(data, d => d.date) as [Date, Date])
+      .domain(domain)
       .range([0, width]);
     
+    // Y Scale (handle all zero values or single value)
+    const maxVal = d3.max(data, d => d.total) || 0;
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.total) || 0])
+      .domain([0, maxVal === 0 ? 1000 : maxVal * 1.1]) // Add headroom
       .nice()
       .range([height, 0]);
     

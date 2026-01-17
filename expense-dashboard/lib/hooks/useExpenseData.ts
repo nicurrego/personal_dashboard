@@ -56,34 +56,56 @@ export function useExpenseData() {
   useEffect(() => {
     async function loadData() {
       try {
+        // Fetch expenses and budgets from API
+        // Add cache: 'no-store' to ensure we get fresh data
         const [expensesResponse, budgetResponse] = await Promise.all([
-          fetch('/expenses_combined_english.csv'),
-          fetch('/monthly_budget.csv')
+          fetch('/api/expenses', { cache: 'no-store' }),
+          fetch('/api/budgets', { cache: 'no-store' })
         ]);
 
-        if (!expensesResponse.ok) throw new Error('Failed to load expense data');
-        // Budget is optional, don't crash if missing but try to read
-        let parsedBudget: Budget[] = [];
+        if (!expensesResponse.ok) {
+          throw new Error('Failed to load expense data');
+        }
+        
+        const rawExpenses = await expensesResponse.json();
+        const parsedExpenses: Expense[] = rawExpenses.map((e: any) => ({
+          year: Number(e.year),
+          month: Number(e.month),
+          date: e.date,
+          target: e.target,
+          category: e.category,
+          value: Number(e.value),
+          item: e.item || '',
+          context: e.context || '',
+          method: e.method || '',
+          shop: e.shop || '',
+          location: e.location || ''
+        }));
+        
+        setExpenses(parsedExpenses);
+
+        // Load budgets if available
         if (budgetResponse.ok) {
-           const budgetText = await budgetResponse.text();
-           parsedBudget = parseBudgetCSV(budgetText);
+           const rawBudgets = await budgetResponse.json();
+           const parsedBudget: Budget[] = rawBudgets.map((b: any) => ({
+             year: Number(b.year),
+             month: Number(b.month),
+             target: b.target,
+             category: b.category,
+             amount: Number(b.amount)
+           }));
            setBudget(parsedBudget);
         }
-
-        const csvText = await expensesResponse.text();
-        const parsedData = parseCSV(csvText);
-        
-        setExpenses(parsedData);
         
         // Extract unique values for filters
-        const years = Array.from(new Set(parsedData.map(e => e.year))).sort();
+        const years = Array.from(new Set(parsedExpenses.map(e => e.year))).sort();
         setUniqueValues({
           years,
-          targets: getUniqueValues(parsedData, 'target'),
-          categories: getUniqueValues(parsedData, 'category'),
-          locations: getUniqueValues(parsedData, 'location'),
-          methods: getUniqueValues(parsedData, 'method'),
-          shops: getUniqueValues(parsedData, 'shop')
+          targets: getUniqueValues(parsedExpenses, 'target'),
+          categories: getUniqueValues(parsedExpenses, 'category'),
+          locations: getUniqueValues(parsedExpenses, 'location'),
+          methods: getUniqueValues(parsedExpenses, 'method'),
+          shops: getUniqueValues(parsedExpenses, 'shop')
         });
         
         // Determine reference year/month
@@ -92,29 +114,33 @@ export function useExpenseData() {
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
         
-        const hasCurrentYearData = parsedData.some(e => e.year === currentYear);
-        const hasCurrentMonthData = parsedData.some(e => e.year === currentYear && e.month === currentMonth);
+        const hasCurrentYearData = parsedExpenses.some(e => e.year === currentYear);
+        const hasCurrentMonthData = parsedExpenses.some(e => e.year === currentYear && e.month === currentMonth);
         
         if (hasCurrentMonthData) {
           setReferenceYear(currentYear);
           setReferenceMonth(currentMonth);
         } else if (hasCurrentYearData) {
           // Use current year but find the latest month with data
-          const monthsInCurrentYear = parsedData
+          const monthsInCurrentYear = parsedExpenses
             .filter(e => e.year === currentYear)
             .map(e => e.month);
           const latestMonth = Math.max(...monthsInCurrentYear);
           setReferenceYear(currentYear);
           setReferenceMonth(latestMonth);
-        } else {
+        } else if (parsedExpenses.length > 0) {
           // Use the latest year and month in the dataset
           const latestYear = Math.max(...years);
-          const monthsInLatestYear = parsedData
+          const monthsInLatestYear = parsedExpenses
             .filter(e => e.year === latestYear)
             .map(e => e.month);
           const latestMonth = Math.max(...monthsInLatestYear);
           setReferenceYear(latestYear);
           setReferenceMonth(latestMonth);
+        } else {
+          // No data at all
+          setReferenceYear(currentYear);
+          setReferenceMonth(currentMonth);
         }
         
         setLoading(false);
