@@ -91,7 +91,7 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-void-black text-white p-6">
+    <div className="min-h-screen bg-void-black text-white p-6 pb-32">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -103,8 +103,18 @@ export default function ExpensesPage() {
             <p className="text-secondary-text text-sm font-mono">{filteredData.length} records</p>
           </div>
           
-          {/* Search */}
+          {/* Actions & Search */}
           <div className="flex items-center gap-4">
+            <Link
+              href="/upload"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 hover:text-cyber-cyan transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <span>Import CSV</span>
+            </Link>
+
             <input
               type="text"
               placeholder="Search..."

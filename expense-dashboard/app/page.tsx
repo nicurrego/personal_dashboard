@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -9,22 +10,35 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
+
   useEffect(() => {
     const supabase = createClient();
     
     // Check current session
     supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        // Redirect if already logged in
+        router.push('/dashboard');
+        return;
+      }
       setUser(user);
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      if (currentUser) {
+        router.push('/dashboard');
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-void-black flex flex-col items-center justify-center p-6 relative overflow-hidden">

@@ -305,7 +305,7 @@ export function QuickEntryFlow({
   const stepConfig = STEP_CONFIG[currentStep];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col pb-32">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <button

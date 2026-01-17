@@ -135,7 +135,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   }
 
   return (
-    <div className="min-h-screen bg-void-black font-sans text-white pb-24">
+    <div className="min-h-screen bg-void-black font-sans text-white pb-48">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Header */}
@@ -250,7 +250,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       {isFilterOpen && (
         <div style={{
           position: 'fixed',
-          bottom: '24px',
+          bottom: '120px',
           right: '96px',
           zIndex: 9998,
           display: 'flex',

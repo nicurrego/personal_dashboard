@@ -199,7 +199,7 @@ export default function ProfilePage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto p-6 space-y-6">
+      <main className="max-w-2xl mx-auto p-6 space-y-6 pb-32">
         {/* Message */}
         {message && (
           <div className={`p-4 rounded-xl border ${

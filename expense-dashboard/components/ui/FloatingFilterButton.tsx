@@ -27,7 +27,7 @@ export default function FloatingFilterButton({ onClick, count, isOpen = false }:
       onClick={onClick}
       style={{
         position: 'fixed',
-        bottom: '24px',
+        bottom: '120px',
         right: '24px',
         zIndex: 9998,
         width: '56px',
