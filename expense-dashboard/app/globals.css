@@ -1,83 +1,208 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* === FROM PLATA CLARA === */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Custom Palette - Vibrant Accents */
+  --color-trust-navy: #171717;
+  --color-growth-green: #22c55e;
+  --color-alert-amber: #f59e0b;
+  --color-laser-magenta: #d946ef;
+  --color-cyber-cyan: #06b6d4;
+  --color-flux-violet: #8b5cf6;
+
+  /* Budget Category Colors */
+  --color-category-future: #22c55e;
+  --color-category-living: #06b6d4;
+  --color-category-present: #f59e0b;
+  --color-category-income: #8b5cf6;
+  
+  --glow-future: 0 0 10px rgba(34, 197, 94, 0.5);
+  --glow-living: 0 0 10px rgba(6, 182, 212, 0.5);
+  --glow-present: 0 0 10px rgba(245, 158, 11, 0.5);
+  --glow-income: 0 0 10px rgba(139, 92, 246, 0.5);
+
+  /* Override Slate to be Monochrome (Neutral) */
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f5f5f5;
+  --color-slate-200: #e5e5e5;
+  --color-slate-300: #d4d4d4;
+  --color-slate-400: #a3a3a3;
+  --color-slate-500: #737373;
+  --color-slate-600: #525252;
+  --color-slate-700: #404040;
+  --color-slate-800: #262626;
+  --color-slate-900: #171717;
+  --color-slate-950: #0a0a0a;
+}
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  --radius: 0.625rem;
+  /* Dark Mode Defaults for Dashboard */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --popover: #0a0a0a;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #262626;
+  --secondary-foreground: #ffffff;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ffffff;
+  --destructive: #404040;
+  --border: #262626;
+  --input: #262626;
+  --ring: #ffffff;
+  --chart-1: #ffffff;
+  --chart-2: #d4d4d4;
+  --chart-3: #a3a3a3;
+  --chart-4: #737373;
+  --chart-5: #404040;
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #262626;
+  --sidebar-ring: #ffffff;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: black; /* Pure black */
+.dark {
+  /* Same as root */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --popover: #0a0a0a;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #262626;
+  --secondary-foreground: #ffffff;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --destructive: #404040;
+  --border: #262626;
+  --input: #262626;
+  --ring: #ffffff;
+  --chart-1: #ffffff;
+  --chart-2: #d4d4d4;
+  --chart-3: #a3a3a3;
+  --chart-4: #737373;
+  --chart-5: #404040;
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #262626;
+  --sidebar-ring: #ffffff;
 }
 
-/* D3 Chart Styles */
-.axis line,
-.axis path {
-  shape-rendering: crispEdges;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-.axis text {
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-}
-
-.grid line {
-  stroke: #e5e7eb;
-  stroke-opacity: 0.7;
-  shape-rendering: crispEdges;
-}
-
-.grid path {
-  stroke-width: 0;
-}
-
-/* Tooltip transitions */
-div[style*="visibility: visible"] {
-  opacity: 1;
-  transition: opacity 0.2s ease-in-out;
-}
-
-div[style*="visibility: hidden"] {
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-}
-
-/* Liquid Glass Design System */
+/* === EXPENSE DASHBOARD COMPONENTS === */
 @layer components {
   .liquid-card {
     @apply bg-[rgba(28,28,30,0.8)] backdrop-blur-[20px] rounded-[24px] border border-[rgba(255,255,255,0.1)];
   }
-
   .liquid-button {
     @apply rounded-full font-bold transition-all duration-200 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.3)];
   }
-
-  /* Typography */
   .text-label {
     @apply text-xs font-semibold uppercase tracking-[0.15em];
     color: #8e8e93;
   }
-
   .text-value {
     @apply text-4xl font-bold tracking-tight text-white font-mono;
   }
-
-  /* Safe area for bottom navigation */
   .safe-area-pb {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-
-  /* Page container with bottom nav space */
   .page-with-nav {
-    padding-bottom: 5rem; /* 80px for bottom nav */
+    padding-bottom: 5rem;
   }
 }
+
+/* D3 Styles */
+.axis line, .axis path { shape-rendering: crispEdges; }
+.axis text { font-family: ui-sans-serif, system-ui, sans-serif; }
+.grid line { stroke: #e5e7eb; stroke-opacity: 0.7; shape-rendering: crispEdges; }
+.grid path { stroke-width: 0; }
+div[style*="visibility: visible"] { opacity: 1; transition: opacity 0.2s ease-in-out; }
+div[style*="visibility: hidden"] { opacity: 0; transition: opacity 0.2s ease-in-out; }
+
+/* PLATACLARA UTILS */
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-0.5deg); }
+  50% { transform: rotate(0.5deg); }
+  75% { transform: rotate(-0.5deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-shake { animation: shake 0.3s ease-in-out infinite; }
+.pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+.mb-safe { margin-bottom: max(0rem, env(safe-area-inset-bottom)); }
+html, body { overscroll-behavior: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.touch-pan-y { touch-action: pan-y; }
+.touch-pan-x { touch-action: pan-x; }
+.touch-none { touch-action: none; }
+.mobile-input-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; will-change: transform; }
