@@ -129,8 +129,8 @@ export default function BudgetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-void-black text-white p-6 pb-32">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-void-black text-white p-6 pb-32 page-ambient">
+      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -172,7 +172,8 @@ export default function BudgetPage() {
         {/* Pro Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Discretionary Income */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div className="glass-premium rounded-xl p-5 hover-lift card-glow-future relative overflow-hidden">
+                <div className="highlight-shine" />
                 <p className="text-sm font-medium text-secondary-text mb-1">Discretionary Income</p>
                 <div className="text-2xl font-bold text-growth-green">
                     {formatCurrency(discretionaryIncome)}
@@ -181,7 +182,8 @@ export default function BudgetPage() {
             </div>
             
             {/* Total Income */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div className="glass-premium rounded-xl p-5 hover-lift card-glow-income relative overflow-hidden">
+                <div className="highlight-shine" />
                 <p className="text-sm font-medium text-secondary-text mb-1">Total Income</p>
                 <div className="text-2xl font-bold text-white">
                     {formatCurrency(totalIncome > 0 ? totalIncome : (fixedCosts + discretionaryIncome))}
@@ -192,7 +194,8 @@ export default function BudgetPage() {
             </div>
 
             {/* Fixed Costs */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div className="glass-premium rounded-xl p-5 hover-lift card-glow-present relative overflow-hidden">
+                <div className="highlight-shine" />
                  <p className="text-sm font-medium text-secondary-text mb-1">Fixed Costs</p>
                 <div className="text-2xl font-bold text-alert-amber">
                     {formatCurrency(fixedCosts)}
@@ -202,7 +205,7 @@ export default function BudgetPage() {
         </div>
 
         {/* Category Allocations Summary */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+        <div className="glass-premium rounded-xl p-6 relative overflow-hidden shimmer-effect">
             <h2 className="text-xl font-bold mb-1">Category Allocations</h2>
             <p className="text-secondary-text text-sm mb-6">Annual planned spending by category (Future & Present)</p>
             

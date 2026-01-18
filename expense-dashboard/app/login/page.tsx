@@ -40,8 +40,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
@@ -50,7 +50,7 @@ function LoginForm() {
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-6">
-          <div className="liquid-card p-6 space-y-4">
+          <div className="liquid-card-premium p-6 space-y-4 hover-lift">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-secondary-text mb-2">

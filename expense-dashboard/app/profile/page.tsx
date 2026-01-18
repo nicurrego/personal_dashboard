@@ -183,7 +183,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black page-ambient">
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -199,7 +199,7 @@ export default function ProfilePage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto p-6 space-y-6 pb-32">
+      <main className="max-w-2xl mx-auto p-6 space-y-6 pb-32 relative z-10">
         {/* Message */}
         {message && (
           <div className={`p-4 rounded-xl border ${
@@ -212,7 +212,7 @@ export default function ProfilePage() {
         )}
 
         {/* Profile Info */}
-        <div className="liquid-card p-6 space-y-4">
+        <div className="liquid-card-premium p-6 space-y-4 hover-lift relative z-10">
           <h2 className="text-xl font-semibold text-white">Profile Information</h2>
           
           {/* Email (read-only) */}
@@ -277,7 +277,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Change Password */}
-        <div className="liquid-card p-6 space-y-4">
+        <div className="liquid-card-premium p-6 space-y-4 hover-lift relative z-10">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white">Password</h2>
             <button
@@ -332,7 +332,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Logout */}
-        <div className="liquid-card p-6">
+        <div className="liquid-card-premium p-6 hover-lift">
           <button
             onClick={handleLogout}
             className="w-full py-3 rounded-xl font-semibold
@@ -344,7 +344,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Danger Zone */}
-        <div className="liquid-card p-6 space-y-4 border-laser-magenta/30">
+        <div className="liquid-card-premium p-6 space-y-4 border-laser-magenta/30 hover-lift">
           <h2 className="text-xl font-semibold text-laser-magenta">Danger Zone</h2>
           <p className="text-sm text-secondary-text">
             Once you delete your account, there is no going back. All your data will be permanently deleted.

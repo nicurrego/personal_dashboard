@@ -4,11 +4,10 @@ import type { BudgetTotals } from '../types';
 import type { ChartType } from './charts/types';
 import { formatMoney, triggerHaptic } from '../utils/formatters';
 import { CATEGORY_COLORS } from '@/lib/category-colors';
-import { DonutChart } from './charts/donut-chart';
-import { SankeyChart } from './charts/sankey-chart';
-import { SavingsProjection } from './charts/savings-projection';
-import { CategoryTreemap } from './charts/category-treemap';
-import { IncomeVsExpenses } from './charts/income-vs-expenses';
+// Use new D3-powered charts
+import { BudgetDonutD3 } from './charts/BudgetDonutD3';
+import { BudgetBarD3 } from './charts/BudgetBarD3';
+import { BudgetProjectionD3 } from './charts/BudgetProjectionD3';
 
 export interface BudgetPercentages {
   future: number;
@@ -50,29 +49,6 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
     onGraphOpen();
   };
 
-  const renderMiniChart = () => {
-    const props = { 
-      totals, 
-      size: 'small' as const, 
-      monthlyNetCashFlow: cashFlowVal 
-    };
-
-    switch (selectedChartType) {
-      case 'DONUT':
-        return <DonutChart {...props} />;
-      case 'SANKEY':
-        return <SankeyChart {...props} />;
-      case 'PROJECTION':
-        return <SavingsProjection {...props} />;
-      case 'TREEMAP':
-        return <CategoryTreemap {...props} />;
-      case 'COMPARISON':
-        return <IncomeVsExpenses {...props} />;
-      default:
-        return <DonutChart {...props} />;
-    }
-  };
-
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-6 sm:px-10 pt-8 pb-8 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
       {/* Ambient Background Glow */}
@@ -109,17 +85,17 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
         >
           <div>
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 w-full">
-              {/* Chart 1: Allocation Donut */}
+              {/* Chart 1: D3 Allocation Donut */}
               <div className="h-24">
-                 <DonutChart totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                 <BudgetDonutD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
-              {/* Chart 2: Income vs Expenses (Bar) */}
+              {/* Chart 2: D3 Income vs Expenses (Bar) */}
               <div className="h-24 hidden lg:block">
-                 <IncomeVsExpenses totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                 <BudgetBarD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
-              {/* Chart 3: Projection (Area) - Visible on XL screens */}
+              {/* Chart 3: D3 Projection (Area) - Visible on XL screens */}
               <div className="h-24 hidden xl:block">
-                 <SavingsProjection totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                 <BudgetProjectionD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
              </div>
           </div>

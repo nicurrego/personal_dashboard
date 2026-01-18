@@ -12,6 +12,7 @@ interface UseBudgetDataReturn {
   // Data state
   data: Record<string, number>;
   setData: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+  initializeData: (newData: Record<string, number>) => void;
   hasChanges: boolean;
   setHasChanges: React.Dispatch<React.SetStateAction<boolean>>;
   
@@ -142,6 +143,14 @@ export function useBudgetData(): UseBudgetDataReturn {
     }
   }, [recordHistory]);
   
+  // Initialize data (for loading existing budget without marking as changed)
+  const initializeData = useCallback((newData: Record<string, number>) => {
+    setData(newData);
+    setHistory([newData]);
+    setHistoryIndex(0);
+    setHasChanges(false);
+  }, []);
+  
   // Cell value calculation (aggregating across span)
   const getCellValue = useCallback((categoryId: string, colIndex: number, span: number): number => {
     let sum = 0;
@@ -234,6 +243,7 @@ export function useBudgetData(): UseBudgetDataReturn {
   return {
     data,
     setData,
+    initializeData,
     hasChanges,
     setHasChanges,
     viewMode,

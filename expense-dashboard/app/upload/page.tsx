@@ -184,7 +184,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pb-20">
+    <div className="min-h-screen bg-black pb-20 page-ambient">
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -199,9 +199,9 @@ export default function UploadPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto p-6 space-y-6">
+      <main className="max-w-2xl mx-auto p-6 space-y-6 relative z-10">
         {/* Instructions */}
-        <div className="liquid-card p-6">
+        <div className="liquid-card-premium p-6 hover-lift">
           <h2 className="text-xl font-semibold text-white mb-4">CSV Format</h2>
           <p className="text-secondary-text text-sm mb-4">
             Your CSV file should have these columns in order:
@@ -257,7 +257,7 @@ export default function UploadPage() {
 
         {/* Preview */}
         {preview.length > 0 && (
-          <div className="liquid-card p-6">
+          <div className="liquid-card-premium p-6 hover-lift">
             <h3 className="text-lg font-semibold text-white mb-4">Preview (first 5 rows)</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -310,7 +310,7 @@ export default function UploadPage() {
 
         {/* Progress */}
         {importing && (
-          <div className="liquid-card p-6">
+          <div className="liquid-card-premium p-6 hover-lift">
             <div className="flex items-center justify-between mb-3">
               <span className="text-white font-medium">Importing...</span>
               <span className="text-cyber-cyan">{progress}%</span>

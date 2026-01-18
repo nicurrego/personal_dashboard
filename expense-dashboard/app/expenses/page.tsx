@@ -102,8 +102,8 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-void-black text-white p-6 pb-32">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-void-black text-white p-6 pb-32 page-ambient">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
@@ -137,8 +137,8 @@ export default function ExpensesPage() {
         </div>
 
         {/* Table */}
-        <div className="liquid-card overflow-hidden mb-6">
-          <div className="overflow-x-auto">
+        <div className="liquid-card-premium overflow-hidden mb-6">
+          <div className="overflow-x-auto relative z-10">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10">

@@ -381,3 +381,360 @@ body {
   color: #8b5cf6;
 }
 
+/* === AMBIENT GLOW EFFECTS === */
+.ambient-glow-cyan {
+  position: relative;
+}
+.ambient-glow-cyan::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-violet {
+  position: relative;
+}
+.ambient-glow-violet::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-green {
+  position: relative;
+}
+.ambient-glow-green::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === GRADIENT FADES / EDGE EFFECTS === */
+.fade-edges {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
+}
+
+.fade-top {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%);
+}
+
+.fade-bottom {
+  mask-image: linear-gradient(to top, transparent 0%, black 8%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 8%);
+}
+
+/* Card with gradient border glow */
+.card-glow-future {
+  box-shadow: 
+    0 0 0 1px rgba(34, 197, 94, 0.2),
+    0 4px 20px rgba(34, 197, 94, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.card-glow-living {
+  box-shadow: 
+    0 0 0 1px rgba(6, 182, 212, 0.2),
+    0 4px 20px rgba(6, 182, 212, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.card-glow-present {
+  box-shadow: 
+    0 0 0 1px rgba(245, 158, 11, 0.2),
+    0 4px 20px rgba(245, 158, 11, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.card-glow-income {
+  box-shadow: 
+    0 0 0 1px rgba(139, 92, 246, 0.2),
+    0 4px 20px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* === SHIMMER / MIRROR EFFECTS === */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+.shimmer-hover:hover {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Mirror reflection effect at bottom */
+.mirror-shine::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.02) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Top highlight shine */
+.highlight-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* === ENHANCED GLASS MORPHISM === */
+.glass-premium {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-frosted {
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === PAGE WRAPPER WITH AMBIENT EFFECTS === */
+.page-ambient {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page-ambient::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-ambient::after {
+  content: '';
+  position: fixed;
+  bottom: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === ENHANCED LIQUID CARD === */
+.liquid-card-premium {
+  @apply bg-[rgba(28,28,30,0.8)] backdrop-blur-[20px] rounded-[24px] border border-[rgba(255,255,255,0.1)];
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-card-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 100%
+  );
+}
+
+.liquid-card-premium::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.15) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* === GRADIENT TEXT EFFECTS === */
+.text-gradient-cyan-green {
+  background: linear-gradient(135deg, #06b6d4 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-violet-cyan {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-amber-green {
+  background: linear-gradient(135deg, #f59e0b 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* === SMOOTH TRANSITIONS === */
+.transition-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-bounce {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* === HOVER LIFT EFFECTS === */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hover-glow-cyan:hover {
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+}
+
+.hover-glow-green:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
+}
+
+/* === PULSE ANIMATION FOR STATUS === */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* === SCAN LINE EFFECT (Optional futuristic) === */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.scanline-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(6, 182, 212, 0.03) 50%,
+    transparent 100%
+  );
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+}
+

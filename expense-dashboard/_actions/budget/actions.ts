@@ -86,6 +86,42 @@ export async function getUserBudget() {
   };
 }
 
+/**
+ * Fetch budget data in a format suitable for the budget builder/editor.
+ * Returns raw budget rows that can be converted to spreadsheet data format.
+ */
+export async function getBudgetForEditing() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return null;
+
+  // Fetch all budgets for the user for the current planning period
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
+  
+  const { data: budgets, error } = await supabase
+    .from('budgets')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('year', currentYear)
+    .order('year', { ascending: true })
+    .order('month', { ascending: true });
+
+  if (error || !budgets || budgets.length === 0) {
+    return null;
+  }
+
+  // Return the raw budget rows
+  return budgets.map((b: any) => ({
+    year: Number(b.year),
+    month: Number(b.month),
+    target: b.target,
+    category: b.category,
+    amount: Number(b.amount)
+  }));
+}
+
 export type BudgetRow = {
   year: number;
   month: number;

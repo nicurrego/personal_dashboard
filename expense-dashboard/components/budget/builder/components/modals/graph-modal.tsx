@@ -6,11 +6,13 @@ import { triggerHaptic } from '../../utils/formatters';
 import type { BudgetTotals } from '../../types';
 import type { ChartType } from '../charts/types';
 import { CHART_DEFINITIONS } from '../charts/types';
-import { DonutChart } from '../charts/donut-chart';
-import { SankeyChart } from '../charts/sankey-chart';
-import { SavingsProjection } from '../charts/savings-projection';
+// Use new D3-powered charts for better visual quality
+import { BudgetDonutD3 } from '../charts/BudgetDonutD3';
+import { BudgetFlowD3 } from '../charts/BudgetFlowD3';
+import { BudgetProjectionD3 } from '../charts/BudgetProjectionD3';
+import { BudgetBarD3 } from '../charts/BudgetBarD3';
+// Keep original charts for treemap (no D3 version yet)
 import { CategoryTreemap } from '../charts/category-treemap';
-import { IncomeVsExpenses } from '../charts/income-vs-expenses';
 
 interface GraphModalProps {
   isOpen: boolean;
@@ -55,15 +57,15 @@ export function GraphModal({ isOpen, onClose, selectedChartType, onChartTypeChan
     
     switch (chartId) {
       case 'DONUT':
-        return <DonutChart {...props} />;
+        return <BudgetDonutD3 {...props} />;
       case 'SANKEY':
-        return <SankeyChart {...props} />;
+        return <BudgetFlowD3 {...props} />;
       case 'PROJECTION':
-        return <SavingsProjection {...props} />;
+        return <BudgetProjectionD3 {...props} />;
       case 'TREEMAP':
         return <CategoryTreemap {...props} />;
       case 'COMPARISON':
-        return <IncomeVsExpenses {...props} />;
+        return <BudgetBarD3 {...props} />;
       default:
         return null;
     }

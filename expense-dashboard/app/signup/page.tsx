@@ -54,9 +54,9 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="w-full max-w-md text-center">
-          <div className="liquid-card p-8">
+      <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+        <div className="w-full max-w-md text-center relative z-10">
+          <div className="liquid-card-premium p-8 hover-lift">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-growth-green/20 flex items-center justify-center">
               <svg className="w-8 h-8 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -79,8 +79,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
@@ -89,7 +89,7 @@ export default function SignupPage() {
 
         {/* Signup Form */}
         <form onSubmit={handleSignup} className="space-y-6">
-          <div className="liquid-card p-6 space-y-4">
+          <div className="liquid-card-premium p-6 space-y-4 hover-lift">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-secondary-text mb-2">

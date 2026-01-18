@@ -32,15 +32,17 @@ interface BudgetSpreadsheetProps {
   onSave: (payload: { data: Record<string, number>, viewMode: string }) => void;
   isLoading: boolean;
   headerActions?: React.ReactNode;
+  initialData?: Record<string, number> | null;
 }
 
-export default function BudgetSpreadsheet({ onSave, isLoading, headerActions }: BudgetSpreadsheetProps) {
+export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, initialData }: BudgetSpreadsheetProps) {
   // Core data management
   const budgetData = useBudgetData();
   const {
     data,
     hasChanges,
     setHasChanges,
+    initializeData,
     viewMode,
     setViewMode,
     columns,
@@ -108,8 +110,17 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions }: 
   const isResizingRef = useRef(false);
   const resizeStartXRef = useRef(0);
   const resizeStartWidthRef = useRef(0);
+  const initialDataLoadedRef = useRef(false);
   
   const startDate = useMemo(() => new Date(), []);
+
+  // Load initial data if provided (for editing existing budget)
+  useEffect(() => {
+    if (initialData && Object.keys(initialData).length > 0 && !initialDataLoadedRef.current) {
+      initializeData(initialData);
+      initialDataLoadedRef.current = true;
+    }
+  }, [initialData, initializeData]);
 
   // Initialize Fixed Column state based on device width
   useEffect(() => {
