@@ -1,186 +1,441 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import {
+  importCSV,
+  validateCSV,
+  type ImportResult,
+  type ImportError,
+  type ImportWarning
+} from '@/lib/csvImporter';
+import type { Expense } from '@/types';
 
-interface ParsedRow {
-  year: number;
-  month: number;
-  date: string;
-  target: string;
-  category: string;
-  value: number;
-  item: string;
-  context: string;
-  method: string;
-  shop: string;
-  location: string;
-}
+type ImportStage = 'select' | 'preview' | 'importing' | 'success' | 'error';
 
 export default function UploadPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
+  const [stage, setStage] = useState<ImportStage>('select');
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<ParsedRow[]>([]);
-  const [totalRows, setTotalRows] = useState(0);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [preview, setPreview] = useState<Expense[]>([]);
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [showWarnings, setShowWarnings] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
 
-  const parseCSVLine = (line: string): string[] => {
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        result.push(current.trim());
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  };
-
-  const parseCSV = (text: string): ParsedRow[] => {
-    const lines = text.trim().split('\n');
-    if (lines.length < 2) return [];
-    
-    const rows: ParsedRow[] = [];
-    
-    for (let i = 1; i < lines.length; i++) {
-      const values = parseCSVLine(lines[i]);
-      if (values.length < 11) continue;
-      
-      try {
-        const row: ParsedRow = {
-          year: parseInt(values[0]) || new Date().getFullYear(),
-          month: parseInt(values[1]) || 1,
-          date: values[2] || new Date().toISOString().split('T')[0],
-          target: values[3] || 'Living',
-          category: values[4] || 'Other',
-          value: parseFloat(values[5].replace(/,/g, '')) || 0,
-          item: values[6] || '',
-          context: values[7] || '',
-          method: values[8] || '',
-          shop: values[9] || '',
-          location: values[10] || '',
-        };
-        
-        if (row.value > 0) {
-          rows.push(row);
-        }
-      } catch {
-        // Skip invalid rows
-      }
-    }
-    
-    return rows;
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
-    
+
     if (!selectedFile.name.endsWith('.csv')) {
       setError('Please select a CSV file');
       return;
     }
-    
+
     setFile(selectedFile);
     setError(null);
-    
+    setStage('select');
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      const parsed = parseCSV(text);
-      setTotalRows(parsed.length);
-      setPreview(parsed.slice(0, 5)); // Show first 5 rows
+
+      // First validate
+      const validation = validateCSV(text);
+      if (!validation.valid && !validation.hasCorrectHeaders) {
+        setError('Invalid CSV format. Please check your file has the correct headers.');
+        return;
+      }
+
+      // Full import to get complete results
+      const result = importCSV(text);
+      setImportResult(result);
+      setPreview(result.data.slice(0, 10));
+      setStage('preview');
+
+      if (!result.success) {
+        setError(`No valid records found. ${result.errors[0]?.message || 'Check your CSV format.'}`);
+      }
+    };
+    reader.onerror = () => {
+      setError('Error reading file');
     };
     reader.readAsText(selectedFile);
-  };
+  }, []);
 
   const handleImport = async () => {
-    if (!file) return;
-    
+    if (!importResult || !importResult.data.length) return;
+
     setImporting(true);
+    setStage('importing');
     setError(null);
     setProgress(0);
-    
+
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
-      setError('Not authenticated');
+      setError('Not authenticated. Please log in first.');
       setImporting(false);
+      setStage('error');
       return;
     }
-    
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const text = event.target?.result as string;
-      const rows = parseCSV(text);
-      
-      const batchSize = 100;
-      let imported = 0;
-      
-      for (let i = 0; i < rows.length; i += batchSize) {
-        const batch = rows.slice(i, i + batchSize).map(row => ({
+
+    const batchSize = 100;
+    let imported = 0;
+    const totalRows = importResult.data.length;
+
+    try {
+      for (let i = 0; i < totalRows; i += batchSize) {
+        const batch = importResult.data.slice(i, i + batchSize).map(row => ({
           user_id: user.id,
-          ...row,
+          year: row.year,
+          month: row.month,
+          date: row.date,
+          target: row.target,
+          category: row.category,
+          value: row.value,
+          item: row.item || '',
+          context: row.context || '',
+          method: row.method || '',
+          shop: row.shop || '',
+          location: row.location || '',
         }));
-        
+
         const { error: insertError } = await supabase
           .from('expenses')
           .insert(batch);
-        
+
         if (insertError) {
           console.error('Insert error:', insertError);
-          setError(`Error importing row ${i}: ${insertError.message}`);
+          setError(`Error at row ${i + 1}: ${insertError.message}`);
           setImporting(false);
+          setStage('error');
           return;
         }
-        
+
         imported += batch.length;
-        setProgress(Math.round((imported / rows.length) * 100));
+        setProgress(Math.round((imported / totalRows) * 100));
       }
-      
-      setSuccess(true);
+
+      setStage('success');
       setImporting(false);
-      
-      // Redirect to dashboard after success
+
+      // Redirect after success
       setTimeout(() => {
         router.push('/dashboard');
-      }, 2000);
-    };
-    
-    reader.readAsText(file);
+      }, 2500);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error during import');
+      setStage('error');
+      setImporting(false);
+    }
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-growth-green/20 flex items-center justify-center">
-            <svg className="w-10 h-10 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Import Complete!</h1>
-          <p className="text-secondary-text mb-4">{totalRows} transactions imported successfully</p>
-          <p className="text-sm text-secondary-text">Redirecting to dashboard...</p>
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.name.endsWith('.csv')) {
+      // Simulate file input change
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(droppedFile);
+      if (fileInputRef.current) {
+        fileInputRef.current.files = dataTransfer.files;
+        handleFileSelect({ target: { files: dataTransfer.files } } as React.ChangeEvent<HTMLInputElement>);
+      }
+    } else {
+      setError('Please drop a CSV file');
+    }
+  }, [handleFileSelect]);
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // ======================================
+  // Render Functions
+  // ======================================
+
+  const renderFormatInfo = () => (
+    <div className="liquid-card-premium p-6 hover-lift">
+      <h2 className="text-xl font-semibold text-white mb-4">Expected CSV Format</h2>
+      <p className="text-secondary-text text-sm mb-4">
+        Your CSV file should have these columns (order matters):
+      </p>
+      <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+        <code className="text-xs text-cyber-cyan whitespace-nowrap">
+          Year, Month, Date, Target, Category, Value, Item, Context, Method, Shop, Location
+        </code>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        <div className="text-xs text-secondary-text">
+          <span className="text-growth-green font-medium">✓ Supported date formats:</span>
+          {' '}YYYY-MM-DD, M/D/YYYY, MM/DD/YYYY
+        </div>
+        <div className="text-xs text-secondary-text">
+          <span className="text-growth-green font-medium">✓ Supported value formats:</span>
+          {' '}1234, $1,234, ¥1234
+        </div>
+        <div className="text-xs text-secondary-text">
+          <span className="text-growth-green font-medium">✓ Auto-conversion:</span>
+          {' '}Saving/Investment → Future, Transport → Transport
         </div>
       </div>
+
+      <p className="text-secondary-text text-xs mt-4 pt-3 border-t border-white/10">
+        <span className="text-white">Example row:</span>
+        <br />
+        <code className="text-cyber-cyan">2024, 1, 2024-01-15, Living, Food, 1500, Lunch, Daily, Cash, Restaurant, Tokyo</code>
+      </p>
+    </div>
+  );
+
+  const renderFileDropzone = () => (
+    <div
+      className={`liquid-card p-8 border-2 border-dashed transition-all cursor-pointer
+        ${file ? 'border-cyber-cyan/50' : 'border-white/20 hover:border-cyber-cyan/30'}`}
+      onClick={() => fileInputRef.current?.click()}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+    >
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
+      <div className="text-center">
+        {file ? (
+          <>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyber-cyan/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-cyber-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p className="text-white font-medium mb-1">{file.name}</p>
+            {importResult && (
+              <p className="text-secondary-text text-sm">
+                {importResult.stats.validRows.toLocaleString()} valid transactions found
+              </p>
+            )}
+            <p className="text-cyber-cyan text-xs mt-2">Click to change file</p>
+          </>
+        ) : (
+          <>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
+              <svg className="w-8 h-8 text-secondary-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </div>
+            <p className="text-white font-medium mb-1">Click to select CSV file</p>
+            <p className="text-secondary-text text-sm">or drag and drop</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderImportStats = () => {
+    if (!importResult) return null;
+    const { stats } = importResult;
+
+    return (
+      <div className="liquid-card-premium p-6 hover-lift">
+        <h3 className="text-lg font-semibold text-white mb-4">Import Analysis</h3>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="text-center p-3 rounded-lg bg-growth-green/10">
+            <div className="text-2xl font-bold text-growth-green">{stats.validRows.toLocaleString()}</div>
+            <div className="text-xs text-secondary-text">Valid Records</div>
+          </div>
+          <div className="text-center p-3 rounded-lg bg-white/5">
+            <div className="text-2xl font-bold text-white">{stats.totalRows.toLocaleString()}</div>
+            <div className="text-xs text-secondary-text">Total Rows</div>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-secondary-text">Date format detected:</span>
+            <span className="text-cyber-cyan">{stats.dateFormatUsed}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-secondary-text">Value format detected:</span>
+            <span className="text-cyber-cyan">{stats.valueFormatUsed}</span>
+          </div>
+          {stats.skippedRows > 0 && (
+            <div className="flex justify-between">
+              <span className="text-secondary-text">Skipped rows:</span>
+              <span className="text-amber-400">{stats.skippedRows}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Warnings & Errors toggles */}
+        {(importResult.warnings.length > 0 || importResult.errors.length > 0) && (
+          <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+            {importResult.warnings.length > 0 && (
+              <button
+                onClick={() => setShowWarnings(!showWarnings)}
+                className="w-full text-left flex items-center justify-between p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+              >
+                <span className="text-amber-400 text-sm">
+                  ⚠️ {importResult.warnings.length} warning{importResult.warnings.length !== 1 ? 's' : ''}
+                </span>
+                <span className="text-xs text-secondary-text">{showWarnings ? '▲' : '▼'}</span>
+              </button>
+            )}
+
+            {showWarnings && importResult.warnings.length > 0 && (
+              <div className="pl-4 space-y-1 max-h-40 overflow-y-auto">
+                {importResult.warnings.slice(0, 20).map((w, i) => (
+                  <div key={i} className="text-xs text-amber-400/70">
+                    Row {w.row}: {w.field} — {w.originalValue} → {w.correctedValue}
+                  </div>
+                ))}
+                {importResult.warnings.length > 20 && (
+                  <div className="text-xs text-secondary-text">
+                    ...and {importResult.warnings.length - 20} more
+                  </div>
+                )}
+              </div>
+            )}
+
+            {importResult.errors.length > 0 && (
+              <button
+                onClick={() => setShowErrors(!showErrors)}
+                className="w-full text-left flex items-center justify-between p-2 rounded-lg bg-laser-magenta/10 hover:bg-laser-magenta/20 transition-colors"
+              >
+                <span className="text-laser-magenta text-sm">
+                  ❌ {importResult.errors.length} error{importResult.errors.length !== 1 ? 's' : ''}
+                </span>
+                <span className="text-xs text-secondary-text">{showErrors ? '▲' : '▼'}</span>
+              </button>
+            )}
+
+            {showErrors && importResult.errors.length > 0 && (
+              <div className="pl-4 space-y-1 max-h-40 overflow-y-auto">
+                {importResult.errors.slice(0, 20).map((e, i) => (
+                  <div key={i} className="text-xs text-laser-magenta/70">
+                    Row {e.row}: {e.message} {e.field && `(${e.field})`}
+                  </div>
+                ))}
+                {importResult.errors.length > 20 && (
+                  <div className="text-xs text-secondary-text">
+                    ...and {importResult.errors.length - 20} more
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
+  };
+
+  const renderPreviewTable = () => {
+    if (preview.length === 0) return null;
+
+    return (
+      <div className="liquid-card-premium p-6 hover-lift">
+        <h3 className="text-lg font-semibold text-white mb-4">Preview (first 10 rows)</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-secondary-text text-left border-b border-white/10">
+                <th className="py-2 pr-4 font-medium">Date</th>
+                <th className="py-2 pr-4 font-medium">Target</th>
+                <th className="py-2 pr-4 font-medium">Category</th>
+                <th className="py-2 pr-4 font-medium text-right">Value</th>
+                <th className="py-2 pr-4 font-medium">Item</th>
+              </tr>
+            </thead>
+            <tbody>
+              {preview.map((row, i) => (
+                <tr key={i} className="text-white border-t border-white/5 hover:bg-white/5">
+                  <td className="py-2 pr-4">{row.date}</td>
+                  <td className="py-2 pr-4">
+                    <span className={`px-2 py-0.5 rounded-full text-xs
+                      ${row.target === 'Living' ? 'bg-cyan-500/20 text-cyan-400' :
+                        row.target === 'Present' ? 'bg-purple-500/20 text-purple-400' :
+                          'bg-green-500/20 text-green-400'}`}>
+                      {row.target}
+                    </span>
+                  </td>
+                  <td className="py-2 pr-4">{row.category}</td>
+                  <td className="py-2 pr-4 text-right font-mono">¥{row.value.toLocaleString()}</td>
+                  <td className="py-2 pr-4 text-secondary-text truncate max-w-[150px]">
+                    {row.item || '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {importResult && importResult.stats.validRows > 10 && (
+          <p className="text-secondary-text text-xs mt-3 pt-3 border-t border-white/10">
+            ...and {(importResult.stats.validRows - 10).toLocaleString()} more rows
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  const renderProgress = () => (
+    <div className="liquid-card-premium p-6 hover-lift">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-white font-medium">Importing data...</span>
+        <span className="text-cyber-cyan font-bold">{progress}%</span>
+      </div>
+      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-cyber-cyan to-growth-green transition-all duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <p className="text-secondary-text text-xs mt-3">
+        {importResult && `${Math.round((progress / 100) * importResult.stats.validRows).toLocaleString()} / ${importResult.stats.validRows.toLocaleString()} records`}
+      </p>
+    </div>
+  );
+
+  const renderSuccess = () => (
+    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <div className="text-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-growth-green/20 flex items-center justify-center animate-pulse">
+          <svg className="w-10 h-10 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold text-white mb-2">Import Complete!</h1>
+        <p className="text-secondary-text mb-4">
+          {importResult?.stats.validRows.toLocaleString()} transactions imported successfully
+        </p>
+        <p className="text-sm text-secondary-text">Redirecting to dashboard...</p>
+
+        <Link
+          href="/dashboard"
+          className="inline-block mt-6 px-6 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
+        >
+          Go to Dashboard Now →
+        </Link>
+      </div>
+    </div>
+  );
+
+  // Success screen
+  if (stage === 'success') {
+    return renderSuccess();
   }
 
   return (
@@ -188,7 +443,7 @@ export default function UploadPage() {
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <Link 
+          <Link
             href="/dashboard"
             className="text-secondary-text hover:text-white transition-colors"
           >
@@ -200,128 +455,48 @@ export default function UploadPage() {
       </header>
 
       <main className="max-w-2xl mx-auto p-6 space-y-6 relative z-10">
-        {/* Instructions */}
-        <div className="liquid-card-premium p-6 hover-lift">
-          <h2 className="text-xl font-semibold text-white mb-4">CSV Format</h2>
-          <p className="text-secondary-text text-sm mb-4">
-            Your CSV file should have these columns in order:
-          </p>
-          <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
-            <code className="text-xs text-cyber-cyan">
-              Year, Month, Date, Target, Category, Value, Item, Context, Method, Shop, Location
-            </code>
-          </div>
-          <p className="text-secondary-text text-xs mt-3">
-            Example: 2024, 1, 2024-01-15, Living, Food, 1500, Lunch, Daily, Cash, Restaurant, Tokyo
-          </p>
-        </div>
+        {/* Format Instructions */}
+        {renderFormatInfo()}
 
         {/* File Input */}
-        <div 
-          className="liquid-card p-8 border-2 border-dashed border-white/20 hover:border-cyber-cyan/50 transition-colors cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          
-          <div className="text-center">
-            {file ? (
-              <>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyber-cyan/20 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-cyber-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium mb-1">{file.name}</p>
-                <p className="text-secondary-text text-sm">{totalRows} valid transactions found</p>
-                <p className="text-cyber-cyan text-xs mt-2">Click to change file</p>
-              </>
-            ) : (
-              <>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-secondary-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium mb-1">Click to select CSV file</p>
-                <p className="text-secondary-text text-sm">or drag and drop</p>
-              </>
-            )}
-          </div>
-        </div>
+        {renderFileDropzone()}
 
-        {/* Preview */}
-        {preview.length > 0 && (
-          <div className="liquid-card-premium p-6 hover-lift">
-            <h3 className="text-lg font-semibold text-white mb-4">Preview (first 5 rows)</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-secondary-text text-left">
-                    <th className="py-2 pr-4">Date</th>
-                    <th className="py-2 pr-4">Category</th>
-                    <th className="py-2 pr-4">Value</th>
-                    <th className="py-2 pr-4">Item</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.map((row, i) => (
-                    <tr key={i} className="text-white border-t border-white/10">
-                      <td className="py-2 pr-4">{row.date}</td>
-                      <td className="py-2 pr-4">{row.category}</td>
-                      <td className="py-2 pr-4">¥{row.value.toLocaleString()}</td>
-                      <td className="py-2 pr-4 text-secondary-text">{row.item || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {totalRows > 5 && (
-              <p className="text-secondary-text text-xs mt-3">
-                ...and {totalRows - 5} more rows
-              </p>
-            )}
-          </div>
-        )}
+        {/* Import Stats */}
+        {stage === 'preview' && renderImportStats()}
 
-        {/* Error */}
+        {/* Preview Table */}
+        {stage === 'preview' && renderPreviewTable()}
+
+        {/* Import Progress */}
+        {stage === 'importing' && renderProgress()}
+
+        {/* Error Display */}
         {error && (
           <div className="p-4 rounded-xl bg-laser-magenta/10 border border-laser-magenta/30 text-laser-magenta">
-            {error}
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p className="font-medium">Import Error</p>
+                <p className="text-sm mt-1 opacity-80">{error}</p>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Import Button */}
-        {file && !importing && (
+        {stage === 'preview' && importResult && importResult.data.length > 0 && !importing && (
           <button
             onClick={handleImport}
             className="w-full py-4 rounded-xl font-bold text-lg
                        bg-gradient-to-r from-cyber-cyan to-growth-green text-white
-                       hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] transition-all"
+                       hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] 
+                       hover:scale-[1.01] active:scale-[0.99]
+                       transition-all duration-200"
           >
-            Import {totalRows} Transactions
+            Import {importResult.stats.validRows.toLocaleString()} Transactions
           </button>
-        )}
-
-        {/* Progress */}
-        {importing && (
-          <div className="liquid-card-premium p-6 hover-lift">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-white font-medium">Importing...</span>
-              <span className="text-cyber-cyan">{progress}%</span>
-            </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-cyber-cyan to-growth-green transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
         )}
       </main>
     </div>

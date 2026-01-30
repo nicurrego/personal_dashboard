@@ -18,16 +18,30 @@ export {
   getUniqueValues
 } from './csvParser';
 
+// Re-export production CSV importer
+export {
+  importCSV,
+  validateCSV,
+  getImportPreview,
+} from './csvImporter';
+export type {
+  ImportResult,
+  ImportError,
+  ImportWarning,
+  ImportStats,
+} from './csvImporter';
+
+
 // Re-export general utilities
 export { cn } from './utils';
 
 // Re-export category colors
-export { 
-  CATEGORY_COLORS, 
-  CATEGORY_GLOWS, 
-  CATEGORY_TAILWIND, 
-  getCategoryColor, 
-  getCategoryClasses 
+export {
+  CATEGORY_COLORS,
+  CATEGORY_GLOWS,
+  CATEGORY_TAILWIND,
+  getCategoryColor,
+  getCategoryClasses
 } from './category-colors';
 export type { CategoryKey } from './category-colors';
 
