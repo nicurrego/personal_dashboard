@@ -14,12 +14,12 @@ export default function Home() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     // Check current session
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         // Redirect if already logged in
-        router.push('/dashboard');
+        router.push('/home');
         return;
       }
       setUser(user);
@@ -30,7 +30,7 @@ export default function Home() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
       if (currentUser) {
-        router.push('/dashboard');
+        router.push('/home');
       } else {
         setUser(null);
         setLoading(false);
@@ -113,7 +113,7 @@ export default function Home() {
             </div>
           </div>
         </Link>
-        
+
         {/* Module 2: Budget */}
         <Link href="/budget" className="group">
           <div className="liquid-card p-8 h-64 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-flux-violet">
@@ -134,7 +134,7 @@ export default function Home() {
             </div>
           </div>
         </Link>
-        
+
         {/* Module 3: Expenses */}
         <Link href="/expenses" className="group">
           <div className="liquid-card p-8 h-64 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-cyber-cyan">
@@ -155,7 +155,7 @@ export default function Home() {
             </div>
           </div>
         </Link>
-        
+
         {/* Module 4: Quick Entry */}
         <Link href="/quick-entry" className="group">
           <div className="liquid-card p-8 h-64 flex flex-col justify-between hover:bg-[rgba(255,255,255,0.03)] transition-all duration-300 border-l-4 border-l-alert-amber">
@@ -179,7 +179,7 @@ export default function Home() {
       </div>
 
       {/* Mobile FAB for Quick Entry */}
-      <Link 
+      <Link
         href="/quick-entry"
         className="md:hidden fixed bottom-6 right-6 w-16 h-16 rounded-full 
                    bg-gradient-to-r from-alert-amber to-growth-green

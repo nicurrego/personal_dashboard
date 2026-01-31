@@ -152,32 +152,55 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 /* === EXPENSE DASHBOARD COMPONENTS === */
-@layer components {
-  .liquid-card {
-    @apply bg-[rgba(28,28,30,0.8)] backdrop-blur-[20px] rounded-[24px] border border-[rgba(255,255,255,0.1)];
-  }
-  .liquid-button {
-    @apply rounded-full font-bold transition-all duration-200 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.3)];
-  }
-  .text-label {
-    @apply text-xs font-semibold uppercase tracking-[0.15em];
-    color: #8e8e93;
-  }
-  .text-value {
-    @apply text-4xl font-bold tracking-tight text-white font-mono;
-  }
-  .safe-area-pb {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  .page-with-nav {
-    padding-bottom: 5rem;
-  }
+.liquid-card {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.liquid-button {
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.liquid-button:active {
+  transform: scale(0.95);
+}
+
+.text-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #8e8e93;
+}
+
+.text-value {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: white;
+  font-family: ui-monospace, monospace;
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.page-with-nav {
+  padding-bottom: 5rem;
 }
 
 /* D3 Styles */
@@ -185,21 +208,26 @@
 .axis path {
   shape-rendering: crispEdges;
 }
+
 .axis text {
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
+
 .grid line {
   stroke: #e5e7eb;
   stroke-opacity: 0.7;
   shape-rendering: crispEdges;
 }
+
 .grid path {
   stroke-width: 0;
 }
+
 div[style*="visibility: visible"] {
   opacity: 1;
   transition: opacity 0.2s ease-in-out;
 }
+
 div[style*="visibility: hidden"] {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
@@ -210,48 +238,62 @@ div[style*="visibility: hidden"] {
   0% {
     transform: rotate(0deg);
   }
+
   25% {
     transform: rotate(-0.5deg);
   }
+
   50% {
     transform: rotate(0.5deg);
   }
+
   75% {
     transform: rotate(-0.5deg);
   }
+
   100% {
     transform: rotate(0deg);
   }
 }
+
 .animate-shake {
   animation: shake 0.3s ease-in-out infinite;
 }
+
 .pb-safe {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
+
 .mb-safe {
   margin-bottom: max(0rem, env(safe-area-inset-bottom));
 }
+
 html,
 body {
   overscroll-behavior: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .touch-pan-y {
   touch-action: pan-y;
 }
+
 .touch-pan-x {
   touch-action: pan-x;
 }
+
 .touch-none {
   touch-action: none;
 }
+
 .mobile-input-bar {
   position: fixed;
   left: 0;
@@ -385,6 +427,7 @@ body {
 .ambient-glow-cyan {
   position: relative;
 }
+
 .ambient-glow-cyan::before {
   content: '';
   position: absolute;
@@ -402,6 +445,7 @@ body {
 .ambient-glow-violet {
   position: relative;
 }
+
 .ambient-glow-violet::after {
   content: '';
   position: absolute;
@@ -419,6 +463,7 @@ body {
 .ambient-glow-green {
   position: relative;
 }
+
 .ambient-glow-green::before {
   content: '';
   position: absolute;
@@ -435,20 +480,16 @@ body {
 
 /* === GRADIENT FADES / EDGE EFFECTS === */
 .fade-edges {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 5%,
-    black 95%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 5%,
-    black 95%,
-    transparent 100%
-  );
+  mask-image: linear-gradient(to bottom,
+      transparent 0%,
+      black 5%,
+      black 95%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0%,
+      black 5%,
+      black 95%,
+      transparent 100%);
 }
 
 .fade-top {
@@ -463,28 +504,28 @@ body {
 
 /* Card with gradient border glow */
 .card-glow-future {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(34, 197, 94, 0.2),
     0 4px 20px rgba(34, 197, 94, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .card-glow-living {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(6, 182, 212, 0.2),
     0 4px 20px rgba(6, 182, 212, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .card-glow-present {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(245, 158, 11, 0.2),
     0 4px 20px rgba(245, 158, 11, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .card-glow-income {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(139, 92, 246, 0.2),
     0 4px 20px rgba(139, 92, 246, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -495,29 +536,26 @@ body {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 .shimmer-effect {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 8s ease-in-out infinite;
 }
 
 .shimmer-hover:hover {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }
@@ -530,11 +568,9 @@ body {
   left: 0;
   right: 0;
   height: 40%;
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.02) 0%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(255, 255, 255, 0.02) 0%,
+      transparent 100%);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -547,12 +583,10 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.15) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 100%);
   pointer-events: none;
 }
 
@@ -562,7 +596,7 @@ body {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -613,7 +647,11 @@ body {
 
 /* === ENHANCED LIQUID CARD === */
 .liquid-card-premium {
-  @apply bg-[rgba(28,28,30,0.8)] backdrop-blur-[20px] rounded-[24px] border border-[rgba(255,255,255,0.1)];
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -625,12 +663,10 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.12) 50%,
+      transparent 100%);
 }
 
 .liquid-card-premium::after {
@@ -640,11 +676,9 @@ body {
   left: 0;
   right: 0;
   height: 30%;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.15) 0%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.15) 0%,
+      transparent 100%);
   pointer-events: none;
 }
 
@@ -699,9 +733,12 @@ body {
 
 /* === PULSE ANIMATION FOR STATUS === */
 @keyframes pulse-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -716,6 +753,7 @@ body {
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(100%);
   }
@@ -728,13 +766,77 @@ body {
   left: 0;
   right: 0;
   height: 50%;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(6, 182, 212, 0.03) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(to bottom,
+      transparent 0%,
+      rgba(6, 182, 212, 0.03) 50%,
+      transparent 100%);
   animation: scanline 8s linear infinite;
   pointer-events: none;
 }
 
+/* === MASCOT ANIMATIONS === */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wiggle {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-3deg);
+  }
+
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 2s ease-in-out infinite;
+}
+
+/* Speech bubble animation */
+@keyframes bubble-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.speech-bubble {
+  animation: bubble-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* === HOME PAGE SPECIFIC === */
+.home-gradient-bg {
+  background: radial-gradient(ellipse 80% 50% at 50% -10%,
+      rgba(6, 182, 212, 0.15) 0%,
+      transparent 50%);
+}
+
+.card-investment {
+  background: linear-gradient(135deg,
+      rgba(28, 28, 30, 0.9) 0%,
+      rgba(10, 10, 10, 0.95) 100%);
+}

@@ -37,8 +37,8 @@ export async function updateSession(request: NextRequest) {
 
   // Protected routes - redirect to login if not authenticated
   // Home page (/) is PUBLIC - accessible without login
-  const protectedPaths = ['/dashboard', '/quick-entry', '/expenses', '/budget', '/profile'];
-  const isProtectedPath = protectedPaths.some(path => 
+  const protectedPaths = ['/home', '/dashboard', '/quick-entry', '/expenses', '/budget', '/profile'];
+  const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );
 
@@ -51,13 +51,13 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect logged-in users away from auth pages
   const authPaths = ['/login', '/signup'];
-  const isAuthPath = authPaths.some(path => 
+  const isAuthPath = authPaths.some(path =>
     request.nextUrl.pathname === path
   );
 
   if (isAuthPath && user) {
     const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
+    url.pathname = '/home';
     return NextResponse.redirect(url);
   }
 
