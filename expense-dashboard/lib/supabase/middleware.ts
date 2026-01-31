@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
 
   // Protected routes - redirect to login if not authenticated
   // Home page (/) is PUBLIC - accessible without login
-  const protectedPaths = ['/home', '/dashboard', '/quick-entry', '/expenses', '/budget', '/profile'];
+  const protectedPaths = ['/home', '/dashboard', '/quick-entry', '/expenses', '/budget', '/my-page'];
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );

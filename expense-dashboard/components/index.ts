@@ -30,6 +30,9 @@ export * from './onboarding';
 // Re-export dashboard components
 export * from './dashboard';
 
+// Re-export expenses components
+export * from './expenses';
+
 // Re-export page-level components
 export { default as MainDashboard } from './MainDashboard';
 export { default as KPICards } from './KPICards';

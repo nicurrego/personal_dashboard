@@ -1,96 +1,94 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import type { Expense } from '@/types';
-import { formatCurrency } from '@/lib/formatters';
-
-/**
- * Extended expense interface for display purposes
- * Uses PascalCase to match legacy table rendering
- */
-interface ExpenseDisplay {
-  Year: number;
-  Month: number;
-  Date: string;
-  Target: string;
-  Category: string;
-  Value: number;
-  Detail: string;
-  Context: string;
-  Method: string;
-  Shop: string;
-  Location: string;
-}
-
-/**
- * Transform API expense to display format
- */
-function toDisplayExpense(e: Expense): ExpenseDisplay {
-  return {
-    Year: e.year,
-    Month: e.month,
-    Date: e.date,
-    Target: e.target,
-    Category: e.category,
-    Value: e.value,
-    Detail: e.item || '',
-    Context: e.context || '',
-    Method: e.method || '',
-    Shop: e.shop || '',
-    Location: e.location || ''
-  };
-}
+import { EditableExpenseTable } from '@/components/expenses';
 
 export default function ExpensesPage() {
-  const [data, setData] = useState<ExpenseDisplay[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [search, setSearch] = useState('');
-  const pageSize = 50;
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const response = await fetch('/api/expenses');
-        if (!response.ok) throw new Error('Failed to load expenses');
-        
-        const rawData = await response.json();
-        const parsed = rawData.map((e: Expense) => toDisplayExpense(e));
-        
-        setData(parsed);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading expenses:', error);
-        setLoading(false);
-      }
+  // Load expenses from API
+  const loadExpenses = useCallback(async () => {
+    try {
+      const response = await fetch('/api/expenses');
+      if (!response.ok) throw new Error('Failed to load expenses');
+
+      const data = await response.json();
+      setExpenses(data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error loading expenses:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load expenses');
+      setLoading(false);
     }
-    loadData();
   }, []);
 
-  // Filter by search
-  const filteredData = data.filter(row => {
-    if (!search) return true;
-    const searchLower = search.toLowerCase();
-    return (
-      row.Category?.toLowerCase().includes(searchLower) ||
-      row.Shop?.toLowerCase().includes(searchLower) ||
-      row.Detail?.toLowerCase().includes(searchLower) ||
-      row.Location?.toLowerCase().includes(searchLower)
-    );
-  });
+  useEffect(() => {
+    loadExpenses();
+  }, [loadExpenses]);
 
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-  const paginatedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
+  // Handle expense update
+  const handleUpdate = async (expense: Expense) => {
+    if (!expense.id) {
+      console.error('Cannot update expense without ID');
+      return;
+    }
 
-  const formatCurrency = (val: number) => `¥${val?.toLocaleString() || 0}`;
+    try {
+      const response = await fetch(`/api/expenses/${expense.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(expense),
+      });
 
-  const targetColors: Record<string, string> = {
-    'Living': 'text-cyber-cyan',
-    'Present': 'text-alert-amber',
-    'Future': 'text-growth-green',
-    'Saving': 'text-growth-green',
-    'Investment': 'text-flux-violet'
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update expense');
+      }
+
+      const updatedExpense = await response.json();
+
+      // Update local state
+      setExpenses(prev =>
+        prev.map(e => e.id === updatedExpense.id ? updatedExpense : e)
+      );
+    } catch (err) {
+      console.error('Error updating expense:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update expense');
+    }
+  };
+
+  // Handle expense delete
+  const handleDelete = async (expense: Expense) => {
+    if (!expense.id) {
+      console.error('Cannot delete expense without ID');
+      return;
+    }
+
+    // Ask for confirmation
+    if (!confirm(`Delete expense: ¥${expense.value.toLocaleString()} - ${expense.category}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/expenses/${expense.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete expense');
+      }
+
+      // Remove from local state
+      setExpenses(prev => prev.filter(e => e.id !== expense.id));
+    } catch (err) {
+      console.error('Error deleting expense:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete expense');
+    }
   };
 
   if (loading) {
@@ -111,88 +109,56 @@ export default function ExpensesPage() {
               ← Back to Home
             </Link>
             <h1 className="text-3xl font-bold">Expenses Data</h1>
-            <p className="text-secondary-text text-sm font-mono">{filteredData.length} records</p>
+            <p className="text-secondary-text text-sm mt-1">
+              Click on any row to edit • Double-click a cell for quick edit
+            </p>
           </div>
-          
-          {/* Actions & Search */}
+
+          {/* Actions */}
           <div className="flex items-center gap-4">
             <Link
               href="/upload"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 hover:text-cyber-cyan transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyber-cyan/20 to-growth-green/20 border border-cyber-cyan/30 text-cyber-cyan text-sm font-medium hover:from-cyber-cyan/30 hover:to-growth-green/30 transition-all"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               <span>Import CSV</span>
             </Link>
-
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-              className="bg-glass-surface border border-white/10 rounded-lg px-4 py-2 text-sm w-64 focus:outline-none focus:border-cyber-cyan"
-            />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="liquid-card-premium overflow-hidden mb-6">
-          <div className="overflow-x-auto relative z-10">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left p-3 text-secondary-text font-medium">Date</th>
-                  <th className="text-left p-3 text-secondary-text font-medium">Target</th>
-                  <th className="text-left p-3 text-secondary-text font-medium">Category</th>
-                  <th className="text-right p-3 text-secondary-text font-medium">Value</th>
-                  <th className="text-left p-3 text-secondary-text font-medium">Shop</th>
-                  <th className="text-left p-3 text-secondary-text font-medium">Location</th>
-                  <th className="text-left p-3 text-secondary-text font-medium">Method</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedData.map((row, i) => (
-                  <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-3 font-mono text-xs">{row.Date}</td>
-                    <td className={`p-3 font-bold ${targetColors[row.Target] || 'text-white'}`}>{row.Target}</td>
-                    <td className="p-3">{row.Category}</td>
-                    <td className="p-3 text-right font-mono font-bold">{formatCurrency(row.Value)}</td>
-                    <td className="p-3 text-secondary-text">{row.Shop}</td>
-                    <td className="p-3 text-secondary-text">{row.Location}</td>
-                    <td className="p-3 text-secondary-text text-xs">{row.Method}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-laser-magenta/10 border border-laser-magenta/30 text-laser-magenta">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p className="font-medium">Error</p>
+                <p className="text-sm mt-1 opacity-80">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-laser-magenta/70 hover:text-laser-magenta"
+              >
+                ✕
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between">
-          <p className="text-secondary-text text-sm">
-            Showing {page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredData.length)} of {filteredData.length}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="px-4 py-2 rounded-lg bg-glass-surface text-white disabled:opacity-30 hover:bg-neutral-800 transition-colors"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 text-secondary-text">
-              {page + 1} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-              disabled={page >= totalPages - 1}
-              className="px-4 py-2 rounded-lg bg-glass-surface text-white disabled:opacity-30 hover:bg-neutral-800 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        {/* Editable Table */}
+        <EditableExpenseTable
+          expenses={expenses}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          editable={true}
+          showDelete={true}
+          pageSize={50}
+          title="All Expenses"
+        />
       </div>
     </div>
   );

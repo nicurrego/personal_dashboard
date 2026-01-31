@@ -3,17 +3,17 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Pencil, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import {
   importCSV,
   validateCSV,
   type ImportResult,
-  type ImportError,
-  type ImportWarning
 } from '@/lib/csvImporter';
+import { EditableExpenseTable } from '@/components/expenses';
 import type { Expense } from '@/types';
 
-type ImportStage = 'select' | 'preview' | 'importing' | 'success' | 'error';
+type ImportStage = 'select' | 'preview' | 'review' | 'importing' | 'success' | 'error';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function UploadPage() {
   const [stage, setStage] = useState<ImportStage>('select');
   const [file, setFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
-  const [preview, setPreview] = useState<Expense[]>([]);
+  const [editableData, setEditableData] = useState<Expense[]>([]);
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function UploadPage() {
       // Full import to get complete results
       const result = importCSV(text);
       setImportResult(result);
-      setPreview(result.data.slice(0, 10));
+      setEditableData([...result.data]);
       setStage('preview');
 
       if (!result.success) {
@@ -70,7 +70,7 @@ export default function UploadPage() {
   }, []);
 
   const handleImport = async () => {
-    if (!importResult || !importResult.data.length) return;
+    if (!editableData.length) return;
 
     setImporting(true);
     setStage('importing');
@@ -89,11 +89,11 @@ export default function UploadPage() {
 
     const batchSize = 100;
     let imported = 0;
-    const totalRows = importResult.data.length;
+    const totalRows = editableData.length;
 
     try {
       for (let i = 0; i < totalRows; i += batchSize) {
-        const batch = importResult.data.slice(i, i + batchSize).map(row => ({
+        const batch = editableData.slice(i, i + batchSize).map(row => ({
           user_id: user.id,
           year: row.year,
           month: row.month,
@@ -157,6 +157,20 @@ export default function UploadPage() {
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+  };
+
+  // Handle editing data in review mode
+  const handleDataChange = (newData: Expense[]) => {
+    setEditableData(newData);
+  };
+
+  // Toggle between preview and full review mode
+  const toggleReviewMode = () => {
+    if (stage === 'preview') {
+      setStage('review');
+    } else {
+      setStage('preview');
+    }
   };
 
   // ======================================
@@ -225,7 +239,7 @@ export default function UploadPage() {
             <p className="text-white font-medium mb-1">{file.name}</p>
             {importResult && (
               <p className="text-secondary-text text-sm">
-                {importResult.stats.validRows.toLocaleString()} valid transactions found
+                {editableData.length.toLocaleString()} valid transactions found
               </p>
             )}
             <p className="text-cyber-cyan text-xs mt-2">Click to change file</p>
@@ -255,7 +269,7 @@ export default function UploadPage() {
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center p-3 rounded-lg bg-growth-green/10">
-            <div className="text-2xl font-bold text-growth-green">{stats.validRows.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-growth-green">{editableData.length.toLocaleString()}</div>
             <div className="text-xs text-secondary-text">Valid Records</div>
           </div>
           <div className="text-center p-3 rounded-lg bg-white/5">
@@ -343,12 +357,22 @@ export default function UploadPage() {
     );
   };
 
-  const renderPreviewTable = () => {
-    if (preview.length === 0) return null;
+  const renderQuickPreview = () => {
+    if (editableData.length === 0) return null;
+    const preview = editableData.slice(0, 5);
 
     return (
       <div className="liquid-card-premium p-6 hover-lift">
-        <h3 className="text-lg font-semibold text-white mb-4">Preview (first 10 rows)</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Quick Preview</h3>
+          <button
+            onClick={toggleReviewMode}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-flux-violet/20 border border-flux-violet/30 text-flux-violet text-sm font-medium hover:bg-flux-violet/30 transition-colors"
+          >
+            <Pencil className="w-4 h-4" />
+            <span>Review & Edit All</span>
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -382,11 +406,42 @@ export default function UploadPage() {
             </tbody>
           </table>
         </div>
-        {importResult && importResult.stats.validRows > 10 && (
+        {editableData.length > 5 && (
           <p className="text-secondary-text text-xs mt-3 pt-3 border-t border-white/10">
-            ...and {(importResult.stats.validRows - 10).toLocaleString()} more rows
+            ...and {(editableData.length - 5).toLocaleString()} more rows
           </p>
         )}
+      </div>
+    );
+  };
+
+  const renderFullReview = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-white">Review & Edit Data</h3>
+            <p className="text-secondary-text text-sm">
+              Click any row to edit • Double-click a cell for quick edit
+            </p>
+          </div>
+          <button
+            onClick={toggleReviewMode}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-colors"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Back to Summary</span>
+          </button>
+        </div>
+
+        <EditableExpenseTable
+          expenses={editableData}
+          onChange={handleDataChange}
+          editable={true}
+          showDelete={true}
+          pageSize={25}
+          isPreviewMode={true}
+        />
       </div>
     );
   };
@@ -404,7 +459,7 @@ export default function UploadPage() {
         />
       </div>
       <p className="text-secondary-text text-xs mt-3">
-        {importResult && `${Math.round((progress / 100) * importResult.stats.validRows).toLocaleString()} / ${importResult.stats.validRows.toLocaleString()} records`}
+        {`${Math.round((progress / 100) * editableData.length).toLocaleString()} / ${editableData.length.toLocaleString()} records`}
       </p>
     </div>
   );
@@ -419,7 +474,7 @@ export default function UploadPage() {
         </div>
         <h1 className="text-3xl font-bold text-white mb-2">Import Complete!</h1>
         <p className="text-secondary-text mb-4">
-          {importResult?.stats.validRows.toLocaleString()} transactions imported successfully
+          {editableData.length.toLocaleString()} transactions imported successfully
         </p>
         <p className="text-sm text-secondary-text">Redirecting to dashboard...</p>
 
@@ -442,7 +497,7 @@ export default function UploadPage() {
     <div className="min-h-screen bg-black pb-20 page-ambient">
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link
             href="/dashboard"
             className="text-secondary-text hover:text-white transition-colors"
@@ -454,18 +509,22 @@ export default function UploadPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto p-6 space-y-6 relative z-10">
-        {/* Format Instructions */}
-        {renderFormatInfo()}
+      <main className="max-w-4xl mx-auto p-6 space-y-6 relative z-10">
+        {/* Format Instructions - only show initially */}
+        {(stage === 'select' || !file) && renderFormatInfo()}
 
         {/* File Input */}
         {renderFileDropzone()}
 
-        {/* Import Stats */}
-        {stage === 'preview' && renderImportStats()}
+        {/* Content based on stage */}
+        {stage === 'preview' && (
+          <>
+            {renderImportStats()}
+            {renderQuickPreview()}
+          </>
+        )}
 
-        {/* Preview Table */}
-        {stage === 'preview' && renderPreviewTable()}
+        {stage === 'review' && renderFullReview()}
 
         {/* Import Progress */}
         {stage === 'importing' && renderProgress()}
@@ -486,7 +545,7 @@ export default function UploadPage() {
         )}
 
         {/* Import Button */}
-        {stage === 'preview' && importResult && importResult.data.length > 0 && !importing && (
+        {(stage === 'preview' || stage === 'review') && editableData.length > 0 && !importing && (
           <button
             onClick={handleImport}
             className="w-full py-4 rounded-xl font-bold text-lg
@@ -495,7 +554,7 @@ export default function UploadPage() {
                        hover:scale-[1.01] active:scale-[0.99]
                        transition-all duration-200"
           >
-            Import {importResult.stats.validRows.toLocaleString()} Transactions
+            Import {editableData.length.toLocaleString()} Transactions
           </button>
         )}
       </main>
