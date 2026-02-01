@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Expense.OS - Personal Finance Tracker",
+  title: "Kibo - Personal Finance Tracker",
   description: "Track expenses, manage budgets, and gain financial insights - works offline too!",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Expense.OS",
+    title: "Kibo",
   },
   formatDetection: {
     telephone: false,

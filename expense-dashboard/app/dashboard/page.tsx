@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import MainDashboard from '@/components/MainDashboard';
 
 // Force dynamic rendering for pages that use client-side hooks
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 function DashboardLoading() {
   return (

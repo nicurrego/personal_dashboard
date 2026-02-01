@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 // Force dynamic rendering for pages that use client-side hooks
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 function LoginForm() {
   const router = useRouter();

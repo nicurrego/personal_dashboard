@@ -1,0 +1,187 @@
+workflows:
+  # =====================================================
+  # iOS Build Workflow (Cloud Mac - Codemagic)
+  # =====================================================
+  ios-release:
+    name: iOS Release Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    
+    environment:
+      node: 20
+      xcode: latest
+      cocoapods: default
+      groups:
+        - ios_credentials # You'll set this up in Codemagic dashboard
+      vars:
+        BUNDLE_ID: "com.expenseos.app"
+        APP_STORE_APP_ID: 1234567890 # Replace with your App Store app ID
+        
+    scripts:
+      # Step 1: Install dependencies
+      - name: Install npm dependencies
+        script: |
+          npm ci
+          
+      # Step 2: Build Next.js static export (uses mobile build script)
+      - name: Build mobile app
+        script: |
+          npm run build:mobile
+          
+      # Step 3: Add iOS platform if not exists
+      - name: Add iOS platform
+        script: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+          
+      # Step 4: Sync Capacitor
+      - name: Sync Capacitor
+        script: |
+          npx cap sync ios
+          
+      # Step 5: Install CocoaPods dependencies
+      - name: Install CocoaPods
+        script: |
+          cd ios/App
+          pod install
+          
+      # Step 6: Set up code signing
+      - name: Set up code signing
+        script: |
+          # This uses Codemagic's automatic code signing
+          # Configure in Codemagic dashboard under "Code signing"
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+          
+      # Step 7: Increment build number
+      - name: Increment build number
+        script: |
+          cd ios/App
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APP_ID")
+          agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
+          
+      # Step 8: Build the app
+      - name: Build iOS app
+        script: |
+          cd ios/App
+          xcode-project build-ipa \
+            --workspace "App.xcworkspace" \
+            --scheme "App" \
+            --config "Release"
+            
+    artifacts:
+      - ios/App/build/ios/ipa/*.ipa
+      - ios/App/build/ios/logs/*.log
+      
+    publishing:
+      app_store_connect:
+        auth: integration # Uses App Store Connect API key from Codemagic
+        submit_to_testflight: true
+        submit_to_app_store: false # Set to true when ready for production
+        
+  # =====================================================
+  # Android Build Workflow
+  # =====================================================
+  android-release:
+    name: Android Release Build
+    max_build_duration: 60
+    instance_type: linux_x2
+    
+    environment:
+      node: 20
+      java: 17
+      android_signing:
+        - expense_os_keystore # You'll set this up in Codemagic dashboard
+      groups:
+        - android_credentials
+      vars:
+        PACKAGE_NAME: "com.expenseos.app"
+        
+    scripts:
+      # Step 1: Install dependencies
+      - name: Install npm dependencies
+        script: |
+          npm ci
+          
+      # Step 2: Build Next.js static export (uses mobile build script)
+      - name: Build mobile app
+        script: |
+          npm run build:mobile
+          
+      # Step 3: Add Android platform if not exists
+      - name: Add Android platform
+        script: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          
+      # Step 4: Sync Capacitor
+      - name: Sync Capacitor
+        script: |
+          npx cap sync android
+          
+      # Step 5: Build Android app bundle
+      - name: Build Android AAB
+        script: |
+          cd android
+          ./gradlew bundleRelease
+          
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/*.apk
+      
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal # Options: internal, alpha, beta, production
+        submit_as_draft: true
+
+  # =====================================================
+  # Preview/Development Build (Both platforms)
+  # =====================================================
+  dev-build:
+    name: Development Build
+    max_build_duration: 45
+    instance_type: mac_mini_m2
+    
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'develop'
+          include: true
+        - pattern: 'feature/*'
+          include: true
+          
+    environment:
+      node: 20
+      xcode: latest
+      java: 17
+      
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+        
+      - name: Build mobile app
+        script: npm run build:mobile
+        
+      - name: Add platforms
+        script: |
+          npx cap add android 2>/dev/null || true
+          npx cap add ios 2>/dev/null || true
+          
+      - name: Sync Capacitor
+        script: npx cap sync
+        
+      - name: Build Android Debug APK
+        script: |
+          cd android
+          ./gradlew assembleDebug
+          
+    artifacts:
+      - android/app/build/outputs/**/*.apk

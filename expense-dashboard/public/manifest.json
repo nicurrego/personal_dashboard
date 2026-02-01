@@ -1,6 +1,6 @@
 {
-    "name": "Expense.OS",
-    "short_name": "Expense.OS",
+    "name": "Kibo",
+    "short_name": "Kibo",
     "description": "Track expenses, manage budgets, and gain financial insights - works offline too!",
     "start_url": "/",
     "display": "standalone",

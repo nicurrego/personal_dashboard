@@ -1,0 +1,704 @@
+Year,Month,Target,Category,Budget
+2023,1,Future,Emergency Fund,30000
+2023,1,Future,Retirement Accounts,25000
+2023,1,Future,Other Investments,20000
+2023,1,Future,Debt Repayment,15000
+2023,1,Future,Goals Fund,20000
+2023,1,Future,Insurance,12000
+2023,1,Future,Skill-Building,10000
+2023,1,Living,Housing,80000
+2023,1,Living,Utilities & Services,25000
+2023,1,Living,Food,45000
+2023,1,Living,Transportation,35000
+2023,1,Living,Healthcare,15000
+2023,1,Living,Basic Personal Care,12000
+2023,1,Present,Enjoyment & Social Life,30000
+2023,1,Present,Personal Development,15000
+2023,1,Present,Travel & Experiences,25000
+2023,1,Present,Hobbies & Leisure,20000
+2023,1,Present,Subscriptions,8000
+2023,1,Present,Life Happens Fund,20000
+2023,2,Future,Emergency Fund,30000
+2023,2,Future,Retirement Accounts,25000
+2023,2,Future,Other Investments,20000
+2023,2,Future,Debt Repayment,15000
+2023,2,Future,Goals Fund,20000
+2023,2,Future,Insurance,12000
+2023,2,Future,Skill-Building,10000
+2023,2,Living,Housing,80000
+2023,2,Living,Utilities & Services,25000
+2023,2,Living,Food,45000
+2023,2,Living,Transportation,35000
+2023,2,Living,Healthcare,15000
+2023,2,Living,Basic Personal Care,12000
+2023,2,Present,Enjoyment & Social Life,30000
+2023,2,Present,Personal Development,15000
+2023,2,Present,Travel & Experiences,25000
+2023,2,Present,Hobbies & Leisure,20000
+2023,2,Present,Subscriptions,8000
+2023,2,Present,Life Happens Fund,20000
+2023,3,Future,Emergency Fund,30000
+2023,3,Future,Retirement Accounts,25000
+2023,3,Future,Other Investments,20000
+2023,3,Future,Debt Repayment,15000
+2023,3,Future,Goals Fund,20000
+2023,3,Future,Insurance,12000
+2023,3,Future,Skill-Building,10000
+2023,3,Living,Housing,80000
+2023,3,Living,Utilities & Services,25000
+2023,3,Living,Food,45000
+2023,3,Living,Transportation,35000
+2023,3,Living,Healthcare,15000
+2023,3,Living,Basic Personal Care,12000
+2023,3,Present,Enjoyment & Social Life,30000
+2023,3,Present,Personal Development,15000
+2023,3,Present,Travel & Experiences,25000
+2023,3,Present,Hobbies & Leisure,20000
+2023,3,Present,Subscriptions,8000
+2023,3,Present,Life Happens Fund,20000
+2023,4,Future,Emergency Fund,30000
+2023,4,Future,Retirement Accounts,25000
+2023,4,Future,Other Investments,20000
+2023,4,Future,Debt Repayment,15000
+2023,4,Future,Goals Fund,20000
+2023,4,Future,Insurance,12000
+2023,4,Future,Skill-Building,10000
+2023,4,Living,Housing,80000
+2023,4,Living,Utilities & Services,25000
+2023,4,Living,Food,45000
+2023,4,Living,Transportation,35000
+2023,4,Living,Healthcare,15000
+2023,4,Living,Basic Personal Care,12000
+2023,4,Present,Enjoyment & Social Life,30000
+2023,4,Present,Personal Development,15000
+2023,4,Present,Travel & Experiences,25000
+2023,4,Present,Hobbies & Leisure,20000
+2023,4,Present,Subscriptions,8000
+2023,4,Present,Life Happens Fund,20000
+2023,5,Future,Emergency Fund,30000
+2023,5,Future,Retirement Accounts,25000
+2023,5,Future,Other Investments,20000
+2023,5,Future,Debt Repayment,15000
+2023,5,Future,Goals Fund,20000
+2023,5,Future,Insurance,12000
+2023,5,Future,Skill-Building,10000
+2023,5,Living,Housing,80000
+2023,5,Living,Utilities & Services,25000
+2023,5,Living,Food,45000
+2023,5,Living,Transportation,35000
+2023,5,Living,Healthcare,15000
+2023,5,Living,Basic Personal Care,12000
+2023,5,Present,Enjoyment & Social Life,30000
+2023,5,Present,Personal Development,15000
+2023,5,Present,Travel & Experiences,25000
+2023,5,Present,Hobbies & Leisure,20000
+2023,5,Present,Subscriptions,8000
+2023,5,Present,Life Happens Fund,20000
+2023,6,Future,Emergency Fund,30000
+2023,6,Future,Retirement Accounts,25000
+2023,6,Future,Other Investments,20000
+2023,6,Future,Debt Repayment,15000
+2023,6,Future,Goals Fund,20000
+2023,6,Future,Insurance,12000
+2023,6,Future,Skill-Building,10000
+2023,6,Living,Housing,80000
+2023,6,Living,Utilities & Services,25000
+2023,6,Living,Food,45000
+2023,6,Living,Transportation,35000
+2023,6,Living,Healthcare,15000
+2023,6,Living,Basic Personal Care,12000
+2023,6,Present,Enjoyment & Social Life,30000
+2023,6,Present,Personal Development,15000
+2023,6,Present,Travel & Experiences,25000
+2023,6,Present,Hobbies & Leisure,20000
+2023,6,Present,Subscriptions,8000
+2023,6,Present,Life Happens Fund,20000
+2023,7,Future,Emergency Fund,30000
+2023,7,Future,Retirement Accounts,25000
+2023,7,Future,Other Investments,20000
+2023,7,Future,Debt Repayment,15000
+2023,7,Future,Goals Fund,20000
+2023,7,Future,Insurance,12000
+2023,7,Future,Skill-Building,10000
+2023,7,Living,Housing,80000
+2023,7,Living,Utilities & Services,25000
+2023,7,Living,Food,45000
+2023,7,Living,Transportation,35000
+2023,7,Living,Healthcare,15000
+2023,7,Living,Basic Personal Care,12000
+2023,7,Present,Enjoyment & Social Life,30000
+2023,7,Present,Personal Development,15000
+2023,7,Present,Travel & Experiences,25000
+2023,7,Present,Hobbies & Leisure,20000
+2023,7,Present,Subscriptions,8000
+2023,7,Present,Life Happens Fund,20000
+2023,8,Future,Emergency Fund,30000
+2023,8,Future,Retirement Accounts,25000
+2023,8,Future,Other Investments,20000
+2023,8,Future,Debt Repayment,15000
+2023,8,Future,Goals Fund,20000
+2023,8,Future,Insurance,12000
+2023,8,Future,Skill-Building,10000
+2023,8,Living,Housing,80000
+2023,8,Living,Utilities & Services,25000
+2023,8,Living,Food,45000
+2023,8,Living,Transportation,35000
+2023,8,Living,Healthcare,15000
+2023,8,Living,Basic Personal Care,12000
+2023,8,Present,Enjoyment & Social Life,30000
+2023,8,Present,Personal Development,15000
+2023,8,Present,Travel & Experiences,25000
+2023,8,Present,Hobbies & Leisure,20000
+2023,8,Present,Subscriptions,8000
+2023,8,Present,Life Happens Fund,20000
+2023,9,Future,Emergency Fund,30000
+2023,9,Future,Retirement Accounts,25000
+2023,9,Future,Other Investments,20000
+2023,9,Future,Debt Repayment,15000
+2023,9,Future,Goals Fund,20000
+2023,9,Future,Insurance,12000
+2023,9,Future,Skill-Building,10000
+2023,9,Living,Housing,80000
+2023,9,Living,Utilities & Services,25000
+2023,9,Living,Food,45000
+2023,9,Living,Transportation,35000
+2023,9,Living,Healthcare,15000
+2023,9,Living,Basic Personal Care,12000
+2023,9,Present,Enjoyment & Social Life,30000
+2023,9,Present,Personal Development,15000
+2023,9,Present,Travel & Experiences,25000
+2023,9,Present,Hobbies & Leisure,20000
+2023,9,Present,Subscriptions,8000
+2023,9,Present,Life Happens Fund,20000
+2023,10,Future,Emergency Fund,30000
+2023,10,Future,Retirement Accounts,25000
+2023,10,Future,Other Investments,20000
+2023,10,Future,Debt Repayment,15000
+2023,10,Future,Goals Fund,20000
+2023,10,Future,Insurance,12000
+2023,10,Future,Skill-Building,10000
+2023,10,Living,Housing,80000
+2023,10,Living,Utilities & Services,25000
+2023,10,Living,Food,45000
+2023,10,Living,Transportation,35000
+2023,10,Living,Healthcare,15000
+2023,10,Living,Basic Personal Care,12000
+2023,10,Present,Enjoyment & Social Life,30000
+2023,10,Present,Personal Development,15000
+2023,10,Present,Travel & Experiences,25000
+2023,10,Present,Hobbies & Leisure,20000
+2023,10,Present,Subscriptions,8000
+2023,10,Present,Life Happens Fund,20000
+2023,11,Future,Emergency Fund,30000
+2023,11,Future,Retirement Accounts,25000
+2023,11,Future,Other Investments,20000
+2023,11,Future,Debt Repayment,15000
+2023,11,Future,Goals Fund,20000
+2023,11,Future,Insurance,12000
+2023,11,Future,Skill-Building,10000
+2023,11,Living,Housing,80000
+2023,11,Living,Utilities & Services,25000
+2023,11,Living,Food,45000
+2023,11,Living,Transportation,35000
+2023,11,Living,Healthcare,15000
+2023,11,Living,Basic Personal Care,12000
+2023,11,Present,Enjoyment & Social Life,30000
+2023,11,Present,Personal Development,15000
+2023,11,Present,Travel & Experiences,25000
+2023,11,Present,Hobbies & Leisure,20000
+2023,11,Present,Subscriptions,8000
+2023,11,Present,Life Happens Fund,20000
+2023,12,Future,Emergency Fund,30000
+2023,12,Future,Retirement Accounts,25000
+2023,12,Future,Other Investments,20000
+2023,12,Future,Debt Repayment,15000
+2023,12,Future,Goals Fund,20000
+2023,12,Future,Insurance,12000
+2023,12,Future,Skill-Building,10000
+2023,12,Living,Housing,80000
+2023,12,Living,Utilities & Services,25000
+2023,12,Living,Food,45000
+2023,12,Living,Transportation,35000
+2023,12,Living,Healthcare,15000
+2023,12,Living,Basic Personal Care,12000
+2023,12,Present,Enjoyment & Social Life,30000
+2023,12,Present,Personal Development,15000
+2023,12,Present,Travel & Experiences,25000
+2023,12,Present,Hobbies & Leisure,20000
+2023,12,Present,Subscriptions,8000
+2023,12,Present,Life Happens Fund,20000
+2024,1,Future,Emergency Fund,32000
+2024,1,Future,Retirement Accounts,27000
+2024,1,Future,Other Investments,22000
+2024,1,Future,Debt Repayment,15000
+2024,1,Future,Goals Fund,22000
+2024,1,Future,Insurance,13000
+2024,1,Future,Skill-Building,11000
+2024,1,Living,Housing,82000
+2024,1,Living,Utilities & Services,27000
+2024,1,Living,Food,48000
+2024,1,Living,Transportation,37000
+2024,1,Living,Healthcare,16000
+2024,1,Living,Basic Personal Care,13000
+2024,1,Present,Enjoyment & Social Life,32000
+2024,1,Present,Personal Development,16000
+2024,1,Present,Travel & Experiences,27000
+2024,1,Present,Hobbies & Leisure,22000
+2024,1,Present,Subscriptions,9000
+2024,1,Present,Life Happens Fund,22000
+2024,2,Future,Emergency Fund,32000
+2024,2,Future,Retirement Accounts,27000
+2024,2,Future,Other Investments,22000
+2024,2,Future,Debt Repayment,15000
+2024,2,Future,Goals Fund,22000
+2024,2,Future,Insurance,13000
+2024,2,Future,Skill-Building,11000
+2024,2,Living,Housing,82000
+2024,2,Living,Utilities & Services,27000
+2024,2,Living,Food,48000
+2024,2,Living,Transportation,37000
+2024,2,Living,Healthcare,16000
+2024,2,Living,Basic Personal Care,13000
+2024,2,Present,Enjoyment & Social Life,32000
+2024,2,Present,Personal Development,16000
+2024,2,Present,Travel & Experiences,27000
+2024,2,Present,Hobbies & Leisure,22000
+2024,2,Present,Subscriptions,9000
+2024,2,Present,Life Happens Fund,22000
+2024,3,Future,Emergency Fund,32000
+2024,3,Future,Retirement Accounts,27000
+2024,3,Future,Other Investments,22000
+2024,3,Future,Debt Repayment,15000
+2024,3,Future,Goals Fund,22000
+2024,3,Future,Insurance,13000
+2024,3,Future,Skill-Building,11000
+2024,3,Living,Housing,82000
+2024,3,Living,Utilities & Services,27000
+2024,3,Living,Food,48000
+2024,3,Living,Transportation,37000
+2024,3,Living,Healthcare,16000
+2024,3,Living,Basic Personal Care,13000
+2024,3,Present,Enjoyment & Social Life,32000
+2024,3,Present,Personal Development,16000
+2024,3,Present,Travel & Experiences,27000
+2024,3,Present,Hobbies & Leisure,22000
+2024,3,Present,Subscriptions,9000
+2024,3,Present,Life Happens Fund,22000
+2024,4,Future,Emergency Fund,32000
+2024,4,Future,Retirement Accounts,27000
+2024,4,Future,Other Investments,22000
+2024,4,Future,Debt Repayment,15000
+2024,4,Future,Goals Fund,22000
+2024,4,Future,Insurance,13000
+2024,4,Future,Skill-Building,11000
+2024,4,Living,Housing,82000
+2024,4,Living,Utilities & Services,27000
+2024,4,Living,Food,48000
+2024,4,Living,Transportation,37000
+2024,4,Living,Healthcare,16000
+2024,4,Living,Basic Personal Care,13000
+2024,4,Present,Enjoyment & Social Life,32000
+2024,4,Present,Personal Development,16000
+2024,4,Present,Travel & Experiences,27000
+2024,4,Present,Hobbies & Leisure,22000
+2024,4,Present,Subscriptions,9000
+2024,4,Present,Life Happens Fund,22000
+2024,5,Future,Emergency Fund,32000
+2024,5,Future,Retirement Accounts,27000
+2024,5,Future,Other Investments,22000
+2024,5,Future,Debt Repayment,15000
+2024,5,Future,Goals Fund,22000
+2024,5,Future,Insurance,13000
+2024,5,Future,Skill-Building,11000
+2024,5,Living,Housing,82000
+2024,5,Living,Utilities & Services,27000
+2024,5,Living,Food,48000
+2024,5,Living,Transportation,37000
+2024,5,Living,Healthcare,16000
+2024,5,Living,Basic Personal Care,13000
+2024,5,Present,Enjoyment & Social Life,32000
+2024,5,Present,Personal Development,16000
+2024,5,Present,Travel & Experiences,27000
+2024,5,Present,Hobbies & Leisure,22000
+2024,5,Present,Subscriptions,9000
+2024,5,Present,Life Happens Fund,22000
+2024,6,Future,Emergency Fund,32000
+2024,6,Future,Retirement Accounts,27000
+2024,6,Future,Other Investments,22000
+2024,6,Future,Debt Repayment,15000
+2024,6,Future,Goals Fund,22000
+2024,6,Future,Insurance,13000
+2024,6,Future,Skill-Building,11000
+2024,6,Living,Housing,82000
+2024,6,Living,Utilities & Services,27000
+2024,6,Living,Food,48000
+2024,6,Living,Transportation,37000
+2024,6,Living,Healthcare,16000
+2024,6,Living,Basic Personal Care,13000
+2024,6,Present,Enjoyment & Social Life,32000
+2024,6,Present,Personal Development,16000
+2024,6,Present,Travel & Experiences,27000
+2024,6,Present,Hobbies & Leisure,22000
+2024,6,Present,Subscriptions,9000
+2024,6,Present,Life Happens Fund,22000
+2024,7,Future,Emergency Fund,32000
+2024,7,Future,Retirement Accounts,27000
+2024,7,Future,Other Investments,22000
+2024,7,Future,Debt Repayment,15000
+2024,7,Future,Goals Fund,22000
+2024,7,Future,Insurance,13000
+2024,7,Future,Skill-Building,11000
+2024,7,Living,Housing,82000
+2024,7,Living,Utilities & Services,27000
+2024,7,Living,Food,48000
+2024,7,Living,Transportation,37000
+2024,7,Living,Healthcare,16000
+2024,7,Living,Basic Personal Care,13000
+2024,7,Present,Enjoyment & Social Life,32000
+2024,7,Present,Personal Development,16000
+2024,7,Present,Travel & Experiences,27000
+2024,7,Present,Hobbies & Leisure,22000
+2024,7,Present,Subscriptions,9000
+2024,7,Present,Life Happens Fund,22000
+2024,8,Future,Emergency Fund,32000
+2024,8,Future,Retirement Accounts,27000
+2024,8,Future,Other Investments,22000
+2024,8,Future,Debt Repayment,15000
+2024,8,Future,Goals Fund,22000
+2024,8,Future,Insurance,13000
+2024,8,Future,Skill-Building,11000
+2024,8,Living,Housing,82000
+2024,8,Living,Utilities & Services,27000
+2024,8,Living,Food,48000
+2024,8,Living,Transportation,37000
+2024,8,Living,Healthcare,16000
+2024,8,Living,Basic Personal Care,13000
+2024,8,Present,Enjoyment & Social Life,32000
+2024,8,Present,Personal Development,16000
+2024,8,Present,Travel & Experiences,27000
+2024,8,Present,Hobbies & Leisure,22000
+2024,8,Present,Subscriptions,9000
+2024,8,Present,Life Happens Fund,22000
+2024,9,Future,Emergency Fund,32000
+2024,9,Future,Retirement Accounts,27000
+2024,9,Future,Other Investments,22000
+2024,9,Future,Debt Repayment,15000
+2024,9,Future,Goals Fund,22000
+2024,9,Future,Insurance,13000
+2024,9,Future,Skill-Building,11000
+2024,9,Living,Housing,82000
+2024,9,Living,Utilities & Services,27000
+2024,9,Living,Food,48000
+2024,9,Living,Transportation,37000
+2024,9,Living,Healthcare,16000
+2024,9,Living,Basic Personal Care,13000
+2024,9,Present,Enjoyment & Social Life,32000
+2024,9,Present,Personal Development,16000
+2024,9,Present,Travel & Experiences,27000
+2024,9,Present,Hobbies & Leisure,22000
+2024,9,Present,Subscriptions,9000
+2024,9,Present,Life Happens Fund,22000
+2024,10,Future,Emergency Fund,32000
+2024,10,Future,Retirement Accounts,27000
+2024,10,Future,Other Investments,22000
+2024,10,Future,Debt Repayment,15000
+2024,10,Future,Goals Fund,22000
+2024,10,Future,Insurance,13000
+2024,10,Future,Skill-Building,11000
+2024,10,Living,Housing,82000
+2024,10,Living,Utilities & Services,27000
+2024,10,Living,Food,48000
+2024,10,Living,Transportation,37000
+2024,10,Living,Healthcare,16000
+2024,10,Living,Basic Personal Care,13000
+2024,10,Present,Enjoyment & Social Life,32000
+2024,10,Present,Personal Development,16000
+2024,10,Present,Travel & Experiences,27000
+2024,10,Present,Hobbies & Leisure,22000
+2024,10,Present,Subscriptions,9000
+2024,10,Present,Life Happens Fund,22000
+2024,11,Future,Emergency Fund,32000
+2024,11,Future,Retirement Accounts,27000
+2024,11,Future,Other Investments,22000
+2024,11,Future,Debt Repayment,15000
+2024,11,Future,Goals Fund,22000
+2024,11,Future,Insurance,13000
+2024,11,Future,Skill-Building,11000
+2024,11,Living,Housing,82000
+2024,11,Living,Utilities & Services,27000
+2024,11,Living,Food,48000
+2024,11,Living,Transportation,37000
+2024,11,Living,Healthcare,16000
+2024,11,Living,Basic Personal Care,13000
+2024,11,Present,Enjoyment & Social Life,32000
+2024,11,Present,Personal Development,16000
+2024,11,Present,Travel & Experiences,27000
+2024,11,Present,Hobbies & Leisure,22000
+2024,11,Present,Subscriptions,9000
+2024,11,Present,Life Happens Fund,22000
+2024,12,Future,Emergency Fund,32000
+2024,12,Future,Retirement Accounts,27000
+2024,12,Future,Other Investments,22000
+2024,12,Future,Debt Repayment,15000
+2024,12,Future,Goals Fund,22000
+2024,12,Future,Insurance,13000
+2024,12,Future,Skill-Building,11000
+2024,12,Living,Housing,82000
+2024,12,Living,Utilities & Services,27000
+2024,12,Living,Food,48000
+2024,12,Living,Transportation,37000
+2024,12,Living,Healthcare,16000
+2024,12,Living,Basic Personal Care,13000
+2024,12,Present,Enjoyment & Social Life,32000
+2024,12,Present,Personal Development,16000
+2024,12,Present,Travel & Experiences,27000
+2024,12,Present,Hobbies & Leisure,22000
+2024,12,Present,Subscriptions,9000
+2024,12,Present,Life Happens Fund,22000
+2025,1,Future,Emergency Fund,34000
+2025,1,Future,Retirement Accounts,29000
+2025,1,Future,Other Investments,24000
+2025,1,Future,Debt Repayment,15000
+2025,1,Future,Goals Fund,24000
+2025,1,Future,Insurance,14000
+2025,1,Future,Skill-Building,12000
+2025,1,Living,Housing,85000
+2025,1,Living,Utilities & Services,29000
+2025,1,Living,Food,51000
+2025,1,Living,Transportation,39000
+2025,1,Living,Healthcare,17000
+2025,1,Living,Basic Personal Care,14000
+2025,1,Present,Enjoyment & Social Life,34000
+2025,1,Present,Personal Development,17000
+2025,1,Present,Travel & Experiences,29000
+2025,1,Present,Hobbies & Leisure,24000
+2025,1,Present,Subscriptions,10000
+2025,1,Present,Life Happens Fund,24000
+2025,2,Future,Emergency Fund,34000
+2025,2,Future,Retirement Accounts,29000
+2025,2,Future,Other Investments,24000
+2025,2,Future,Debt Repayment,15000
+2025,2,Future,Goals Fund,24000
+2025,2,Future,Insurance,14000
+2025,2,Future,Skill-Building,12000
+2025,2,Living,Housing,85000
+2025,2,Living,Utilities & Services,29000
+2025,2,Living,Food,51000
+2025,2,Living,Transportation,39000
+2025,2,Living,Healthcare,17000
+2025,2,Living,Basic Personal Care,14000
+2025,2,Present,Enjoyment & Social Life,34000
+2025,2,Present,Personal Development,17000
+2025,2,Present,Travel & Experiences,29000
+2025,2,Present,Hobbies & Leisure,24000
+2025,2,Present,Subscriptions,10000
+2025,2,Present,Life Happens Fund,24000
+2025,3,Future,Emergency Fund,34000
+2025,3,Future,Retirement Accounts,29000
+2025,3,Future,Other Investments,24000
+2025,3,Future,Debt Repayment,15000
+2025,3,Future,Goals Fund,24000
+2025,3,Future,Insurance,14000
+2025,3,Future,Skill-Building,12000
+2025,3,Living,Housing,85000
+2025,3,Living,Utilities & Services,29000
+2025,3,Living,Food,51000
+2025,3,Living,Transportation,39000
+2025,3,Living,Healthcare,17000
+2025,3,Living,Basic Personal Care,14000
+2025,3,Present,Enjoyment & Social Life,34000
+2025,3,Present,Personal Development,17000
+2025,3,Present,Travel & Experiences,29000
+2025,3,Present,Hobbies & Leisure,24000
+2025,3,Present,Subscriptions,10000
+2025,3,Present,Life Happens Fund,24000
+2025,4,Future,Emergency Fund,34000
+2025,4,Future,Retirement Accounts,29000
+2025,4,Future,Other Investments,24000
+2025,4,Future,Debt Repayment,15000
+2025,4,Future,Goals Fund,24000
+2025,4,Future,Insurance,14000
+2025,4,Future,Skill-Building,12000
+2025,4,Living,Housing,85000
+2025,4,Living,Utilities & Services,29000
+2025,4,Living,Food,51000
+2025,4,Living,Transportation,39000
+2025,4,Living,Healthcare,17000
+2025,4,Living,Basic Personal Care,14000
+2025,4,Present,Enjoyment & Social Life,34000
+2025,4,Present,Personal Development,17000
+2025,4,Present,Travel & Experiences,29000
+2025,4,Present,Hobbies & Leisure,24000
+2025,4,Present,Subscriptions,10000
+2025,4,Present,Life Happens Fund,24000
+2025,5,Future,Emergency Fund,34000
+2025,5,Future,Retirement Accounts,29000
+2025,5,Future,Other Investments,24000
+2025,5,Future,Debt Repayment,15000
+2025,5,Future,Goals Fund,24000
+2025,5,Future,Insurance,14000
+2025,5,Future,Skill-Building,12000
+2025,5,Living,Housing,85000
+2025,5,Living,Utilities & Services,29000
+2025,5,Living,Food,51000
+2025,5,Living,Transportation,39000
+2025,5,Living,Healthcare,17000
+2025,5,Living,Basic Personal Care,14000
+2025,5,Present,Enjoyment & Social Life,34000
+2025,5,Present,Personal Development,17000
+2025,5,Present,Travel & Experiences,29000
+2025,5,Present,Hobbies & Leisure,24000
+2025,5,Present,Subscriptions,10000
+2025,5,Present,Life Happens Fund,24000
+2025,6,Future,Emergency Fund,34000
+2025,6,Future,Retirement Accounts,29000
+2025,6,Future,Other Investments,24000
+2025,6,Future,Debt Repayment,15000
+2025,6,Future,Goals Fund,24000
+2025,6,Future,Insurance,14000
+2025,6,Future,Skill-Building,12000
+2025,6,Living,Housing,85000
+2025,6,Living,Utilities & Services,29000
+2025,6,Living,Food,51000
+2025,6,Living,Transportation,39000
+2025,6,Living,Healthcare,17000
+2025,6,Living,Basic Personal Care,14000
+2025,6,Present,Enjoyment & Social Life,34000
+2025,6,Present,Personal Development,17000
+2025,6,Present,Travel & Experiences,29000
+2025,6,Present,Hobbies & Leisure,24000
+2025,6,Present,Subscriptions,10000
+2025,6,Present,Life Happens Fund,24000
+2025,7,Future,Emergency Fund,34000
+2025,7,Future,Retirement Accounts,29000
+2025,7,Future,Other Investments,24000
+2025,7,Future,Debt Repayment,15000
+2025,7,Future,Goals Fund,24000
+2025,7,Future,Insurance,14000
+2025,7,Future,Skill-Building,12000
+2025,7,Living,Housing,85000
+2025,7,Living,Utilities & Services,29000
+2025,7,Living,Food,51000
+2025,7,Living,Transportation,39000
+2025,7,Living,Healthcare,17000
+2025,7,Living,Basic Personal Care,14000
+2025,7,Present,Enjoyment & Social Life,34000
+2025,7,Present,Personal Development,17000
+2025,7,Present,Travel & Experiences,29000
+2025,7,Present,Hobbies & Leisure,24000
+2025,7,Present,Subscriptions,10000
+2025,7,Present,Life Happens Fund,24000
+2025,8,Future,Emergency Fund,34000
+2025,8,Future,Retirement Accounts,29000
+2025,8,Future,Other Investments,24000
+2025,8,Future,Debt Repayment,15000
+2025,8,Future,Goals Fund,24000
+2025,8,Future,Insurance,14000
+2025,8,Future,Skill-Building,12000
+2025,8,Living,Housing,85000
+2025,8,Living,Utilities & Services,29000
+2025,8,Living,Food,51000
+2025,8,Living,Transportation,39000
+2025,8,Living,Healthcare,17000
+2025,8,Living,Basic Personal Care,14000
+2025,8,Present,Enjoyment & Social Life,34000
+2025,8,Present,Personal Development,17000
+2025,8,Present,Travel & Experiences,29000
+2025,8,Present,Hobbies & Leisure,24000
+2025,8,Present,Subscriptions,10000
+2025,8,Present,Life Happens Fund,24000
+2025,9,Future,Emergency Fund,34000
+2025,9,Future,Retirement Accounts,29000
+2025,9,Future,Other Investments,24000
+2025,9,Future,Debt Repayment,15000
+2025,9,Future,Goals Fund,24000
+2025,9,Future,Insurance,14000
+2025,9,Future,Skill-Building,12000
+2025,9,Living,Housing,85000
+2025,9,Living,Utilities & Services,29000
+2025,9,Living,Food,51000
+2025,9,Living,Transportation,39000
+2025,9,Living,Healthcare,17000
+2025,9,Living,Basic Personal Care,14000
+2025,9,Present,Enjoyment & Social Life,34000
+2025,9,Present,Personal Development,17000
+2025,9,Present,Travel & Experiences,29000
+2025,9,Present,Hobbies & Leisure,24000
+2025,9,Present,Subscriptions,10000
+2025,9,Present,Life Happens Fund,24000
+2025,10,Future,Emergency Fund,34000
+2025,10,Future,Retirement Accounts,29000
+2025,10,Future,Other Investments,24000
+2025,10,Future,Debt Repayment,15000
+2025,10,Future,Goals Fund,24000
+2025,10,Future,Insurance,14000
+2025,10,Future,Skill-Building,12000
+2025,10,Living,Housing,85000
+2025,10,Living,Utilities & Services,29000
+2025,10,Living,Food,51000
+2025,10,Living,Transportation,39000
+2025,10,Living,Healthcare,17000
+2025,10,Living,Basic Personal Care,14000
+2025,10,Present,Enjoyment & Social Life,34000
+2025,10,Present,Personal Development,17000
+2025,10,Present,Travel & Experiences,29000
+2025,10,Present,Hobbies & Leisure,24000
+2025,10,Present,Subscriptions,10000
+2025,10,Present,Life Happens Fund,24000
+2025,11,Future,Emergency Fund,34000
+2025,11,Future,Retirement Accounts,29000
+2025,11,Future,Other Investments,24000
+2025,11,Future,Debt Repayment,15000
+2025,11,Future,Goals Fund,24000
+2025,11,Future,Insurance,14000
+2025,11,Future,Skill-Building,12000
+2025,11,Living,Housing,85000
+2025,11,Living,Utilities & Services,29000
+2025,11,Living,Food,51000
+2025,11,Living,Transportation,39000
+2025,11,Living,Healthcare,17000
+2025,11,Living,Basic Personal Care,14000
+2025,11,Present,Enjoyment & Social Life,34000
+2025,11,Present,Personal Development,17000
+2025,11,Present,Travel & Experiences,29000
+2025,11,Present,Hobbies & Leisure,24000
+2025,11,Present,Subscriptions,10000
+2025,11,Present,Life Happens Fund,24000
+2025,12,Future,Emergency Fund,34000
+2025,12,Future,Retirement Accounts,29000
+2025,12,Future,Other Investments,24000
+2025,12,Future,Debt Repayment,15000
+2025,12,Future,Goals Fund,24000
+2025,12,Future,Insurance,14000
+2025,12,Future,Skill-Building,12000
+2025,12,Living,Housing,85000
+2025,12,Living,Utilities & Services,29000
+2025,12,Living,Food,51000
+2025,12,Living,Transportation,39000
+2025,12,Living,Healthcare,17000
+2025,12,Living,Basic Personal Care,14000
+2025,12,Present,Enjoyment & Social Life,34000
+2025,12,Present,Personal Development,17000
+2025,12,Present,Travel & Experiences,29000
+2025,12,Present,Hobbies & Leisure,24000
+2025,12,Present,Subscriptions,10000
+2025,12,Present,Life Happens Fund,24000
+2026,1,Future,Emergency Fund,35000
+2026,1,Future,Retirement Accounts,30000
+2026,1,Future,Other Investments,25000
+2026,1,Future,Debt Repayment,15000
+2026,1,Future,Goals Fund,25000
+2026,1,Future,Insurance,15000
+2026,1,Future,Skill-Building,13000
+2026,1,Living,Housing,87000
+2026,1,Living,Utilities & Services,30000
+2026,1,Living,Food,53000
+2026,1,Living,Transportation,40000
+2026,1,Living,Healthcare,18000
+2026,1,Living,Basic Personal Care,15000
+2026,1,Present,Enjoyment & Social Life,35000
+2026,1,Present,Personal Development,18000
+2026,1,Present,Travel & Experiences,30000
+2026,1,Present,Hobbies & Leisure,25000
+2026,1,Present,Subscriptions,11000
+2026,1,Present,Life Happens Fund,25000
