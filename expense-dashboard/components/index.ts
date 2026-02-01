@@ -41,3 +41,7 @@ export { default as TransactionTable } from './TransactionTable';
 // Re-export context providers
 export { HeaderProvider, useHeader } from './header-context';
 export { default as PageTitle } from './page-title';
+
+// Re-export providers
+export * from './providers';
+

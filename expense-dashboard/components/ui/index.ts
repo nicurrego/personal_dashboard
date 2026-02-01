@@ -20,15 +20,15 @@ export { Skeleton } from './skeleton';
 
 // Popovers and Overlays
 export { Popover, PopoverTrigger, PopoverContent } from './popover';
-export { 
-  Sheet, 
-  SheetTrigger, 
-  SheetClose, 
-  SheetContent, 
-  SheetHeader, 
-  SheetFooter, 
-  SheetTitle, 
-  SheetDescription 
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription
 } from './sheet';
 export {
   DropdownMenu,
@@ -82,6 +82,7 @@ export { default as FloatingFilterButton } from './FloatingFilterButton';
 export { default as EmptyState } from './EmptyState';
 export { BottomSheet } from './bottom-sheet';
 export { MobileInputBar } from './mobile-input-bar';
+export { SyncStatusIndicator } from './SyncStatusIndicator';
 
 // Note: Sidebar requires '@/hooks/use-mobile' - uncomment when hook is created
 // export {
