@@ -9,22 +9,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // User Requested Palette
-        'trust-navy': '#171717',    // Backgrounds, Cards
-        'growth-green': '#22c55e',  // Future items, Text, Icons
-        'alert-amber': '#f59e0b',   // Present items, Warnings
-        'cyber-cyan': '#06b6d4',    // Living items, Info
-        'laser-magenta': '#d946ef', // Critical, Issues
-        'flux-violet': '#8B5CF6',   // Source, Income, Attention
-        
-        // Legacy/Liquid Glass (remapped or kept for compatibility)
-        'void-black': '#000000',
-        'glass-surface': '#1C1C1E',
-        'card-surface': '#2C2C2E',
-        'secondary-text': '#8E8E93',
+        // Kibo Main Palette
+        'kibo-bg': '#1B4034',    // Main Background (Dark Green)
+        'kibo-red': '#85241E',   // Accents/Destructive
+        'kibo-orange': '#CC8257', // Primary Accents
+        'kibo-blue': '#6CA1B7',   // Secondary Accents
+
+        // Categories Palette (Present, Future, Living)
+        'cat-dark': '#1B4032',
+        'cat-mint': '#8DF2CD',    // Future
+        'cat-sage': '#487363',    // Living
+        'cat-pale': '#A9D9C7',    // Present
+        'cat-white': '#F2F2F2',   // Text
+
+        // Semantic Mapping
+        'trust-navy': '#1B4034',
+        'growth-green': '#8DF2CD',
+        'alert-amber': '#CC8257',
+        'cyber-cyan': '#487363',
+        'laser-magenta': '#85241E',
+        'flux-violet': '#6CA1B7',
+
+        // Legacy/Compatibility Layer
+        'glass-surface': '#1B4034',
+        'secondary-text': '#A9D9C7',
+        'cobalt-blue': '#6CA1B7',
+        'electric-orange': '#CC8257',
+        'acid-green': '#8DF2CD',
+        'void-black': '#1B4034',
+        'card-surface': '#1B4034',
+
+        // Standard
+        background: '#1B4034',
+        foreground: '#F2F2F2',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-outfit)', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

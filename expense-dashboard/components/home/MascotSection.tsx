@@ -57,9 +57,9 @@ const getMascotMessages = (
 const getMascotImage = (mood: 'normal' | 'happy' | 'sad' | 'pleased'): string => {
     const images = {
         normal: '/mascot/normal.png',
-        happy: '/mascot/happy.jpg',
-        sad: '/mascot/sad.jpg',
-        pleased: '/mascot/pleased.jpg'
+        happy: '/mascot/happy.png',
+        sad: '/mascot/sad.png',
+        pleased: '/mascot/pleased.png'
     };
     return images[mood];
 };

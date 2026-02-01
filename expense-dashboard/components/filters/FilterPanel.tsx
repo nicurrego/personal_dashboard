@@ -15,7 +15,7 @@ interface FilterPanelProps {
 }
 
 export default function FilterPanel({ filters, onChange, uniqueValues }: FilterPanelProps) {
-  
+
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const year = parseInt(e.target.value);
     // Simple year filtering logic for now - sets start/end date to Jan 1 - Dec 31 of selected year
@@ -27,9 +27,9 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
     } else {
       onChange({
         ...filters,
-        dateRange: { 
-          start: new Date(year, 0, 1), 
-          end: new Date(year, 11, 31, 23, 59, 59) 
+        dateRange: {
+          start: new Date(year, 0, 1),
+          end: new Date(year, 11, 31, 23, 59, 59)
         }
       });
     }
@@ -40,7 +40,7 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
     const newValues = current.includes(value)
       ? current.filter(v => v !== value)
       : [...current, value];
-      
+
     onChange({
       ...filters,
       [field]: newValues
@@ -68,7 +68,7 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
     <div className="liquid-card p-6 mb-8 relative">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-label text-secondary-text">Data Filters</h2>
-        <button 
+        <button
           onClick={() => onChange({
             dateRange: { start: null, end: null },
             months: [],
@@ -78,17 +78,17 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
             methods: [],
             shops: []
           })}
-          className="text-xs font-bold text-electric-orange hover:text-white uppercase tracking-wider transition-colors"
+          className="text-xs font-bold text-[#CC8257] hover:text-white uppercase tracking-wider transition-colors"
         >
           Reset All
         </button>
       </div>
-      
+
       <div className="space-y-6">
         {/* Year Filter */}
         <div>
           <label className="block text-label mb-3">Year</label>
-          <select 
+          <select
             className="w-full bg-glass-surface text-white border border-white/10 rounded-xl shadow-inner focus:ring-cobalt-blue focus:border-cobalt-blue p-3 appearance-none font-mono"
             onChange={handleYearChange}
           >
@@ -105,13 +105,13 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
             <label className="text-label">Months</label>
             <div className="flex gap-2">
               {[1, 2, 3, 4].map(q => (
-                 <button 
-                   key={q} 
-                   onClick={() => applyQuarter(q)}
-                   className="text-[10px] font-bold text-secondary-text hover:text-white bg-white/5 px-2 py-1 rounded"
-                 >
-                   Q{q}
-                 </button>
+                <button
+                  key={q}
+                  onClick={() => applyQuarter(q)}
+                  className="text-[10px] font-bold text-secondary-text hover:text-white bg-white/5 px-2 py-1 rounded"
+                >
+                  Q{q}
+                </button>
               ))}
             </div>
           </div>
@@ -123,11 +123,10 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
                 <button
                   key={m}
                   onClick={() => toggleMonth(monthNum)}
-                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
-                    isSelected 
-                      ? 'bg-white text-black shadow-lg shadow-white/20' 
-                      : 'bg-glass-surface text-secondary-text hover:bg-white/10'
-                  }`}
+                  className={`py-2 rounded-lg text-xs font-bold transition-all ${isSelected
+                    ? 'bg-white text-black shadow-lg shadow-white/20'
+                    : 'bg-glass-surface text-secondary-text hover:bg-white/10'
+                    }`}
                 >
                   {m}
                 </button>
@@ -144,13 +143,12 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
               <button
                 key={target}
                 onClick={() => handleMultiSelect('targets', target)}
-                className={`liquid-button px-5 py-2 text-sm ${
-                  filters.targets.includes(target)
-                    ? target === 'Living' ? 'bg-cobalt-blue text-white shadow-[0_0_15px_rgba(10,132,255,0.4)]' :
-                      target === 'Present' ? 'bg-electric-orange text-black shadow-[0_0_15px_rgba(255,159,10,0.4)]' :
-                      'bg-acid-green text-black shadow-[0_0_15px_rgba(204,255,0,0.4)]'
-                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
-                }`}
+                className={`liquid-button px-5 py-2 text-sm ${filters.targets.includes(target)
+                  ? target === 'Living' ? 'bg-[#487363] text-white' : // cat-sage
+                    target === 'Present' ? 'bg-[#A9D9C7] text-black' : // cat-pale
+                      'bg-[#8DF2CD] text-black' // cat-mint
+                  : 'bg-card border border-white/5 hover:bg-white/5 text-muted-foreground'
+                  }`}
               >
                 {target}
               </button>
@@ -166,11 +164,10 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
               <button
                 key={cat}
                 onClick={() => handleMultiSelect('categories', cat)}
-                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${
-                  filters.categories.includes(cat)
-                    ? 'bg-cobalt-blue text-white shadow-[0_0_15px_rgba(10,132,255,0.3)]'
-                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
-                }`}
+                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${filters.categories.includes(cat)
+                  ? 'bg-[#6CA1B7] text-white' // kibo-blue
+                  : 'bg-card text-muted-foreground border border-white/5 hover:bg-white/5'
+                  }`}
               >
                 {cat}
               </button>
@@ -186,11 +183,10 @@ export default function FilterPanel({ filters, onChange, uniqueValues }: FilterP
               <button
                 key={loc}
                 onClick={() => handleMultiSelect('locations', loc)}
-                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${
-                  filters.locations.includes(loc)
-                    ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]'
-                    : 'bg-glass-surface text-secondary-text border border-white/5 hover:bg-[rgba(255,255,255,0.05)]'
-                }`}
+                className={`liquid-button px-5 py-2 text-sm flex-shrink-0 whitespace-nowrap ${filters.locations.includes(loc)
+                  ? 'bg-white text-black'
+                  : 'bg-card text-muted-foreground border border-white/5 hover:bg-white/5'
+                  }`}
               >
                 {loc}
               </button>

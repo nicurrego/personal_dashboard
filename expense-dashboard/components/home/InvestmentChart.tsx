@@ -46,8 +46,8 @@ export function InvestmentChart({ totalInvested, pendingToInvest }: InvestmentCh
 
         // Data arcs
         const data = [
-            { value: investedPercentage, color: '#22c55e', label: 'Invertido' },
-            { value: 100 - investedPercentage, color: '#f59e0b', label: 'Pendiente' }
+            { value: investedPercentage, color: '#8DF2CD', label: 'Invertido' }, // cat-mint
+            { value: 100 - investedPercentage, color: '#CC8257', label: 'Pendiente' } // kibo-orange
         ];
 
         const pie = d3.pie<{ value: number; color: string; label: string }>()
@@ -62,30 +62,7 @@ export function InvestmentChart({ totalInvested, pendingToInvest }: InvestmentCh
             .cornerRadius(thickness / 2)
             .padAngle(0.02);
 
-        // Create gradient definitions
-        const defs = svg.append('defs');
-
-        // Green gradient
-        const greenGradient = defs.append('linearGradient')
-            .attr('id', 'greenGradient')
-            .attr('x1', '0%')
-            .attr('y1', '0%')
-            .attr('x2', '100%')
-            .attr('y2', '100%');
-        greenGradient.append('stop').attr('offset', '0%').attr('stop-color', '#22c55e');
-        greenGradient.append('stop').attr('offset', '100%').attr('stop-color', '#06b6d4');
-
-        // Orange gradient
-        const orangeGradient = defs.append('linearGradient')
-            .attr('id', 'orangeGradient')
-            .attr('x1', '0%')
-            .attr('y1', '0%')
-            .attr('x2', '100%')
-            .attr('y2', '100%');
-        orangeGradient.append('stop').attr('offset', '0%').attr('stop-color', '#f59e0b');
-        orangeGradient.append('stop').attr('offset', '100%').attr('stop-color', '#d946ef');
-
-        // Draw arcs with animation
+        // Draw arcs with solid colors (no gradients/filters)
         const arcs = svg.selectAll('.arc')
             .data(pie(data))
             .enter()
@@ -93,8 +70,7 @@ export function InvestmentChart({ totalInvested, pendingToInvest }: InvestmentCh
             .attr('class', 'arc');
 
         arcs.append('path')
-            .attr('fill', (d, i) => i === 0 ? 'url(#greenGradient)' : 'url(#orangeGradient)')
-            .attr('filter', 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))')
+            .attr('fill', d => d.data.color)
             .transition()
             .duration(1000)
             .ease(d3.easeCubicOut)
@@ -109,10 +85,10 @@ export function InvestmentChart({ totalInvested, pendingToInvest }: InvestmentCh
         svg.append('text')
             .attr('text-anchor', 'middle')
             .attr('dy', '-0.2em')
-            .attr('fill', 'white')
+            .attr('fill', '#F2F2F2') // cat-white
             .attr('font-size', '28px')
             .attr('font-weight', 'bold')
-            .attr('font-family', 'ui-monospace, monospace')
+            .attr('font-family', 'var(--font-outfit), sans-serif')
             .text(`${investedPercentage.toFixed(0)}%`);
 
         svg.append('text')
@@ -143,12 +119,12 @@ export function InvestmentChart({ totalInvested, pendingToInvest }: InvestmentCh
                     {/* Legend */}
                     <div className="flex gap-6 mt-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-growth-green to-cyber-cyan" />
-                            <span className="text-xs text-secondary-text">Invertido</span>
+                            <div className="w-3 h-3 rounded-full bg-[#8DF2CD]" />
+                            <span className="text-xs text-cat-pale">Invertido</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-alert-amber to-laser-magenta" />
-                            <span className="text-xs text-secondary-text">Pendiente</span>
+                            <div className="w-3 h-3 rounded-full bg-[#CC8257]" />
+                            <span className="text-xs text-cat-pale">Pendiente</span>
                         </div>
                     </div>
                 </div>

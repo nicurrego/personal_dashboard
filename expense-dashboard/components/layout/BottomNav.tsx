@@ -85,7 +85,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="bottom-nav-fixed fixed bottom-0 left-0 right-0 z-[100] bg-black/90 backdrop-blur-xl border-t border-white/10 safe-area-pb">
+    <nav className="bottom-nav-fixed fixed bottom-0 left-0 right-0 z-[100] bg-[#1B4034] border-t border-[#487363] safe-area-pb">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -98,10 +98,10 @@ export function BottomNav() {
               className={`
                 flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all
                 ${isAddButton
-                  ? 'bg-gradient-to-r from-cyber-cyan to-growth-green text-white -mt-4 px-5 py-3 rounded-2xl shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                  ? 'bg-[#CC8257] text-white -mt-4 px-5 py-3 rounded-full border-4 border-[#1B4034]' // Solid orange button
                   : isActive
-                    ? 'text-cyber-cyan'
-                    : 'text-secondary-text hover:text-white'
+                    ? 'text-[#8DF2CD]' // Mint for active
+                    : 'text-[#A9D9C7] hover:text-white' // Pale mint for inactive
                 }
               `}
             >
