@@ -13,7 +13,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Kibo - Personal Finance Tracker",
+  title: "Kibo",
   description: "Track expenses, manage budgets, and gain financial insights - works offline too!",
   manifest: "/manifest.json",
   appleWebApp: {
@@ -43,7 +43,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#8b5cf6',
+  themeColor: '#1B4034',
 };
 
 export default function RootLayout({
@@ -54,7 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#8b5cf6" />
+        <meta name="theme-color" content="#1B4034" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

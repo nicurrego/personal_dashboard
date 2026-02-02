@@ -12,7 +12,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/dashboard';
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -40,20 +40,20 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+    <div className="min-h-screen bg-[#1B4034] flex items-center justify-center p-6 page-ambient">
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-secondary-text">Sign in to your expense tracker</p>
+          <h1 className="text-3xl font-bold text-[#F2F2F2] mb-2">Welcome Back</h1>
+          <p className="text-[#A9D9C7]">Sign in to your Kibo account</p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-6">
-          <div className="liquid-card-premium p-6 space-y-4 hover-lift">
+          <div className="bg-[#1B4034] border border-[#A9D9C7] p-6 rounded-xl shadow-lg">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
+              <label className="block text-sm font-medium text-[#A9D9C7] mb-2">
                 Email
               </label>
               <input
@@ -62,15 +62,15 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                           text-white placeholder:text-secondary-text/50
-                           focus:border-cyber-cyan focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#1B4032] border border-[#A9D9C7]/30
+                           text-[#F2F2F2] placeholder:text-[#F2F2F2]/30
+                           focus:border-[#A9D9C7] focus:outline-none transition-colors"
               />
             </div>
 
             {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-[#A9D9C7] mb-2">
                 Password
               </label>
               <input
@@ -79,16 +79,16 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                           text-white placeholder:text-secondary-text/50
-                           focus:border-cyber-cyan focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#1B4032] border border-[#A9D9C7]/30
+                           text-[#F2F2F2] placeholder:text-[#F2F2F2]/30
+                           focus:border-[#A9D9C7] focus:outline-none transition-colors"
               />
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-lg bg-laser-magenta/10 border border-laser-magenta/30">
-                <p className="text-sm text-laser-magenta">{error}</p>
+              <div className="p-3 mt-4 rounded-lg bg-[#C24656]/10 border border-[#C24656]/30">
+                <p className="text-sm text-[#C24656]">{error}</p>
               </div>
             )}
 
@@ -97,10 +97,10 @@ function LoginForm() {
               type="submit"
               disabled={loading}
               className={`
-                w-full py-4 rounded-xl font-bold text-lg transition-all duration-200
+                w-full mt-6 py-4 rounded-xl font-bold text-lg transition-all duration-200
                 ${loading
-                  ? 'bg-white/10 text-secondary-text cursor-not-allowed'
-                  : 'bg-gradient-to-r from-cyber-cyan to-growth-green text-white hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]'
+                  ? 'bg-[#A9D9C7]/50 text-[#1B4034] cursor-not-allowed'
+                  : 'bg-[#A9D9C7] text-[#1B4034] hover:bg-white hover:shadow-[0_0_20px_rgba(169,217,199,0.3)]'
                 }
               `}
             >
@@ -120,11 +120,11 @@ function LoginForm() {
         </form>
 
         {/* Sign Up Link */}
-        <p className="text-center text-secondary-text mt-6">
+        <p className="text-center text-[#A9D9C7]/70 mt-6">
           Don&apos;t have an account?{' '}
-          <Link 
-            href="/signup" 
-            className="text-cyber-cyan hover:text-cyber-cyan/80 transition-colors font-medium"
+          <Link
+            href="/signup"
+            className="text-[#A9D9C7] hover:text-white transition-colors font-bold"
           >
             Sign up
           </Link>
@@ -132,9 +132,9 @@ function LoginForm() {
 
         {/* Back to Home */}
         <p className="text-center mt-4">
-          <Link 
-            href="/" 
-            className="text-secondary-text/70 hover:text-white text-sm transition-colors"
+          <Link
+            href="/"
+            className="text-[#F2F2F2]/50 hover:text-[#F2F2F2] text-sm transition-colors"
           >
             ← Back to home
           </Link>
@@ -146,8 +146,8 @@ function LoginForm() {
 
 function LoginLoading() {
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="loading-spinner loading-spinner--lg border-cyber-cyan"></div>
+    <div className="min-h-screen bg-[#1B4034] flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-4 border-[#A9D9C7]/30 border-t-[#A9D9C7] animate-spin"></div>
     </div>
   );
 }

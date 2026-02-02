@@ -4,8 +4,8 @@
     "description": "Track expenses, manage budgets, and gain financial insights - works offline too!",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#0a0a0a",
-    "theme_color": "#8b5cf6",
+    "background_color": "#1B4034",
+    "theme_color": "#1B4034",
     "orientation": "portrait",
     "scope": "/",
     "icons": [

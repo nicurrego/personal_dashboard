@@ -94,7 +94,7 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
           relative mb-4 p-4 rounded-2xl
           bg-kibo-bg
           border border-kibo-teal/30 backdrop-blur-sm
-          max-w-[280px] min-h-[80px]
+          w-full max-w-sm min-h-[80px]
           shadow-[0_4px_12px_rgba(0,0,0,0.2)]
           transition-all duration-300
           ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
@@ -170,11 +170,6 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                 <div className="absolute top-4 -left-3 w-1.5 h-1.5 bg-kibo-purple rounded-full animate-pulse delay-300" />
                 <div className="absolute -bottom-1 right-4 w-1 h-1 bg-kibo-red rounded-full animate-pulse delay-500" />
             </div>
-
-            {/* Mascot name */}
-            <p className="mt-3 text-secondary-text text-xs font-medium tracking-wider uppercase">
-                Kibo
-            </p>
         </div>
     );
 }

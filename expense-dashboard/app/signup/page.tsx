@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 
 export default function SignupPage() {
   const router = useRouter();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -34,7 +34,7 @@ export default function SignupPage() {
     setLoading(true);
 
     const supabase = createClient();
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -54,21 +54,21 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+      <div className="min-h-screen bg-[#1B4034] flex items-center justify-center p-6 page-ambient">
         <div className="w-full max-w-md text-center relative z-10">
-          <div className="liquid-card-premium p-8 hover-lift">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-growth-green/20 flex items-center justify-center">
-              <svg className="w-8 h-8 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-[#1B4034] border border-[#A9D9C7] p-8 rounded-xl shadow-lg">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#614FBB]/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#614FBB]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Check your email</h2>
-            <p className="text-secondary-text mb-6">
-              We&apos;ve sent a confirmation link to <strong className="text-white">{email}</strong>
+            <h2 className="text-2xl font-bold text-[#F2F2F2] mb-2">Check your email</h2>
+            <p className="text-[#A9D9C7] mb-6">
+              We&apos;ve sent a confirmation link to <strong className="text-[#F2F2F2]">{email}</strong>
             </p>
-            <Link 
+            <Link
               href="/login"
-              className="inline-block px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors"
+              className="inline-block px-6 py-3 rounded-xl bg-[#A9D9C7] text-[#1B4034] font-bold hover:bg-white transition-colors"
             >
               Back to Login
             </Link>
@@ -79,20 +79,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+    <div className="min-h-screen bg-[#1B4034] flex items-center justify-center p-6 page-ambient">
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-secondary-text">Start tracking your expenses</p>
+          <h1 className="text-3xl font-bold text-[#F2F2F2] mb-2">Create Account</h1>
+          <p className="text-[#A9D9C7]">Let's start a new chapter with Kibo</p>
         </div>
 
         {/* Signup Form */}
         <form onSubmit={handleSignup} className="space-y-6">
-          <div className="liquid-card-premium p-6 space-y-4 hover-lift">
+          <div className="bg-[#1B4034] border border-[#A9D9C7] p-6 rounded-xl shadow-lg">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
+              <label className="block text-sm font-medium text-[#A9D9C7] mb-2">
                 Email
               </label>
               <input
@@ -101,15 +101,15 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                           text-white placeholder:text-secondary-text/50
-                           focus:border-cyber-cyan focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#1B4032] border border-[#A9D9C7]/30
+                           text-[#F2F2F2] placeholder:text-[#F2F2F2]/30
+                           focus:border-[#A9D9C7] focus:outline-none transition-colors"
               />
             </div>
 
             {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-[#A9D9C7] mb-2">
                 Password
               </label>
               <input
@@ -118,15 +118,15 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                           text-white placeholder:text-secondary-text/50
-                           focus:border-cyber-cyan focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#1B4032] border border-[#A9D9C7]/30
+                           text-[#F2F2F2] placeholder:text-[#F2F2F2]/30
+                           focus:border-[#A9D9C7] focus:outline-none transition-colors"
               />
             </div>
 
             {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-[#A9D9C7] mb-2">
                 Confirm Password
               </label>
               <input
@@ -135,16 +135,16 @@ export default function SignupPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                           text-white placeholder:text-secondary-text/50
-                           focus:border-cyber-cyan focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#1B4032] border border-[#A9D9C7]/30
+                           text-[#F2F2F2] placeholder:text-[#F2F2F2]/30
+                           focus:border-[#A9D9C7] focus:outline-none transition-colors"
               />
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-lg bg-laser-magenta/10 border border-laser-magenta/30">
-                <p className="text-sm text-laser-magenta">{error}</p>
+              <div className="p-3 mt-4 rounded-lg bg-[#C24656]/10 border border-[#C24656]/30">
+                <p className="text-sm text-[#C24656]">{error}</p>
               </div>
             )}
 
@@ -153,10 +153,10 @@ export default function SignupPage() {
               type="submit"
               disabled={loading}
               className={`
-                w-full py-4 rounded-xl font-bold text-lg transition-all duration-200
+                w-full mt-6 py-4 rounded-xl font-bold text-lg transition-all duration-200
                 ${loading
-                  ? 'bg-white/10 text-secondary-text cursor-not-allowed'
-                  : 'bg-gradient-to-r from-growth-green to-cyber-cyan text-white hover:shadow-[0_0_30px_rgba(34,197,94,0.3)]'
+                  ? 'bg-[#A9D9C7]/50 text-[#1B4034] cursor-not-allowed'
+                  : 'bg-[#A9D9C7] text-[#1B4034] hover:bg-white hover:shadow-[0_0_20px_rgba(169,217,199,0.3)]'
                 }
               `}
             >
@@ -176,11 +176,11 @@ export default function SignupPage() {
         </form>
 
         {/* Login Link */}
-        <p className="text-center text-secondary-text mt-6">
+        <p className="text-center text-[#A9D9C7]/70 mt-6">
           Already have an account?{' '}
-          <Link 
-            href="/login" 
-            className="text-cyber-cyan hover:text-cyber-cyan/80 transition-colors font-medium"
+          <Link
+            href="/login"
+            className="text-[#A9D9C7] hover:text-white transition-colors font-bold"
           >
             Sign in
           </Link>
@@ -188,9 +188,9 @@ export default function SignupPage() {
 
         {/* Back to Home */}
         <p className="text-center mt-4">
-          <Link 
-            href="/" 
-            className="text-secondary-text/70 hover:text-white text-sm transition-colors"
+          <Link
+            href="/"
+            className="text-[#F2F2F2]/50 hover:text-[#F2F2F2] text-sm transition-colors"
           >
             ← Back to home
           </Link>
