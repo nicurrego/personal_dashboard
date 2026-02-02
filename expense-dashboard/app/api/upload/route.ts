@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    
+
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
@@ -22,49 +22,42 @@ export async function POST(request: NextRequest) {
 
     // Get file content
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const csvContent = Buffer.from(bytes).toString('utf-8');
 
-    // Save to temp location
-    const tempDir = path.join(process.cwd(), 'temp');
-    await mkdir(tempDir, { recursive: true });
-    
-    const inputPath = path.join(tempDir, 'upload_raw.csv');
-    const outputPath = path.join(tempDir, 'upload_cleaned.csv');
-    
-    await writeFile(inputPath, buffer);
+    // Use the production-ready TypeScript importer instead of external Python
+    const { importCSV } = await import('@/lib/csv');
+    const result = importCSV(csvContent);
 
-    // Run Python cleaner
-    const cleanerPath = path.resolve(process.cwd(), '..', 'csv_cleaner.py');
-    
-    try {
-      await execAsync(`python "${cleanerPath}" "${inputPath}" --output "${outputPath}" --quiet`);
-    } catch (error) {
-      console.error('Cleaner error:', error);
-      // If Python fails, just copy the original
-      await writeFile(outputPath, buffer);
+    if (!result.success && result.errors.length > 0) {
+      return NextResponse.json({
+        error: 'Validation failed',
+        details: result.errors[0].message
+      }, { status: 400 });
     }
 
-    // Copy cleaned file to public folder as expenses data
+    // Convert parsed data back to CSV string for the persistent file
+    // (Or we could just save the raw content if we prefer, but importing ensures it's valid)
+    const headers = 'year,month,date,target,category,value,item,context,method,shop,location';
+    const rows = result.data.map(e =>
+      `${e.year},${e.month},${e.date},${e.target},${e.category},${e.value},"${e.item || ''}","${e.context || ''}","${e.method || ''}","${e.shop || ''}","${e.location || ''}"`
+    ).join('\n');
+    const cleanedContent = `${headers}\n${rows}`;
+
+    // Save to public folder as the source of truth for the dashboard
     const publicPath = path.join(process.cwd(), 'public', 'expenses_combined_english.csv');
-    const { readFile } = await import('fs/promises');
-    const cleanedData = await readFile(outputPath);
-    await writeFile(publicPath, cleanedData);
+    await writeFile(publicPath, cleanedContent);
 
-    // Read the cleaned file to return stats
-    const cleanedContent = cleanedData.toString('utf-8');
-    const lines = cleanedContent.split('\n').filter(line => line.trim());
-    const recordCount = lines.length - 1; // Subtract header
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'File uploaded and cleaned',
-      records: recordCount,
+    return NextResponse.json({
+      success: true,
+      message: 'File uploaded and cleaned successfully',
+      records: result.data.length,
+      warnings: result.warnings.length,
       filename: file.name
     });
 
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to process file',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });

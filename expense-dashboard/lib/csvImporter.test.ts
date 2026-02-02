@@ -7,7 +7,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { importCSV, validateCSV, getImportPreview } from './csvImporter';
+import { importCSV, validateCSV, getImportPreview } from './csv';
 
 // Read the actual CSV file
 const csvPath = join(__dirname, '..', '..', 'expenses_data.csv');

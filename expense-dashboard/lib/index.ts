@@ -11,25 +11,27 @@ export * from './formatters';
 // Re-export analytics (replacing old dataTransforms)
 export * from './analytics';
 
-// Re-export CSV utilities
-export {
-  parseCSV,
-  parseBudgetCSV,
-  getUniqueValues
-} from './csvParser';
-
-// Re-export production CSV importer
+// Re-export CSV utilities (Modular System)
 export {
   importCSV,
   validateCSV,
   getImportPreview,
-} from './csvImporter';
+  parseCSVLine,
+  detectColumnMapping,
+  parseDate,
+  parseValue,
+  cleanString,
+  normalizeTarget,
+  normalizeCategory
+} from './csv';
+
 export type {
   ImportResult,
   ImportError,
   ImportWarning,
   ImportStats,
-} from './csvImporter';
+  ColumnMapping
+} from './csv';
 
 
 // Re-export general utilities
