@@ -1,217 +1,198 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
-import {
-    WelcomeHeader,
-    MascotSection,
-    InvestmentSummary,
-    InvestmentChart
-} from '@/components/home';
-import { BottomNav } from '@/components/layout';
-
-interface InvestmentData {
-    totalInvested: number;
-    pendingToInvest: number;
-    totalBudget: number;
-}
+import { useExpenseData } from '@/hooks/use-expense-data';
+import { MascotSection } from '@/components/home/MascotSection';
+import BudgetRingsD3 from '@/components/charts/BudgetRingsD3';
+import { formatCurrency } from '@/lib/d3-utils';
+import { ExpenseTarget } from '@/types';
 
 export default function HomePage() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [investmentData, setInvestmentData] = useState<InvestmentData>({
-        totalInvested: 0,
-        pendingToInvest: 0,
-        totalBudget: 0
-    });
     const router = useRouter();
-    const supabase = createClient();
+    const [user, setUser] = useState<User | null>(null);
+    const { expenses, budget, loading } = useExpenseData();
 
+    // -- Authentication Check --
     useEffect(() => {
-        const checkAuth = async () => {
+        const supabase = createClient();
+        const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-
             if (!user) {
                 router.push('/login');
-                return;
+            } else {
+                setUser(user);
             }
+        };
+        checkUser();
+    }, [router]);
 
-            setUser(user);
-            await fetchInvestmentData(user.id);
-            setLoading(false);
+    // -- Data Processing --
+    const { ringData, availableBudget, metrics, refDate } = useMemo(() => {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        // 1. Filter for Current Month
+        // Note: Safely handle if year/month are strings or numbers in raw data
+        const monthlyExpenses = expenses.filter(e =>
+            Number(e.year) === currentYear && Number(e.month) === currentMonth
+        );
+        const monthlyBudgets = budget.filter(b =>
+            Number(b.year) === currentYear && Number(b.month) === currentMonth
+        );
+
+        // 2. Helpers
+        const sumExpenses = (target?: ExpenseTarget) => {
+            return monthlyExpenses
+                .filter(e => !target || e.target === target)
+                .reduce((sum, e) => sum + e.value, 0);
         };
 
-        checkAuth();
+        const sumBudget = (target?: ExpenseTarget) => {
+            return monthlyBudgets
+                .filter(b => !target || b.target === target)
+                .reduce((sum, b) => sum + b.amount, 0);
+        };
 
-        // Auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (!session?.user) {
-                router.push('/login');
-            } else {
-                setUser(session.user);
+        // 3. Calculate Totals
+        const totalSpent = sumExpenses();
+        const totalBudget = sumBudget();
+
+        const futureSpent = sumExpenses('Future');
+        const futureBudget = sumBudget('Future');
+
+        const livingSpent = sumExpenses('Living');
+        const livingBudget = sumBudget('Living');
+
+        const presentSpent = sumExpenses('Present');
+        const presentBudget = sumBudget('Present');
+
+        // 4. Ring Data (Outer to Inner: Total -> Future -> Living -> Present)
+        const ringData = [
+            {
+                label: 'Total',
+                spent: totalSpent,
+                budget: totalBudget,
+                color: '#A9D9C7' // Total (Teal)
+            },
+            {
+                label: 'Future',
+                spent: futureSpent,
+                budget: futureBudget,
+                color: '#614FBB' // Future (Purple)
+            },
+            {
+                label: 'Living',
+                spent: livingSpent,
+                budget: livingBudget,
+                color: '#65A1C9' // Living (Blue)
+            },
+            {
+                label: 'Present',
+                spent: presentSpent,
+                budget: presentBudget,
+                color: '#C24656' // Present (Red)
             }
-        });
+        ];
 
-        return () => subscription.unsubscribe();
-    }, [router, supabase]);
+        // 5. Available (Total Budget - Total Spent)
+        const availableBudget = Math.max(0, totalBudget - totalSpent);
 
-    const fetchInvestmentData = async (userId: string) => {
-        try {
-            // Fetch expenses for the current month - this represents "invested"
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        // Metrics for Mascot (Investment Health)
+        // If Budget is 0, avoid NaN
+        const investmentPercentage = totalBudget > 0 ? (futureSpent / totalBudget) * 100 : 0;
+        const pendingPercentage = totalBudget > 0 ? (availableBudget / totalBudget) * 100 : 0;
 
-            const { data: expenses, error: expensesError } = await supabase
-                .from('expenses')
-                .select('amount')
-                .eq('user_id', userId)
-                .gte('date', startOfMonth.toISOString().split('T')[0])
-                .lte('date', endOfMonth.toISOString().split('T')[0]);
+        return {
+            ringData,
+            availableBudget,
+            metrics: { investmentPercentage, pendingPercentage },
+            refDate: now
+        };
+    }, [expenses, budget]);
 
-            if (expensesError) {
-                console.error('Error fetching expenses:', expensesError);
-            }
 
-            // Calculate total spent this month
-            const totalSpent = expenses?.reduce((sum, exp) => sum + (exp.amount || 0), 0) || 0;
-
-            // Fetch budget for the current month
-            const { data: budgets, error: budgetsError } = await supabase
-                .from('budgets')
-                .select('*')
-                .eq('user_id', userId)
-                .eq('year', now.getFullYear())
-                .lte('start_month', now.getMonth())
-                .gte('end_month', now.getMonth());
-
-            if (budgetsError) {
-                console.error('Error fetching budgets:', budgetsError);
-            }
-
-            // Calculate total budget for this month
-            let totalBudget = 0;
-            if (budgets && budgets.length > 0) {
-                budgets.forEach((budget) => {
-                    const monthKey = `month_${now.getMonth()}`;
-                    if (budget.data && budget.data[monthKey]) {
-                        totalBudget += budget.data[monthKey].amount || 0;
-                    }
-                });
-            }
-
-            // If no budget set, use a default or estimated monthly budget
-            if (totalBudget === 0) {
-                // Estimate based on average spending or use a placeholder
-                totalBudget = totalSpent > 0 ? totalSpent * 1.5 : 100000; // 150% of spent or default
-            }
-
-            const pendingToInvest = Math.max(0, totalBudget - totalSpent);
-
-            setInvestmentData({
-                totalInvested: totalSpent,
-                pendingToInvest: pendingToInvest,
-                totalBudget: totalBudget
-            });
-
-        } catch (error) {
-            console.error('Error fetching investment data:', error);
-            // Set fallback data
-            setInvestmentData({
-                totalInvested: 45000,
-                pendingToInvest: 55000,
-                totalBudget: 100000
-            });
-        }
-    };
-
-    if (loading) {
+    if (!user || loading) {
         return (
-            <div className="min-h-screen bg-void-black flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-2 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
-                    <p className="text-secondary-text text-sm">Cargando...</p>
-                </div>
+            <div className="min-h-screen bg-[#1B4034] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
             </div>
         );
     }
 
-    const { totalInvested, pendingToInvest, totalBudget } = investmentData;
-    const investedPercentage = totalBudget > 0 ? (totalInvested / totalBudget) * 100 : 0;
-    const pendingPercentage = totalBudget > 0 ? (pendingToInvest / totalBudget) * 100 : 0;
-
     return (
-        <div className="min-h-screen bg-void-black page-ambient page-with-nav">
-            {/* Main Content */}
-            <main className="relative z-10 px-4 pt-6 pb-8 max-w-lg mx-auto">
-                {/* Welcome Header */}
-                <WelcomeHeader userName={user?.email?.split('@')[0]} />
+        <main className="min-h-[100dvh] bg-[#1B4034] flex flex-col items-center justify-end pb-28 px-6 page-ambient gap-6">
 
-                {/* Mascot Section */}
-                <div className="my-8 flex justify-center">
-                    <MascotSection
-                        investmentPercentage={investedPercentage}
-                        pendingPercentage={pendingPercentage}
-                        userName={user?.email?.split('@')[0]}
-                    />
+            {/* Top: Kibo Text & Mascot */}
+            <div className="w-full max-w-[350px] flex flex-col items-center z-10 transition-all duration-300">
+                <MascotSection
+                    investmentPercentage={metrics.investmentPercentage}
+                    pendingPercentage={metrics.pendingPercentage}
+                    userName={user.user_metadata?.name || 'Friend'}
+                />
+            </div>
+
+            {/* Middle: Ring Graph */}
+            <div className="w-full max-w-[350px] relative z-20 transition-all duration-300">
+                <div className="liquid-card p-5 flex items-center justify-between bg-[#1B4034] border border-[#A9D9C7]/20 rounded-3xl gap-4 shadow-lg shadow-black/20">
+
+                    {/* Left: Legend */}
+                    <div className="flex flex-col gap-4 pl-2">
+                        {ringData.map(d => (
+                            <div key={d.label} className="flex items-center gap-3">
+                                <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.3)]" style={{ backgroundColor: d.color }} />
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] uppercase tracking-wider text-[#A9D9C7] opacity-70 leading-none mb-1">{d.label}</span>
+                                    <span className="text-sm font-mono text-white font-bold leading-none">
+                                        {d.budget > 0 ? Math.round((d.spent / d.budget) * 100) : 0}%
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Right: Rings */}
+                    <div className="w-[140px] h-[140px] shrink-0">
+                        <BudgetRingsD3 data={ringData} />
+                    </div>
                 </div>
+            </div>
 
-                {/* Investment Summary Cards */}
-                <section className="mb-6">
-                    <InvestmentSummary
-                        totalInvested={totalInvested}
-                        pendingToInvest={pendingToInvest}
-                        currency="JPY"
-                    />
-                </section>
+            {/* Bottom: Available Info */}
+            <div className="w-full max-w-[350px] z-20 transition-all duration-300">
+                <div className="liquid-card p-6 flex flex-col items-center text-center border border-[#A9D9C7]/30 bg-[#1B4034] rounded-3xl relative overflow-hidden shadow-lg shadow-black/20">
+                    {/* Decorative background element */}
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#A9D9C7]/5 rounded-bl-[100px] pointer-events-none" />
 
-                {/* Investment Chart */}
-                <section className="mb-8">
-                    <InvestmentChart
-                        totalInvested={totalInvested}
-                        pendingToInvest={pendingToInvest}
-                    />
-                </section>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#A9D9C7] mb-2 opacity-80">Available Budget</span>
+                    <span className="text-4xl font-bold text-white font-sans tracking-tight mb-4">
+                        {formatCurrency(availableBudget)}
+                    </span>
 
-                {/* Quick Actions */}
-                <section className="grid grid-cols-2 gap-3">
-                    <Link
-                        href="/dashboard"
-                        className="liquid-card p-4 flex flex-col items-center gap-2
-                       hover:bg-white/5 transition-all duration-300
-                       border-l-2 border-l-growth-green"
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-growth-green/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                        <span className="text-xs text-white font-medium">Ver Dashboard</span>
-                    </Link>
+                    {/* Category Breakdown */}
+                    <div className="w-full grid grid-cols-3 gap-2 border-t border-[#A9D9C7]/10 pt-4 mt-1">
+                        {ringData.filter(d => d.label !== 'Total').map(d => {
+                            const remaining = Math.max(0, d.budget - d.spent);
+                            return (
+                                <div key={d.label} className="flex flex-col items-center">
+                                    <span className="text-[9px] uppercase tracking-wider text-[#A9D9C7] opacity-60 mb-0.5">{d.label}</span>
+                                    <span className="text-sm font-semibold text-white">
+                                        {formatCurrency(remaining)}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-                    <Link
-                        href="/quick-entry"
-                        className="liquid-card p-4 flex flex-col items-center gap-2
-                       hover:bg-white/5 transition-all duration-300
-                       border-l-2 border-l-alert-amber"
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-alert-amber/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-alert-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                        </div>
-                        <span className="text-xs text-white font-medium">Añadir Gasto</span>
-                    </Link>
-                </section>
-            </main>
+                    <span className="text-[10px] uppercase tracking-wider text-[#A9D9C7]/40 mt-4">
+                        {refDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                    </span>
+                </div>
+            </div>
 
-            {/* Bottom Navigation */}
-            <BottomNav />
-        </div>
+        </main>
     );
 }
