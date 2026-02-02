@@ -9,7 +9,7 @@ import {
   importCSV,
   validateCSV,
   type ImportResult,
-} from '@/lib/csvImporter';
+} from '@/lib/csv';
 import { EditableExpenseTable } from '@/components/expenses';
 import type { Expense } from '@/types';
 

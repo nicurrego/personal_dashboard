@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { QuickEntryFlow } from '@/components/quick-entry';
-import { QuickEntryData, AutocompleteData, QuickEntryOption, Expense } from '@/lib/types';
-import { getUniqueValues } from '@/lib/csvParser';
+import { QuickEntryData, AutocompleteData, QuickEntryOption, Expense } from '@/types';
+import { getUniqueValues } from '@/lib/analytics';
 import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
 
 export default function QuickEntryPage() {

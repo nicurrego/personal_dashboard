@@ -9,12 +9,12 @@ export function filterBudget(budgetItems: Budget[], filters: FilterState): Budge
     if (filters.dateRange.start || filters.dateRange.end) {
       // Construct a date for the budget item (1st of the month)
       const budgetDate = new Date(item.year, item.month - 1, 1);
-      
+
       if (filters.dateRange.start) {
         if (budgetDate < new Date(filters.dateRange.start.getFullYear(), filters.dateRange.start.getMonth(), 1)) return false;
       }
       if (filters.dateRange.end) {
-         if (budgetDate > filters.dateRange.end) return false;
+        if (budgetDate > filters.dateRange.end) return false;
       }
     }
 
@@ -32,7 +32,7 @@ export function filterBudget(budgetItems: Budget[], filters: FilterState): Budge
     if (filters.categories.length > 0 && !filters.categories.includes(item.category)) {
       return false;
     }
-    
+
     return true;
   });
 }
@@ -54,22 +54,22 @@ export function filterExpenses(expenses: Expense[], filters: FilterState): Expen
       const expenseMonth = new Date(expense.date).getMonth() + 1;
       if (!filters.months.includes(expenseMonth)) return false;
     }
-    
+
     // Target filter
     if (filters.targets.length > 0 && !filters.targets.includes(expense.target)) {
       return false;
     }
-    
+
     // Category filter
     if (filters.categories.length > 0 && !filters.categories.includes(expense.category)) {
       return false;
     }
-    
+
     // Location filter
     if (filters.locations.length > 0 && !filters.locations.includes(expense.location)) {
       return false;
     }
-    
+
     // Method filter
     if (filters.methods.length > 0 && !filters.methods.includes(expense.method)) {
       return false;
@@ -79,7 +79,17 @@ export function filterExpenses(expenses: Expense[], filters: FilterState): Expen
     if (filters.shops && filters.shops.length > 0 && !filters.shops.includes(expense.shop)) {
       return false;
     }
-    
+
     return true;
   });
+}
+
+/**
+ * Get unique values from a field
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getUniqueValues(expenses: Expense[], field: keyof Expense): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const unique = new Set(expenses.map(e => String((e as any)[field])).filter(v => v));
+  return Array.from(unique).sort();
 }

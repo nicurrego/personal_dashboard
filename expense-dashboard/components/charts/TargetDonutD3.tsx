@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { TargetDistribution } from '@/lib/types';
+import { TargetDistribution } from '@/types';
 import {
   createResponsiveSVG,
   createTooltip,

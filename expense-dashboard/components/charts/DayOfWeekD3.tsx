@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { createResponsiveSVG, formatCurrency, createTooltip } from '@/lib/d3-utils';
-import { Expense } from '@/lib/types';
+import { Expense } from '@/types';
 import { getSpendingByDayOfWeek } from '@/lib/analytics';
 
 interface DayOfWeekD3Props {

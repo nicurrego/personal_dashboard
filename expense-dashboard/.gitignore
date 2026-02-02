@@ -43,6 +43,8 @@ next-env.d.ts
 # Local Data
 *.csv
 !public/*.csv
+public/backup_*.csv
+/temp
 
 # Windows
 Thumbs.db

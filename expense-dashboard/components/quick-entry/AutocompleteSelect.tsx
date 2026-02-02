@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { OptionChip } from './OptionChip';
-import { QuickEntryOption } from '@/lib/types';
+import { QuickEntryOption } from '@/types';
 
 interface AutocompleteSelectProps {
   options: QuickEntryOption[];
@@ -39,9 +39,9 @@ export function AutocompleteSelect({
 
   // Filter options based on search
   const filteredOptions = searchTerm
-    ? sortedOptions.filter(opt => 
-        opt.label.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? sortedOptions.filter(opt =>
+      opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : sortedOptions;
 
   // Check if search term matches an existing option
@@ -94,7 +94,7 @@ export function AutocompleteSelect({
             recentCount={option.recentCount}
           />
         ))}
-        
+
         {filteredOptions.length === 0 && searchTerm && (
           <p className="text-white text-sm py-2 px-3 bg-white/10 rounded-lg">
             No matches. Press Enter to add <strong>{searchTerm}</strong>
@@ -128,7 +128,7 @@ export function AutocompleteSelect({
                        placeholder:text-secondary-text
                        transition-all duration-200"
           />
-          
+
           {/* Custom value submit button - HIGH visibility */}
           {searchTerm && !exactMatch && (
             <button

@@ -1,6 +1,6 @@
 'use client';
 
-import { FilterState } from '@/lib/types';
+import { FilterState } from '@/types';
 
 interface FilterPanelProps {
   filters: FilterState;

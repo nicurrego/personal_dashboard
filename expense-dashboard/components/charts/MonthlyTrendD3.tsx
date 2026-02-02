@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { MonthlyData } from '@/lib/types';
+import { MonthlyData } from '@/types';
 import {
   createResponsiveSVG,
   createTooltip,

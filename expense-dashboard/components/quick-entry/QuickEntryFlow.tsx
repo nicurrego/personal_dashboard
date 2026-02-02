@@ -5,7 +5,7 @@ import {
   QuickEntryData,
   QuickEntryStep,
   AutocompleteData
-} from '@/lib/types';
+} from '@/types';
 import { ProgressIndicator } from './ProgressIndicator';
 import { StepCard } from './StepCard';
 import { OptionChip } from './OptionChip';

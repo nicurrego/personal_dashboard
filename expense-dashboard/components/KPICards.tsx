@@ -1,6 +1,6 @@
 'use client';
 
-import { KPIMetrics } from '@/lib/types';
+import { KPIMetrics } from '@/types';
 import { formatCurrency, formatPercentage } from '@/lib/d3-utils';
 
 interface KPICardsProps {

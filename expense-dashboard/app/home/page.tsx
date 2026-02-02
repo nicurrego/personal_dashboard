@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import {
@@ -177,7 +178,7 @@ export default function HomePage() {
 
                 {/* Quick Actions */}
                 <section className="grid grid-cols-2 gap-3">
-                    <a
+                    <Link
                         href="/dashboard"
                         className="liquid-card p-4 flex flex-col items-center gap-2
                        hover:bg-white/5 transition-all duration-300
@@ -190,9 +191,9 @@ export default function HomePage() {
                             </svg>
                         </div>
                         <span className="text-xs text-white font-medium">Ver Dashboard</span>
-                    </a>
+                    </Link>
 
-                    <a
+                    <Link
                         href="/quick-entry"
                         className="liquid-card p-4 flex flex-col items-center gap-2
                        hover:bg-white/5 transition-all duration-300
@@ -205,7 +206,7 @@ export default function HomePage() {
                             </svg>
                         </div>
                         <span className="text-xs text-white font-medium">Añadir Gasto</span>
-                    </a>
+                    </Link>
                 </section>
             </main>
 

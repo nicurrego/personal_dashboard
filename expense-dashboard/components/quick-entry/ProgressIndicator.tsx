@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { QuickEntryStep } from '@/lib/types';
+import { QuickEntryStep } from '@/types';
 
 const STEPS: QuickEntryStep[] = [
   'amount',
@@ -28,24 +28,24 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
       {/* Progress bar container */}
       <div className="relative h-1 bg-white/10 rounded-full overflow-hidden">
         {/* Animated progress fill */}
-        <div 
+        <div
           className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
-          style={{ 
+          style={{
             width: `${progress}%`,
             background: 'linear-gradient(90deg, #06b6d4 0%, #22c55e 50%, #f59e0b 100%)'
           }}
         />
-        
+
         {/* Glow effect */}
-        <div 
+        <div
           className="absolute top-0 h-full rounded-full blur-sm opacity-50 transition-all duration-500 ease-out"
-          style={{ 
+          style={{
             width: `${progress}%`,
             background: 'linear-gradient(90deg, #06b6d4 0%, #22c55e 50%, #f59e0b 100%)'
           }}
         />
       </div>
-      
+
       {/* Step counter */}
       <div className="flex justify-between items-center mt-2">
         <span className="text-xs text-secondary-text font-medium">

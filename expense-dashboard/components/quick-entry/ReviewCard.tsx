@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { QuickEntryData } from '@/lib/types';
+import { QuickEntryData } from '@/types';
 
 interface ReviewCardProps {
   data: QuickEntryData;

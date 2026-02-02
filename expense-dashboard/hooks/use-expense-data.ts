@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Expense, FilterState, Budget, UniqueFilterValues, TimeRangePreset } from '@/types';
 import { INITIAL_FILTER_STATE } from '@/types';
-import { getUniqueValues } from '@/lib/csvParser';
+import { getUniqueValues } from '@/lib/analytics';
 import { filterExpenses } from '@/lib/analytics';
 
 const initialUniqueValues: UniqueFilterValues = {
@@ -27,7 +27,7 @@ export function useExpenseData() {
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTER_STATE);
   const [uniqueValues, setUniqueValues] = useState<UniqueFilterValues>(initialUniqueValues);
   const [timeRangePreset, setTimeRangePreset] = useState<TimeRangePreset>('month'); // Default to this month
-  
+
   // Reference year/month (will be set to latest in data if current has no data)
   const [referenceYear, setReferenceYear] = useState<number>(new Date().getFullYear());
   const [referenceMonth, setReferenceMonth] = useState<number>(new Date().getMonth() + 1);
@@ -46,7 +46,7 @@ export function useExpenseData() {
         if (!expensesResponse.ok) {
           throw new Error('Failed to load expense data');
         }
-        
+
         const rawExpenses = await expensesResponse.json();
         const parsedExpenses: Expense[] = rawExpenses.map((e: any) => ({
           year: Number(e.year),
@@ -61,22 +61,22 @@ export function useExpenseData() {
           shop: e.shop || '',
           location: e.location || ''
         }));
-        
+
         setExpenses(parsedExpenses);
 
         // Load budgets if available
         if (budgetResponse.ok) {
-           const rawBudgets = await budgetResponse.json();
-           const parsedBudget: Budget[] = rawBudgets.map((b: any) => ({
-             year: Number(b.year),
-             month: Number(b.month),
-             target: b.target,
-             category: b.category,
-             amount: Number(b.amount)
-           }));
-           setBudget(parsedBudget);
+          const rawBudgets = await budgetResponse.json();
+          const parsedBudget: Budget[] = rawBudgets.map((b: any) => ({
+            year: Number(b.year),
+            month: Number(b.month),
+            target: b.target,
+            category: b.category,
+            amount: Number(b.amount)
+          }));
+          setBudget(parsedBudget);
         }
-        
+
         // Extract unique values for filters
         const years = Array.from(new Set(parsedExpenses.map(e => e.year))).sort();
         setUniqueValues({
@@ -87,16 +87,16 @@ export function useExpenseData() {
           methods: getUniqueValues(parsedExpenses, 'method'),
           shops: getUniqueValues(parsedExpenses, 'shop')
         });
-        
+
         // Determine reference year/month
         // If current year has no data, use the latest year in the dataset
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
-        
+
         const hasCurrentYearData = parsedExpenses.some(e => e.year === currentYear);
         const hasCurrentMonthData = parsedExpenses.some(e => e.year === currentYear && e.month === currentMonth);
-        
+
         if (hasCurrentMonthData) {
           setReferenceYear(currentYear);
           setReferenceMonth(currentMonth);
@@ -122,7 +122,7 @@ export function useExpenseData() {
           setReferenceYear(currentYear);
           setReferenceMonth(currentMonth);
         }
-        
+
         setLoading(false);
       } catch (err) {
         console.error('Error loading data:', err);
@@ -130,7 +130,7 @@ export function useExpenseData() {
         setLoading(false);
       }
     }
-    
+
     loadData();
   }, []);
 
@@ -140,7 +140,7 @@ export function useExpenseData() {
 
     // First apply time range preset
     let timeFiltered = expenses;
-    
+
     if (timeRangePreset === 'month') {
       timeFiltered = expenses.filter(e => e.year === referenceYear && e.month === referenceMonth);
     } else if (timeRangePreset === 'year') {
@@ -206,7 +206,7 @@ export function useExpenseData() {
         // Rehydrate dates
         if (parsed.filters?.dateRange?.start) parsed.filters.dateRange.start = new Date(parsed.filters.dateRange.start);
         if (parsed.filters?.dateRange?.end) parsed.filters.dateRange.end = new Date(parsed.filters.dateRange.end);
-        
+
         if (parsed.filters) setFilters(parsed.filters);
         if (parsed.timeRangePreset) setTimeRangePreset(parsed.timeRangePreset);
       } catch (e) {
@@ -223,7 +223,7 @@ export function useExpenseData() {
         const parsed = JSON.parse(saved);
         if (parsed.filters?.dateRange?.start) parsed.filters.dateRange.start = new Date(parsed.filters.dateRange.start);
         if (parsed.filters?.dateRange?.end) parsed.filters.dateRange.end = new Date(parsed.filters.dateRange.end);
-        
+
         setFilters(parsed.filters || INITIAL_FILTER_STATE);
         setTimeRangePreset(parsed.timeRangePreset || 'month');
       } catch (e) {
@@ -237,12 +237,12 @@ export function useExpenseData() {
   }, []);
 
   // Count active filters
-  const activeFilterCount = 
-    (filters.dateRange.start ? 1 : 0) + 
-    (filters.months?.length || 0) + 
-    filters.categories.length + 
-    filters.locations.length + 
-    filters.shops.length + 
+  const activeFilterCount =
+    (filters.dateRange.start ? 1 : 0) +
+    (filters.months?.length || 0) +
+    filters.categories.length +
+    filters.locations.length +
+    filters.shops.length +
     filters.targets.length;
 
   return {
@@ -251,7 +251,7 @@ export function useExpenseData() {
     filteredExpenses,
     loading,
     error,
-    
+
     // Filters
     filters,
     setFilters,
@@ -259,7 +259,7 @@ export function useExpenseData() {
     saveDefaultView,
     uniqueValues,
     activeFilterCount,
-    
+
     // Time Range Preset
     timeRangePreset,
     setTimeRangePreset,
