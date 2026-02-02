@@ -23,22 +23,22 @@ export default function BudgetProgressRings({ progress }: BudgetProgressRingsPro
         <RingItem
           label="Total"
           data={progress.total}
-          color="#6CA1B7" // Kibo Blue
+          color="var(--color-total)" // Income/Total Teal
         />
         <RingItem
           label="Living"
           data={progress.living}
-          color="#487363" // Sage
+          color="var(--color-living)" // Living Blue
         />
         <RingItem
           label="Present"
           data={progress.present}
-          color="#A9D9C7" // Pale Mint
+          color="var(--color-present)" // Present Red
         />
         <RingItem
           label="Future"
           data={progress.future}
-          color="#8DF2CD" // Mint
+          color="var(--color-future)" // Future Purple
         />
       </div>
     </div>
@@ -60,8 +60,8 @@ function RingItem({
   const percentage = isFinite(data.percentage) ? data.percentage : 0;
   const isOverBudget = percentage > 100;
 
-  // Use Red if over budget, otherwise prop color
-  const displayColor = isOverBudget ? '#85241E' : color; // Kibo Red
+  // Determine display color (warning if over 100%)
+  const displayColor = percentage > 100 ? 'var(--color-present)' : color;
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -123,7 +123,7 @@ function RingItem({
 
         {/* Center Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className={`text-2xl font-bold tracking-tight ${isOverBudget ? 'text-[#85241E]' : 'text-white'}`}>
+          <span className={`text-2xl font-bold tracking-tight ${isOverBudget ? 'text-[#C24656]' : 'text-white'}`}>
             {Math.round(percentage)}<span className="text-sm align-top opacity-70">%</span>
           </span>
         </div>

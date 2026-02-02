@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { 
-  QuickEntryData, 
-  QuickEntryStep, 
-  AutocompleteData 
+import {
+  QuickEntryData,
+  QuickEntryStep,
+  AutocompleteData
 } from '@/lib/types';
 import { ProgressIndicator } from './ProgressIndicator';
 import { StepCard } from './StepCard';
@@ -44,11 +44,11 @@ const STEP_CONFIG: Record<QuickEntryStep, { title: string; subtitle?: string }> 
 
 // Target colors for visual distinction
 const TARGET_COLORS: Record<string, string> = {
-  'Living': '#06b6d4',    // Cyan
-  'Present': '#f59e0b',   // Amber
-  'Saving': '#22c55e',    // Green
-  'Investment': '#8B5CF6', // Violet
-  'Future': '#22c55e',    // Green (alias)
+  'Living': '#614FBB',    // Future/Living Purple
+  'Present': '#C24656',   // Present Red
+  'Saving': '#A9D9C7',    // Income/Safe Teal
+  'Investment': '#614FBB', // Future Purple
+  'Future': '#614FBB',    // Future Purple
 };
 
 interface QuickEntryFlowProps {
@@ -61,14 +61,14 @@ interface QuickEntryFlowProps {
   onCancel: () => void;
 }
 
-export function QuickEntryFlow({ 
-  autocompleteData, 
+export function QuickEntryFlow({
+  autocompleteData,
   targetCategories,
   targets,
   contexts,
   items,
-  onSave, 
-  onCancel 
+  onSave,
+  onCancel
 }: QuickEntryFlowProps) {
   const [currentStep, setCurrentStep] = useState<QuickEntryStep>('amount');
   const [data, setData] = useState<QuickEntryData>({
@@ -88,9 +88,9 @@ export function QuickEntryFlow({
   // Get categories filtered by selected target
   const filteredCategories = useMemo(() => {
     if (!data.target) return autocompleteData.categories;
-    
+
     const categoriesForTarget = targetCategories.get(data.target) || [];
-    return autocompleteData.categories.filter(cat => 
+    return autocompleteData.categories.filter(cat =>
       categoriesForTarget.includes(cat.id)
     );
   }, [data.target, targetCategories, autocompleteData.categories]);
@@ -118,7 +118,7 @@ export function QuickEntryFlow({
 
   // Data update helpers
   const updateData = useCallback(<K extends keyof QuickEntryData>(
-    key: K, 
+    key: K,
     value: QuickEntryData[K]
   ) => {
     setData(prev => ({ ...prev, [key]: value }));
@@ -126,8 +126,8 @@ export function QuickEntryFlow({
 
   // Handle target change - reset category when target changes
   const handleTargetChange = useCallback((target: string) => {
-    setData(prev => ({ 
-      ...prev, 
+    setData(prev => ({
+      ...prev,
       target: target as QuickEntryData['target'],
       category: ''
     }));
@@ -305,7 +305,7 @@ export function QuickEntryFlow({
   const stepConfig = STEP_CONFIG[currentStep];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col pb-32 page-ambient">
+    <div className="min-h-screen bg-[#1B4034] flex flex-col pb-32 page-ambient">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <button
@@ -317,9 +317,9 @@ export function QuickEntryFlow({
             {currentStep === 'amount' ? 'Cancel' : 'Back'}
           </span>
         </button>
-        
+
         <h1 className="text-sm font-medium text-white">Quick Entry</h1>
-        
+
         {currentStep !== 'review' ? (
           <button
             onClick={goNext}
@@ -356,7 +356,7 @@ export function QuickEntryFlow({
               transition-all duration-200
               ${currentStep === 'amount' && !data.value
                 ? 'bg-white/10 text-secondary-text cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyber-cyan to-growth-green text-white active:scale-[0.98]'
+                : 'bg-[#614FBB] text-white active:scale-[0.98]'
               }
             `}
           >

@@ -16,10 +16,10 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
   const containerRef = useRef<HTMLDivElement>(null);
 
   const dateRange = d3.extent(expenses, d => new Date(d.date)) as [Date, Date];
-  const daysDiff = dateRange[0] && dateRange[1] 
+  const daysDiff = dateRange[0] && dateRange[1]
     ? (dateRange[1].getTime() - dateRange[0].getTime()) / (1000 * 60 * 60 * 24)
     : 0;
-  
+
   const tooMuchData = daysDiff > 180; // Limit to ~6 months
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
     d3.select(containerRef.current).selectAll('*').remove();
 
     const container = containerRef.current;
-    
+
     // Margins logic: Expanded needs more space? Or standard?
     const margin = isExpanded
       ? { top: 40, right: 30, bottom: 30, left: 40 }
@@ -39,7 +39,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
 
     // --- DATA TRANSFORMATION ---
     const dailyMap = new Map<string, number>();
-    
+
     expenses.forEach(e => {
       const d = new Date(e.date);
       // Normalized Key: YYYY-MM-DD
@@ -69,34 +69,40 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
     // --- SCALES ---
     // X Axis: Weeks
     const maxWeeks = d3.max(data, d => d.dayParams.weekIndex) || 0;
-    
+
     // Check if we have too many weeks for the width?
     // If we have > 52 weeks in a non-expanded view (approx 350px width => 6px/cell), it's tight.
     // But we are handling the "hard limit" via tooMuchData
-    
+
     // Cells should be square optimally.
     const cellSize = Math.min(
       width / (maxWeeks + 1),
       height / 7
     );
-    
+
     const xScale = d3.scaleLinear()
       .domain([0, maxWeeks])
       .range([0, cellSize * maxWeeks]);
-      
+
     // Y Axis: Days (0 to 6)
     const yScale = d3.scaleBand()
       .domain([0, 1, 2, 3, 4, 5, 6] as any)
       .range([0, cellSize * 7])
-      .padding(0.1); 
+      .padding(0.1);
 
     // Color Scale
     const maxVal = d3.max(data, d => d.value) || 0;
-    
-    // Custom "Cyber" colors
-    const cyberScale = d3.scaleLinear<string>()
-      .domain([0, maxVal * 0.2, maxVal * 0.6, maxVal])
-      .range(['#1f2937', '#06b6d4', '#d946ef', '#ffffff']);
+
+    // Resolve theme colors
+    const style = getComputedStyle(document.documentElement);
+    const colorStart = style.getPropertyValue('--color-kibo-bg').trim() || '#1B4034';
+    const colorEnd = style.getPropertyValue('--color-total').trim() || '#A9D9C7';
+
+    // Color Scale - Monochrome (Deep Green -> Bright Teal)
+    const colorScale = d3.scaleLinear<string>()
+      .domain([0, maxVal])
+      .range([colorStart, colorEnd]);
+    // Ramp from Darker BG -> Dark Teal -> Mid Teal -> Kibo Total Teal
 
     // --- DRAWING ---
     const tooltip = createTooltip(container);
@@ -110,16 +116,18 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
       .attr('height', cellSize - 1)
       .attr('rx', 2)
       .attr('ry', 2)
-      .attr('fill', d => d.value === 0 ? '#1f2937' : cyberScale(d.value)) // Gray for empty, color for val
+      .attr('rx', 2)
+      .attr('ry', 2)
+      .attr('fill', d => d.value === 0 ? '#1B4032' : colorScale(d.value)) // Darker Kibo Green for empty, purple for val
       .attr('opacity', 0.8)
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         if (d.value === 0) return;
-        
+
         d3.select(this)
           .attr('stroke', '#fff')
           .attr('stroke-width', 1)
           .attr('opacity', 1);
-          
+
         tooltip
           .html(`
             <strong>${d3.timeFormat('%Y-%m-%d')(d.date)}</strong><br/>
@@ -127,12 +135,12 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
           `)
           .style('visibility', 'visible');
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         d3.select(this)
           .attr('stroke', 'none')
           .attr('opacity', 0.8);
@@ -156,19 +164,19 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
     // X Axis: Weeks/Dates
     // Group data by weekIndex to find the start date of each week
     const weeksData = d3.groups(data, d => d.dayParams.weekIndex);
-    
+
     // Determine label frequency
     const totalWeeks = weeksData.length;
     let labelStep = 1;
     if (totalWeeks > 10) labelStep = 4; // Monthly-ish
     if (totalWeeks > 30) labelStep = 8; // Bi-monthly-ish
-    
+
     const xLabels = weeksData.filter(d => d[0] % labelStep === 0).map(d => {
-       const weekIndex = d[0];
-       const daysInWeek = d[1];
-       // Find the earliest date in this week column
-       const minDate = d3.min(daysInWeek, x => x.date) as Date;
-       return { weekIndex, date: minDate };
+      const weekIndex = d[0];
+      const daysInWeek = d[1];
+      // Find the earliest date in this week column
+      const minDate = d3.min(daysInWeek, x => x.date) as Date;
+      return { weekIndex, date: minDate };
     });
 
     g.selectAll('.xLabel')
@@ -189,7 +197,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
   }, [expenses, isExpanded, tooMuchData]);
 
   return (
-    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-[#1B4034]' : 'liquid-card p-5'}`}>
       {!isExpanded && (
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Spending Heatmap</h2>
@@ -209,7 +217,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
             )}
             {/* Hide expand if too much data, or maybe allow it? If too much data, expand doesn't help if cells are microscopic. Let's hide it for now or disable it. User said "instead of the chart put a message". */}
             {onExpand && !tooMuchData && (
-              <button 
+              <button
                 onClick={onExpand}
                 className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
                 aria-label="Expand Chart"
@@ -225,35 +233,35 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
           </div>
         </div>
       )}
-      
+
       {tooMuchData ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4" style={{ height: isExpanded ? '100%' : '300px' }}>
           <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/30">
-             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
-               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-             </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
           </div>
           <div>
             <h3 className="text-lg font-bold text-white mb-2">Too Much Data</h3>
             <p className="text-sm text-gray-400 max-w-xs mx-auto">
               There is too much history to display comfortably in this heatmap.
-              <br/><br/>
+              <br /><br />
               <span className="text-cyan-400 font-medium">Please filter by Month or Year</span> to zoom in and see your patterns.
             </p>
           </div>
         </div>
       ) : (
         <div className="flex flex-col h-full relative">
-          <div 
-            ref={containerRef} 
+          <div
+            ref={containerRef}
             className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
             style={{ height: isExpanded ? 'calc(100% - 40px)' : '260px' }}
           />
-          
+
           {/* Legend */}
           <div className={`flex items-center justify-end gap-3 px-4 ${isExpanded ? 'pb-8' : 'pb-2'} text-xs text-secondary-text`}>
             <span>Less</span>
-            <div className="w-24 h-2 rounded-full" style={{ background: 'linear-gradient(to right, #1f2937, #06b6d4, #d946ef, #ffffff)' }} />
+            <div className="w-24 h-2 rounded-full" style={{ background: 'linear-gradient(to right, #1B4032, #2A6B58, #6CA1B7, #A9D9C7)' }} />
             <span>More</span>
           </div>
         </div>

@@ -92,10 +92,10 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
             <div
                 className={`
           relative mb-4 p-4 rounded-2xl
-          bg-gradient-to-br from-[rgba(40,40,45,0.9)] to-[rgba(28,28,30,0.95)]
-          border border-white/10 backdrop-blur-xl
+          bg-kibo-bg
+          border border-kibo-teal/30 backdrop-blur-sm
           max-w-[280px] min-h-[80px]
-          shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+          shadow-[0_4px_12px_rgba(0,0,0,0.2)]
           transition-all duration-300
           ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
         `}
@@ -105,8 +105,14 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                     className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0
                      border-l-[12px] border-l-transparent
                      border-r-[12px] border-r-transparent
-                     border-t-[12px] border-t-[rgba(28,28,30,0.95)]"
+                     border-t-[12px] border-t-kibo-bg"
+                    style={{ filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.1))' }}
                 />
+
+                {/* Add a border line for the pointer to match the bubble border if possible, 
+                    but CSS triangles are tricky with borders. 
+                    Simplified: just the shape color matches the bubble bg. 
+                */}
 
                 {/* Message content */}
                 <p className="text-white text-sm font-medium leading-relaxed text-center">
@@ -122,8 +128,8 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                                 className={`
                   w-1.5 h-1.5 rounded-full transition-all duration-300
                   ${index === currentMessageIndex
-                                        ? 'bg-cyber-cyan w-4'
-                                        : 'bg-white/30'}
+                                        ? 'bg-kibo-teal w-4'
+                                        : 'bg-kibo-teal/30'}
                 `}
                             />
                         ))}
@@ -137,10 +143,10 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                 <div
                     className={`
             absolute inset-0 rounded-full blur-3xl opacity-30
-            ${currentMessage?.mood === 'happy' ? 'bg-growth-green' :
-                            currentMessage?.mood === 'sad' ? 'bg-alert-amber' :
-                                currentMessage?.mood === 'pleased' ? 'bg-flux-violet' :
-                                    'bg-cyber-cyan'}
+            ${currentMessage?.mood === 'happy' ? 'bg-kibo-purple' :
+                            currentMessage?.mood === 'sad' ? 'bg-kibo-red' :
+                                currentMessage?.mood === 'pleased' ? 'bg-kibo-blue' :
+                                    'bg-kibo-teal'}
           `}
                 />
 
@@ -148,7 +154,7 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                 <div
                     className="relative w-32 h-32 md:w-40 md:h-40 
                      transition-transform duration-500 hover:scale-105
-                     drop-shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                     drop-shadow-[0_0_10px_rgba(169,217,199,0.2)]"
                 >
                     <Image
                         src={getMascotImage(currentMessage?.mood || 'normal')}
@@ -160,9 +166,9 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                 </div>
 
                 {/* Floating particles around mascot */}
-                <div className="absolute -top-2 -right-2 w-2 h-2 bg-cyber-cyan rounded-full animate-pulse" />
-                <div className="absolute top-4 -left-3 w-1.5 h-1.5 bg-growth-green rounded-full animate-pulse delay-300" />
-                <div className="absolute -bottom-1 right-4 w-1 h-1 bg-flux-violet rounded-full animate-pulse delay-500" />
+                <div className="absolute -top-2 -right-2 w-2 h-2 bg-kibo-teal rounded-full animate-pulse" />
+                <div className="absolute top-4 -left-3 w-1.5 h-1.5 bg-kibo-purple rounded-full animate-pulse delay-300" />
+                <div className="absolute -bottom-1 right-4 w-1 h-1 bg-kibo-red rounded-full animate-pulse delay-500" />
             </div>
 
             {/* Mascot name */}

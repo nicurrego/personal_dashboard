@@ -11,15 +11,15 @@ interface OptionChipProps {
   recentCount?: number;
 }
 
-export function OptionChip({ 
-  label, 
-  selected = false, 
+export function OptionChip({
+  label,
+  selected = false,
   onClick,
   variant = 'default',
   color,
   recentCount
 }: OptionChipProps) {
-  
+
   // Get selection styling with HIGH contrast - WHITE text on colored background
   const getSelectionStyles = () => {
     if (selected) {
@@ -36,31 +36,31 @@ export function OptionChip({
       switch (variant) {
         case 'target':
           return {
-            backgroundColor: '#06b6d4',
-            borderColor: '#06b6d4',
-            color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(6,182,212,0.5)'
+            backgroundColor: '#A9D9C7',
+            borderColor: '#A9D9C7',
+            color: '#1B4034', // Dark text on light teal
+            boxShadow: '0 0 20px rgba(169,217,199,0.5)'
           };
         case 'method':
           return {
-            backgroundColor: '#8B5CF6',
-            borderColor: '#8B5CF6',
+            backgroundColor: '#614FBB',
+            borderColor: '#614FBB',
             color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(139,92,246,0.5)'
+            boxShadow: '0 0 20px rgba(97,79,187,0.5)'
           };
         case 'context':
           return {
-            backgroundColor: '#f59e0b',
-            borderColor: '#f59e0b',
+            backgroundColor: '#614FBB',
+            borderColor: '#614FBB',
             color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(245,158,11,0.5)'
+            boxShadow: '0 0 20px rgba(97,79,187,0.5)'
           };
         default:
           return {
-            backgroundColor: '#22c55e',
-            borderColor: '#22c55e',
-            color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(34,197,94,0.5)'
+            backgroundColor: '#A9D9C7',
+            borderColor: '#A9D9C7',
+            color: '#1B4034',
+            boxShadow: '0 0 20px rgba(169,217,199,0.5)'
           };
       }
     }
@@ -89,10 +89,10 @@ export function OptionChip({
       <span className="whitespace-nowrap">
         {label}
       </span>
-      
+
       {/* Recent usage indicator */}
       {recentCount && recentCount > 0 && !selected && (
-        <span 
+        <span
           className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1
                      flex items-center justify-center
                      bg-white/30 text-[10px] font-bold text-white rounded-full"
@@ -100,7 +100,7 @@ export function OptionChip({
           {recentCount > 99 ? '99+' : recentCount}
         </span>
       )}
-      
+
       {/* Selection checkmark */}
       {selected && (
         <span className="ml-1 font-bold">✓</span>

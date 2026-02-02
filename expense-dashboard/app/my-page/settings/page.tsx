@@ -176,14 +176,14 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen bg-[#1B4034] flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-black page-ambient">
+        <div className="min-h-screen bg-[#1B4034] page-ambient">
             {/* Header */}
             <header className="border-b border-white/10 px-4 py-4">
                 <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -203,8 +203,8 @@ export default function SettingsPage() {
                 {/* Message */}
                 {message && (
                     <div className={`p-4 rounded-xl border ${message.type === 'success'
-                            ? 'bg-growth-green/10 border-growth-green/30 text-growth-green'
-                            : 'bg-laser-magenta/10 border-laser-magenta/30 text-laser-magenta'
+                        ? 'bg-growth-green/10 border-growth-green/30 text-growth-green'
+                        : 'bg-laser-magenta/10 border-laser-magenta/30 text-laser-magenta'
                         }`}>
                         {message.text}
                     </div>
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                         onClick={handleSaveProfile}
                         disabled={saving}
                         className="w-full py-3 rounded-xl font-semibold
-                       bg-gradient-to-r from-cyber-cyan to-growth-green text-white
+                       bg-[#614FBB] text-white
                        hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all"
                     >
                         {saving ? 'Saving...' : 'Save Changes'}

@@ -16,14 +16,14 @@ export default function FloatingFilterButton({ onClick, count, isOpen = false }:
     setMounted(true);
   }, []);
 
-  // Colors: When closed - dark bg with violet icon. When open - violet bg with dark icon
-  const bgColor = isOpen ? '#8B5CF6' : '#1C1C1E';
-  const iconColor = isOpen ? '#000000' : '#8B5CF6';
-  const borderColor = isOpen ? 'rgba(255,255,255,0.3)' : 'rgba(139,92,246,0.3)';
-  const shadowColor = isOpen ? 'rgba(139,92,246,0.5)' : 'rgba(139,92,246,0.3)';
+  // Colors: When closed - dark bg with Teal icon. When open - Teal bg with dark icon
+  const bgColor = isOpen ? 'var(--color-total)' : 'var(--color-kibo-bg)';
+  const iconColor = isOpen ? 'var(--color-kibo-bg)' : 'var(--color-total)';
+  const borderColor = isOpen ? 'rgba(255,255,255,0.3)' : 'var(--color-total)';
+  const shadowColor = isOpen ? 'var(--color-total)' : 'rgba(169, 217, 199, 0.3)'; // Teal-ish shadow
 
   const buttonContent = (
-    <button 
+    <button
       onClick={onClick}
       style={{
         position: 'fixed',
@@ -39,9 +39,8 @@ export default function FloatingFilterButton({ onClick, count, isOpen = false }:
         alignItems: 'center',
         justifyContent: 'center',
         border: `2px solid ${borderColor}`,
-        boxShadow: `0 4px 20px ${shadowColor}`,
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
+        transition: 'transform 0.1s ease',
       }}
       aria-label="Toggle Filters"
     >
@@ -65,14 +64,14 @@ export default function FloatingFilterButton({ onClick, count, isOpen = false }:
           width: '20px',
           height: '20px',
           borderRadius: '50%',
-          backgroundColor: '#FF9F0A',
-          color: '#000000',
+          backgroundColor: 'var(--color-present)', // Use Present Red for badge
+          color: '#FFFFFF',
           fontSize: '10px',
           fontWeight: 'bold',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          border: '2px solid #1C1C1E',
+          border: '2px solid var(--color-kibo-bg)',
         }}>
           {count}
         </span>
@@ -81,7 +80,7 @@ export default function FloatingFilterButton({ onClick, count, isOpen = false }:
   );
 
   if (!mounted) return null;
-  
+
   return createPortal(buttonContent, document.body);
 }
 

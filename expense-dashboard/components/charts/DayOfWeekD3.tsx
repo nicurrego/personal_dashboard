@@ -25,7 +25,7 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
     const data = getSpendingByDayOfWeek(expenses);
 
     const container = containerRef.current;
-    
+
     // Margins logic
     const margin = isExpanded
       ? { top: 40, right: 30, bottom: 50, left: 60 }
@@ -46,36 +46,23 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
     // --- DRAWING ---
     const tooltip = createTooltip(container);
 
-    // --- COLORS (Gradient) ---
-    // Use objectBoundingBox so each bar gets its own gradient from bottom to top
-    // This works correctly even after CSS rotation since it's relative to each shape
-    const defs = svg.append('defs');
-    const gradient = defs.append('linearGradient')
-      .attr('id', 'dayHeatGradient')
-      .attr('gradientUnits', 'objectBoundingBox')
-      .attr('x1', '0%')
-      .attr('y1', '100%')  // Start at bottom of each bar
-      .attr('x2', '0%')
-      .attr('y2', '0%');   // End at top of each bar
-
-    gradient.append('stop').attr('offset', '0%').attr('stop-color', '#1f2937');
-    gradient.append('stop').attr('offset', '20%').attr('stop-color', '#06b6d4');
-    gradient.append('stop').attr('offset', '60%').attr('stop-color', '#d946ef');
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#ffffff');
+    // --- COLORS (Monochrome Kibo Purple) ---
+    // User requested "monochrome" and "no gradients". 
+    // We will use solid fill #614FBB. Keeping logic simple.
 
     // Bars
     g.selectAll('.bar')
       .data(data)
       .join('rect')
       .attr('class', 'bar')
-      .attr('x', d => x(d.day)!)
+      .attr('x', d => x(d.day) || 0)
       .attr('y', d => y(d.total))
       .attr('width', x.bandwidth())
       .attr('height', d => height - y(d.total))
-      .attr('fill', 'url(#dayHeatGradient)')
-      .attr('rx', 4)
+      .attr('fill', 'var(--color-total)') // Solid Kibo Teal
+      .attr('rx', 6)
       .attr('ry', 4)
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         d3.select(this).attr('opacity', 0.8);
         tooltip
           .html(`
@@ -85,12 +72,12 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
           `)
           .style('visibility', 'visible');
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         d3.select(this).attr('opacity', 1);
         tooltip.style('visibility', 'hidden');
       });
@@ -114,9 +101,9 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
         return '¥' + d;
       }))
       .selectAll('text')
-      .style('fill', '#9ca3af')
+      .style('fill', '#9ca3af') // Keep gray for axis text or make it Teal/White? Gray is fine for secondary text.
       .style('font-size', '10px');
-      
+
     // Remove domain lines for cleaner look
     g.selectAll('.domain').remove();
     g.selectAll('.tick line').attr('stroke', '#374151').attr('stroke-dasharray', '2,2');
@@ -124,7 +111,7 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
   }, [expenses, isExpanded]);
 
   return (
-    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-[#1B4034]' : 'liquid-card p-5'}`}>
       {!isExpanded && (
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Day of Week Analysis</h2>
@@ -142,8 +129,8 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
           </div>
         </div>
       )}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
         style={{ height: isExpanded ? '100%' : '200px' }}
       />

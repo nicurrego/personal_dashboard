@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { CategoryTotal } from '@/lib/types';
-import { 
-  createResponsiveSVG, 
-  createTooltip, 
-  formatCurrency, 
+import {
+  createResponsiveSVG,
+  createTooltip,
+  formatCurrency,
   formatPercentage,
   animateBars,
   createStyledAxis,
@@ -22,55 +22,54 @@ interface CategoryBarD3Props {
 
 export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = false }: CategoryBarD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (!containerRef.current || data.length === 0) return;
-    
+
     // Clear previous chart
     d3.select(containerRef.current).selectAll('*').remove();
-    
+
     const container = containerRef.current;
-    
+
     // Adjust margins for expanded view
     const margin = isExpanded
       ? { top: 10, right: 30, bottom: 20, left: 140 } // More space for names on left
       : { top: 20, right: 50, bottom: 20, left: 120 };
 
     const { svg, g, width, height } = createResponsiveSVG(container, margin);
-    
+
     // Create scales
     const yScale = d3.scaleBand()
       .domain(data.map(d => d.category))
       .range([0, height])
       .padding(0.3);
-      
+
     const xScale = d3.scaleLinear()
       .domain([0, d3.max(data, d => d.total) || 0])
       .nice()
       .range([0, width]);
-      
+
     // Tooltip
     const tooltip = createTooltip(container);
-    
+
     // Create Axes
     const yAxis = d3.axisLeft(yScale)
       .tickSize(0)
       .tickPadding(10)
       .tickFormat(d => truncateText(d, 100)); // Truncate long names
-      
+
     const xAxis = d3.axisBottom(xScale)
       .ticks(5)
       .tickFormat(d => formatCurrency(d as number));
-      
+
     createStyledAxis(g, yAxis, 'left');
     // Optional: Hide bottom axis for cleaner look if value labels are used
     // createStyledAxis(g, xAxis, 'bottom', `translate(0,${height})`);
-    
-    // Color scale (System Gradient: Flux Violet -> Cyber Cyan)
-    const colorScale = d3.scaleSequential()
-      .domain([0, data.length])
-      .interpolator(d3.interpolateRgb('#8B5CF6', '#06b6d4'));
-      
+
+    // Color scale (Monochrome Kibo Purple)
+    // We'll just access the color directly
+    // const colorScale = ... removed
+
     // Draw Bars
     g.selectAll('.bar')
       .data(data)
@@ -79,7 +78,7 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
       .attr('x', 0)
       .attr('y', d => yScale(d.category) || 0)
       .attr('height', yScale.bandwidth())
-      .attr('fill', (d, i) => colorScale(i)) // Gradient by rank
+      .attr('fill', 'var(--color-total)') // Solid Kibo Teal (Total)
       .attr('rx', 4) // Rounded corners
       .attr('width', 0) // Start at width 0 for animation
       .transition()
@@ -87,7 +86,7 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
       .delay((d, i) => i * 100)
       .ease(d3.easeCubicOut)
       .attr('width', d => xScale(d.total));
-      
+
     // Add Value Labels at end of bars
     g.selectAll('.label')
       .data(data)
@@ -105,16 +104,20 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
       .delay((d, i) => i * 100 + 800)
       .duration(500)
       .style('opacity', 1);
-      
+
     // Interactions
     g.selectAll('rect')
-      .on('mouseover', function(event, d: any) {
+      .on('mouseover', function (event, d: any) {
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', '#d946ef') // Laser Magenta Highlight
-          .attr('filter', 'drop-shadow(0 0 8px #d946ef)');
-          
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr('fill', '#A9D9C7')
+          .attr('opacity', 1);
+        // Removed glow filter
+
         tooltip
           .html(`
             <strong>${d.category}</strong><br/>
@@ -124,28 +127,32 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
           `)
           .style('visibility', 'visible');
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function(event, d) {
+      .on('mouseout', function (event, d) {
         // Restore gradient color
         const index = data.findIndex(item => item.category === (d as { category: string }).category);
-        
+
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('fill', colorScale(index))
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr('fill', '#A9D9C7')
+          .attr('opacity', 1)
           .attr('filter', 'none');
-          
+
         tooltip.style('visibility', 'hidden');
       });
-      
+
   }, [data, isExpanded]);
-  
+
   return (
-    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-[#1B4034]' : 'liquid-card p-5'}`}>
       {!isExpanded && (
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Top Categories</h2>
@@ -162,7 +169,7 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
               </button>
-              <button 
+              <button
                 onClick={onExpand}
                 className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
                 aria-label="Expand Chart"
@@ -178,8 +185,8 @@ export default function CategoryBarD3({ data, onExpand, onInfo, isExpanded = fal
           )}
         </div>
       )}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
         style={{ height: isExpanded ? '100%' : '400px' }}
       />

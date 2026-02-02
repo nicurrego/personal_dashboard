@@ -41,16 +41,7 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
-  {
-    href: '/expenses',
-    label: 'Expenses',
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-      </svg>
-    ),
-  },
+
   {
     href: '/budget',
     label: 'Budget',
@@ -85,7 +76,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="bottom-nav-fixed fixed bottom-0 left-0 right-0 z-[100] bg-[#1B4034] border-t border-[#487363] safe-area-pb">
+    <nav className="bottom-nav-fixed fixed bottom-0 left-0 right-0 z-[100] bg-[#1B4034] border-t border-[#A9D9C7] safe-area-pb">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -98,12 +89,13 @@ export function BottomNav() {
               className={`
                 flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all
                 ${isAddButton
-                  ? 'bg-[#CC8257] text-white -mt-4 px-5 py-3 rounded-full border-4 border-[#1B4034]' // Solid orange button
+                  ? 'text-kibo-bg -mt-4 px-5 py-3 rounded-full border-4 border-[#1B4034]'
                   : isActive
-                    ? 'text-[#8DF2CD]' // Mint for active
-                    : 'text-[#A9D9C7] hover:text-white' // Pale mint for inactive
+                    ? 'text-kibo-teal' // Teal for active
+                    : 'text-[#F2F2F2]/50 hover:text-kibo-teal' // Dimmed white for inactive, Teal on hover
                 }
               `}
+              style={isAddButton ? { backgroundColor: 'var(--color-total)' } : undefined}
             >
               {item.icon}
               <span className={`text-[10px] font-medium ${isAddButton ? 'hidden' : ''}`}>

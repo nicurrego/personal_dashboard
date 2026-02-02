@@ -72,7 +72,7 @@ export default function MyPage() {
                 <h1 className="text-2xl font-bold text-white tracking-tight">My Page</h1>
                 <Link
                     href="/my-page/settings"
-                    className="p-2 rounded-full bg-[#1B4034] hover:bg-[#487363] transition-colors text-white border border-[#487363]"
+                    className="p-2 rounded-full bg-[#1B4034] hover:bg-[#1B4032] transition-colors text-white border border-[#A9D9C7]"
                 >
                     <Settings className="w-5 h-5" />
                 </Link>
@@ -81,9 +81,9 @@ export default function MyPage() {
             <main className="max-w-lg mx-auto px-4 space-y-8">
 
                 {/* Progress Overview (Solid Card) */}
-                <section className="relative overflow-hidden rounded-3xl bg-[#1B4032] border border-[#487363] p-6">
+                <section className="relative overflow-hidden rounded-3xl bg-[#1B4032] border border-[#A9D9C7] p-6">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-[#6CA1B7] flex items-center justify-center text-white font-bold text-xl">
+                        <div className="w-12 h-12 rounded-full bg-[#A9D9C7] flex items-center justify-center text-white font-bold text-xl">
                             <User className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -98,7 +98,7 @@ export default function MyPage() {
                             <span className="text-white font-medium">Create Budget</span>
                         </div>
                         <div className="h-2 w-full bg-[#1B4034] rounded-full overflow-hidden">
-                            <div className="h-full bg-[#8DF2CD] w-[35%] rounded-full" />
+                            <div className="h-full bg-[#A9D9C7] w-[35%] rounded-full" />
                         </div>
                     </div>
                 </section>
@@ -118,8 +118,8 @@ export default function MyPage() {
 
                             // Map colors manually to palette
                             const borderColor = isSelected
-                                ? (p.id === 'safe' ? 'border-[#487363]' : p.id === 'grow' ? 'border-[#8DF2CD]' : 'border-[#CC8257]')
-                                : 'border-[#487363]';
+                                ? (p.id === 'safe' ? 'border-[#A9D9C7]' : p.id === 'grow' ? 'border-[#614FBB]' : 'border-[#C24656]')
+                                : 'border-[#A9D9C7]';
 
                             const bgColor = isSelected
                                 ? '#1B4032' // Active solid
@@ -138,7 +138,7 @@ export default function MyPage() {
 
                                     <div className="relative z-10 flex items-start gap-4">
                                         <div className={`
-                      p-3 rounded-xl bg-[#1B4034] border border-[#487363]
+                      p-3 rounded-xl bg-[#1B4034] border border-[#A9D9C7]
                       text-white shadow-sm
                     `}>
                                             {p.icon}
@@ -150,7 +150,7 @@ export default function MyPage() {
                                                     {p.title}
                                                 </h3>
                                                 {isSelected && (
-                                                    <div className={`p-1 rounded-full ${p.id === 'safe' ? 'text-[#487363]' : p.id === 'grow' ? 'text-[#8DF2CD]' : 'text-[#CC8257]'} bg-[#1B4034]`}>
+                                                    <div className={`p-1 rounded-full ${p.id === 'safe' ? 'text-[#A9D9C7]' : p.id === 'grow' ? 'text-[#614FBB]' : 'text-[#C24656]'} bg-[#1B4034]`}>
                                                         <Check className="w-4 h-4" />
                                                     </div>
                                                 )}
@@ -169,7 +169,7 @@ export default function MyPage() {
                 {/* Goals Placeholder */}
                 <section className="pt-4">
                     <h2 className="text-xl font-bold text-white mb-4">Goals</h2>
-                    <div className="text-center py-8 rounded-2xl border border-dashed border-[#487363] bg-[#1B4032]">
+                    <div className="text-center py-8 rounded-2xl border border-dashed border-[#A9D9C7] bg-[#1B4032]">
                         <p className="text-[#A9D9C7]">Goal setting coming soon...</p>
                     </div>
                 </section>

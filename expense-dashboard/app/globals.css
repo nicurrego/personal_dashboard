@@ -41,110 +41,115 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
 
-  /* Budget Category Colors - Categories Palette */
-  --color-category-future: #8DF2CD;
-  /* Mint */
-  --color-category-living: #487363;
-  /* Sage */
-  --color-category-present: #A9D9C7;
-  /* Pale Mint */
-  --color-category-income: #6CA1B7;
-  /* Kibo Blue */
+  /* Budget Category Colors - Strict Kibo Palette - Source of Truth */
+  --color-total: #A9D9C7;
+  /* Total/Income (Teal) */
+  --color-future: #614FBB;
+  /* Future (Purple) */
+  --color-living: #65A1C9;
+  /* Living (Blue) - Updated from Purple */
+  --color-present: #C24656;
+  /* Present (Red) */
 
-  /* Global Colors Map */
+  /* Mappings for legacy or specific use */
+  --color-category-income: var(--color-total);
+  --color-category-future: var(--color-future);
+  --color-category-living: var(--color-living);
+  --color-category-present: var(--color-present);
+
+  /* Global Colors Map - Extras */
   --color-kibo-bg: #1B4034;
-  --color-kibo-red: #85241E;
-  --color-kibo-orange: #CC8257;
-  --color-kibo-blue: #6CA1B7;
 }
 
 :root {
   --radius: 0.5rem;
 
-  /* Kibo Main Palette */
+  /* Kibo Main Strict Palette */
+  /* Background: User confirmed "looks great" - kept existing */
   --background: #1B4034;
-  /* Dark Green */
   --foreground: #F2F2F2;
-  /* Whiteish */
 
-  /* Cards same as BG but maybe with border handling or slight tint provided by component classes if needed. 
-     For minimalism/solid, often cards are just the bg or a slightly different shade. 
-     Let's use the Dark Green 2 from Categories (#1B4032) or just #1B4034. 
-     Let's make card slightly lighter or different for contrast? 
-     Actually, let's use #1B4034 and rely on borders/spacing. 
-     Or maybe #1B4032 is darker? 34 vs 32 blue channel. 
-     Let's use #163329 (Calculated darker) or just stick to the palette. 
-     The palette has #1B4032 and #487363. #487363 is quite light for a card bg if text is white.
-     Let's stick to #1B4034 for BG and Card, distinct by border #487363. */
+  /* Components */
   --card: #1B4034;
   --card-foreground: #F2F2F2;
 
   --popover: #1B4034;
   --popover-foreground: #F2F2F2;
 
-  --primary: #CC8257;
-  /* Orange */
+  /* Primary Action -> Future/Living Purple */
+  --primary: #614FBB;
   --primary-foreground: #F2F2F2;
 
-  --secondary: #6CA1B7;
-  /* Blue */
-  --secondary-foreground: #F2F2F2;
+  /* Secondary/Info -> Income Teal */
+  --secondary: #A9D9C7;
+  --secondary-foreground: #1B4034;
+  /* Dark text on light teal */
 
+  /* Muted/Subtle -> Darker shade or mixed opacity */
   --muted: #1B4032;
-  /* Darker Green */
+  /* Slightly darker green for variety */
   --muted-foreground: #A9D9C7;
-  /* Pale Mint */
+  /* Teal for muted text per user ref */
 
-  --accent: #487363;
-  /* Sage */
+  /* Accent -> Purple */
+  --accent: #614FBB;
   --accent-foreground: #F2F2F2;
 
-  --destructive: #85241E;
-  /* Red */
+  /* Destructive -> Present Red/Pink */
+  --destructive: #C24656;
   --destructive-foreground: #F2F2F2;
 
-  --border: #487363;
-  /* Sage Border */
+  /* Borders -> Teal for visibility or Purple? 
+     User said "totals/income: #A9D9C7". 
+     Let's use Teal for Borders/Lines */
+  --border: #A9D9C7;
   --input: #1B4032;
-  --ring: #CC8257;
-  /* Orange Ring */
+  --ring: #614FBB;
 
-  --chart-1: #8DF2CD;
-  --chart-2: #A9D9C7;
-  --chart-3: #487363;
-  --chart-4: #6CA1B7;
-  --chart-5: #CC8257;
+  /* Charts */
+  /* Charts - Mapped to Categories */
+  --chart-1: var(--color-total);
+  /* Income/Total */
+  --chart-2: var(--color-future);
+  /* Future */
+  --chart-3: var(--color-present);
+  /* Present */
+  --chart-4: var(--color-living);
+  /* Living */
+  --chart-5: #F2F2F2;
+  /* White generic */
 
   --sidebar: #1B4034;
   --sidebar-foreground: #F2F2F2;
-  --sidebar-primary: #CC8257;
+  --sidebar-primary: #614FBB;
   --sidebar-primary-foreground: #F2F2F2;
-  --sidebar-accent: #487363;
+  --sidebar-accent: #614FBB;
   --sidebar-accent-foreground: #F2F2F2;
-  --sidebar-border: #487363;
-  --sidebar-ring: #CC8257;
+  --sidebar-border: #A9D9C7;
+  --sidebar-ring: #614FBB;
 }
 
 .dark {
-  /* Same as root since it's a solid theme */
+  /* Enforce Critical Palette in Dark Mode too (Solid Theme) */
   --background: #1B4034;
   --foreground: #F2F2F2;
   --card: #1B4034;
   --card-foreground: #F2F2F2;
   --popover: #1B4034;
   --popover-foreground: #F2F2F2;
-  --primary: #CC8257;
+  --primary: #614FBB;
   --primary-foreground: #F2F2F2;
-  --secondary: #6CA1B7;
-  --secondary-foreground: #F2F2F2;
+  --secondary: #A9D9C7;
+  --secondary-foreground: #1B4034;
   --muted: #1B4032;
   --muted-foreground: #A9D9C7;
-  --accent: #487363;
+  --accent: #614FBB;
   --accent-foreground: #F2F2F2;
-  --destructive: #85241E;
-  --border: #487363;
+  --destructive: #C24656;
+  --destructive-foreground: #F2F2F2;
+  --border: #A9D9C7;
   --input: #1B4032;
-  --ring: #CC8257;
+  --ring: #614FBB;
 }
 
 @layer base {
@@ -218,19 +223,19 @@
 
 /* Solid Text Gradients (Actually just solid colors now for minimalism) */
 .text-gradient-cyan-green {
-  @apply text-[#8DF2CD];
+  @apply text-[var(--color-total)];
   background: none;
   -webkit-text-fill-color: initial;
 }
 
 .text-gradient-violet-cyan {
-  @apply text-[#6CA1B7];
+  @apply text-[var(--color-total)];
   background: none;
   -webkit-text-fill-color: initial;
 }
 
 .text-gradient-amber-green {
-  @apply text-[#CC8257];
+  @apply text-[var(--color-future)];
   background: none;
   -webkit-text-fill-color: initial;
 }

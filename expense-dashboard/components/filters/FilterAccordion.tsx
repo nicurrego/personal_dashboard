@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { 
-  DndContext, 
-  closestCenter, 
-  useSensor, 
-  useSensors, 
-  TouchSensor, 
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  TouchSensor,
   MouseSensor,
   DragEndEvent
 } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  verticalListSortingStrategy, 
-  useSortable 
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FilterState, UniqueFilterValues } from '@/types';
@@ -66,9 +66,9 @@ function SortableFilterItem({ id, children }: { id: string; children: React.Reac
  * Accordion-style filter panel with drag-and-drop reordering.
  * Displays as a bottom sheet on mobile.
  */
-export default function FilterAccordion({ 
-  filters, 
-  setFilters, 
+export default function FilterAccordion({
+  filters,
+  setFilters,
   uniqueValues,
   order,
   setOrder,
@@ -169,34 +169,34 @@ export default function FilterAccordion({
   if (!mounted) return null;
 
   // Shared styles
-  const sectionStyle: React.CSSProperties = { backgroundColor: '#000000' };
-  const headerBtnStyle: React.CSSProperties = { 
-    width: '100%', padding: '16px', display: 'flex', alignItems: 'center', 
-    justifyContent: 'space-between', backgroundColor: '#000000', border: 'none', cursor: 'pointer' 
+  const sectionStyle: React.CSSProperties = { backgroundColor: '#1B4034' };
+  const headerBtnStyle: React.CSSProperties = {
+    width: '100%', padding: '16px', display: 'flex', alignItems: 'center',
+    justifyContent: 'space-between', backgroundColor: '#1B4034', border: 'none', cursor: 'pointer'
   };
-  const labelStyle: React.CSSProperties = { 
-    color: '#8E8E93', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' 
+  const labelStyle: React.CSSProperties = {
+    color: '#A9D9C7', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em'
   };
-  const valueStyle: React.CSSProperties = { 
-    color: '#8B5CF6', fontSize: '14px', fontWeight: 700, maxWidth: '180px', 
-    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' 
+  const valueStyle: React.CSSProperties = {
+    color: '#F2F2F2', fontSize: '14px', fontWeight: 700, maxWidth: '180px',
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
   };
   const chipStyle = (isSelected: boolean): React.CSSProperties => ({
     padding: '10px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600,
-    border: isSelected ? '2px solid #8B5CF6' : '2px solid #3A3A3C',
-    backgroundColor: isSelected ? '#8B5CF6' : 'transparent',
-    color: isSelected ? '#FFFFFF' : '#8E8E93',
+    border: isSelected ? '2px solid #614FBB' : '2px solid #1B4032',
+    backgroundColor: isSelected ? '#614FBB' : 'transparent',
+    color: isSelected ? '#F2F2F2' : '#A9D9C7',
     cursor: 'pointer', transition: 'all 0.2s ease',
   });
   const resetBtnStyle: React.CSSProperties = {
     padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600,
-    border: '1px solid rgba(255,159,10,0.5)', backgroundColor: 'transparent',
-    color: '#FF9F0A', cursor: 'pointer',
+    border: '1px solid #C24656', backgroundColor: 'transparent',
+    color: '#C24656', cursor: 'pointer',
   };
   const dividerStyle: React.CSSProperties = { height: '1px', backgroundColor: 'rgba(255,255,255,0.1)' };
-  const arrowStyle = (isExpanded: boolean): React.CSSProperties => ({ 
-    color: '#8E8E93', fontSize: '12px', 
-    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' 
+  const arrowStyle = (isExpanded: boolean): React.CSSProperties => ({
+    color: '#8E8E93', fontSize: '12px',
+    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'
   });
 
   const renderFilter = (id: string) => {
@@ -218,7 +218,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('shop')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Shop</span>
-                {expandedFilters.has('shop') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, shops: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('shop') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, shops: [] }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getShopDisplay()}</span>
@@ -246,7 +246,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('location')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Location</span>
-                {expandedFilters.has('location') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, locations: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('location') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, locations: [] }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getLocationDisplay()}</span>
@@ -274,7 +274,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('category')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Category</span>
-                {expandedFilters.has('category') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, categories: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('category') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, categories: [] }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getCategoryDisplay()}</span>
@@ -292,7 +292,11 @@ export default function FilterAccordion({
               <div style={{ padding: '16px', display: 'flex', gap: '8px' }}>
                 {['Living', 'Present', 'Future'].map(target => {
                   const isSelected = filters.targets.includes(target);
-                  const colors: Record<string, string> = { Living: '#06b6d4', Present: '#f59e0b', Future: '#22c55e' };
+                  const colors: Record<string, string> = {
+                    Living: 'var(--color-living)',
+                    Present: 'var(--color-present)',
+                    Future: 'var(--color-future)'
+                  };
                   const color = colors[target];
                   return (
                     <button key={target} onClick={() => {
@@ -300,9 +304,9 @@ export default function FilterAccordion({
                       setFilters({ ...filters, targets: current.includes(target) ? current.filter(t => t !== target) : [...current, target] });
                     }} style={{
                       flex: 1, padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600,
-                      border: isSelected ? `2px solid ${color}` : '2px solid #3A3A3C',
+                      border: isSelected ? `2px solid ${color}` : '2px solid #1B4032',
                       backgroundColor: isSelected ? color : 'transparent',
-                      color: isSelected ? (target === 'Future' || target === 'Present' ? '#000' : '#FFF') : '#8E8E93',
+                      color: isSelected ? '#F2F2F2' : '#A9D9C7',
                       cursor: 'pointer', transition: 'all 0.2s ease',
                     }}>{target}</button>
                   );
@@ -313,7 +317,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('target')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Target</span>
-                {expandedFilters.has('target') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, targets: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('target') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, targets: [] }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getTargetDisplay()}</span>
@@ -332,25 +336,25 @@ export default function FilterAccordion({
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                   {[1, 2, 3, 4].map(q => (
                     <button key={q} onClick={() => {
-                      const start = (q-1)*3+1;
-                      setFilters({...filters, months: [start, start+1, start+2]});
+                      const start = (q - 1) * 3 + 1;
+                      setFilters({ ...filters, months: [start, start + 1, start + 2] });
                       setTimeRangePreset('all');
-                    }} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid #3A3A3C', backgroundColor: 'transparent', color: '#8E8E93', cursor: 'pointer' }}>Q{q}</button>
+                    }} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid #1B4032', backgroundColor: 'transparent', color: '#A9D9C7', cursor: 'pointer' }}>Q{q}</button>
                   ))}
-                  <button onClick={() => setFilters({...filters, months: []})} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid rgba(255,159,10,0.3)', backgroundColor: 'transparent', color: '#FF9F0A', cursor: 'pointer' }}>Clear</button>
+                  <button onClick={() => setFilters({ ...filters, months: [] })} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: '1px solid #C24656', backgroundColor: 'transparent', color: '#C24656', cursor: 'pointer' }}>Clear</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                   {MONTHS.map((m, i) => {
                     const monthNum = i + 1;
                     // Highlight if in explicit filters.months, OR if timeRangePreset is 'month' and it's the current month
-                    const isSelected = (filters.months || []).includes(monthNum) || 
-                                     (timeRangePreset === 'month' && (!filters.months || filters.months.length === 0) && monthNum === currentMonth);
+                    const isSelected = (filters.months || []).includes(monthNum) ||
+                      (timeRangePreset === 'month' && (!filters.months || filters.months.length === 0) && monthNum === currentMonth);
                     return (
                       <button key={m} onClick={() => {
                         const current = filters.months || [];
                         setFilters({ ...filters, months: isSelected ? current.filter(x => x !== monthNum) : [...current, monthNum] });
                         setTimeRangePreset('all');
-                      }} style={{ padding: '10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, border: isSelected ? '2px solid #8B5CF6' : '2px solid #3A3A3C', backgroundColor: isSelected ? '#8B5CF6' : 'transparent', color: isSelected ? '#FFFFFF' : '#8E8E93', cursor: 'pointer', transition: 'all 0.2s ease' }}>{m}</button>
+                      }} style={{ padding: '10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, border: isSelected ? '2px solid #614FBB' : '2px solid #1B4032', backgroundColor: isSelected ? '#614FBB' : 'transparent', color: isSelected ? '#F2F2F2' : '#A9D9C7', cursor: 'pointer', transition: 'all 0.2s ease' }}>{m}</button>
                     );
                   })}
                 </div>
@@ -360,7 +364,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('month')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Month</span>
-                {expandedFilters.has('month') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, months: []}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('month') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, months: [] }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getMonthDisplay()}</span>
@@ -377,13 +381,13 @@ export default function FilterAccordion({
             {expandedFilters.has('year') && (
               <div style={{ padding: '16px 16px 12px 16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button onClick={() => {
-                  setFilters({...filters, dateRange: { start: null, end: null }});
+                  setFilters({ ...filters, dateRange: { start: null, end: null } });
                   setTimeRangePreset('all');
                 }} style={chipStyle(timeRangePreset === 'all' && !filters.dateRange.start)}>All</button>
-                {uniqueValues.years.sort((a,b) => b-a).map(year => {
+                {uniqueValues.years.sort((a, b) => b - a).map(year => {
                   // Highlight if explicit dateRange matches, OR if timeRangePreset is active and year matches currentYear
-                  const isSelected = filters.dateRange.start?.getFullYear() === year || 
-                                   ((timeRangePreset === 'month' || timeRangePreset === 'year') && year === currentYear);
+                  const isSelected = filters.dateRange.start?.getFullYear() === year ||
+                    ((timeRangePreset === 'month' || timeRangePreset === 'year') && year === currentYear);
                   return (
                     <button key={year} onClick={() => {
                       setFilters({ ...filters, dateRange: { start: new Date(year, 0, 1), end: new Date(year, 11, 31) } });
@@ -397,7 +401,7 @@ export default function FilterAccordion({
             <button onClick={() => toggleSection('year')} style={headerBtnStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={labelStyle}>Year</span>
-                {expandedFilters.has('year') && <button onClick={(e) => { e.stopPropagation(); setFilters({...filters, dateRange: { start: null, end: null }}); }} style={resetBtnStyle}>Reset</button>}
+                {expandedFilters.has('year') && <button onClick={(e) => { e.stopPropagation(); setFilters({ ...filters, dateRange: { start: null, end: null } }); }} style={resetBtnStyle}>Reset</button>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={valueStyle}>{getYearDisplay()}</span>
@@ -407,7 +411,7 @@ export default function FilterAccordion({
             <div style={dividerStyle} />
           </div>
         );
-      
+
       default:
         return null;
     }
@@ -416,12 +420,12 @@ export default function FilterAccordion({
   const content = (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)', zIndex: 9996 }} />
-      <div className="text-white liquid-card" style={{ 
+      <div className="text-white liquid-card" style={{
         position: 'fixed', left: 0, right: 0, bottom: '100px',
-        backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(20px)',
+        backgroundColor: '#1B4034', backdropFilter: 'none',
         zIndex: 9997, maxHeight: '70vh', overflowY: 'auto',
         borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
-        boxShadow: '0 -4px 30px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 -4px 30px rgba(0,0,0,0.5)', border: '1px solid #A9D9C7',
       }}>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={order} strategy={verticalListSortingStrategy}>

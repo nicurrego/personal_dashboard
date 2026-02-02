@@ -27,10 +27,10 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
 
   const getTargetColor = (target: string | null): string => {
     switch (target) {
-      case 'Living': return 'text-cyber-cyan';
-      case 'Present': return 'text-alert-amber';
-      case 'Saving': return 'text-growth-green';
-      case 'Investment': return 'text-flux-violet';
+      case 'Living': return 'text-[#614FBB]';
+      case 'Present': return 'text-[#C24656]';
+      case 'Saving': return 'text-[#A9D9C7]';
+      case 'Investment': return 'text-[#614FBB]';
       default: return 'text-secondary-text';
     }
   };
@@ -65,7 +65,7 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
                        transition-all duration-150 group"
           >
             <span className="text-secondary-text text-sm font-medium">{item.label}</span>
-            
+
             <div className="flex items-center gap-2">
               <span className={`font-semibold ${item.colorClass || 'text-white'}`}>
                 {item.value}
@@ -87,7 +87,7 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
           transition-all duration-200 border-2
           ${isSubmitting || !isValid
             ? 'bg-white/10 border-white/10 text-secondary-text cursor-not-allowed'
-            : 'bg-growth-green border-growth-green text-white shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98]'
+            : 'bg-[#614FBB] border-[#614FBB] text-white shadow-[0_0_25px_rgba(97,79,187,0.5)] active:scale-[0.98]'
           }
         `}
       >
@@ -106,7 +106,7 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
 
       {/* Required fields hint */}
       {!isValid && (
-        <p className="text-xs text-alert-amber text-center font-medium">
+        <p className="text-xs text-[#C24656] text-center font-medium">
           Amount, Category, and Target are required
         </p>
       )}

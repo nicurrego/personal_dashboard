@@ -25,14 +25,14 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
     // Top 5 for card, Top 20 for expanded
     const limit = isExpanded ? 20 : 5;
     const data = getTopShops(expenses, limit);
-    
+
     // If no shops data, show message?
     if (data.length === 0) {
       // Logic for "No Shop Data" could be added here, but for now we render empty or D3 handles it
     }
 
     const container = containerRef.current;
-    
+
     // Margins logic
     // Horizontal bars need space on LEFT for labels
     const margin = isExpanded
@@ -54,20 +54,13 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
     // --- DRAWING ---
     const tooltip = createTooltip(container);
 
-    // --- COLORS (Gradient) ---
-    const defs = svg.append('defs');
-    const gradient = defs.append('linearGradient')
-      .attr('id', 'shopHeatGradient')
-      .attr('gradientUnits', 'userSpaceOnUse')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', width) // Max value on right
-      .attr('y2', 0);
+    // --- COLORS (Monochrome Kibo Purple) ---
+    // User requested "monochrome" and "no gradients". 
+    // We will use a solid fill, but defined in a simple way or just direct attribute.
+    // However, keeping the gradient definition but making it single color is safest to minimize code churn
+    // if we want to add subtle fade later. For now, strict solid.
 
-    gradient.append('stop').attr('offset', '0%').attr('stop-color', '#1f2937');
-    gradient.append('stop').attr('offset', '20%').attr('stop-color', '#06b6d4');
-    gradient.append('stop').attr('offset', '60%').attr('stop-color', '#d946ef');
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#ffffff');
+    // Actually, let's just use fill directly on the rect to be clean.
 
     // Bars
     g.selectAll('.bar')
@@ -78,10 +71,10 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
       .attr('y', d => y(d.shop)!)
       .attr('width', d => x(d.total))
       .attr('height', y.bandwidth())
-      .attr('fill', 'url(#shopHeatGradient)')
+      .attr('fill', 'var(--color-total)') // Solid Kibo Teal
       .attr('rx', 4)
       .attr('ry', 4)
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         d3.select(this).attr('opacity', 0.8);
         tooltip
           .html(`
@@ -91,12 +84,12 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
           `)
           .style('visibility', 'visible');
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         d3.select(this).attr('opacity', 1);
         tooltip.style('visibility', 'hidden');
       });
@@ -125,7 +118,7 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
       .text(d => formatCurrency(d.total))
       .style('font-size', '10px')
       .style('fill', '#9ca3af');
-      
+
     // Remove domain lines for cleaner look
     g.selectAll('.domain').remove();
     g.selectAll('.tick line').remove();
@@ -133,7 +126,7 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
   }, [expenses, isExpanded]);
 
   return (
-    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-[#1B4034]' : 'liquid-card p-5'}`}>
       {!isExpanded && (
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Top Shops</h2>
@@ -151,8 +144,8 @@ export default function TopShopsD3({ expenses, onExpand, onInfo, isExpanded = fa
           </div>
         </div>
       )}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
         style={{ height: isExpanded ? '100%' : '200px' }}
       />

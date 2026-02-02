@@ -25,10 +25,10 @@ export default function QuickEntryPage() {
         // 1. Initialize Structure from Defaults
         const targetMap = new Map<string, string[]>();
         const allDefaultCategories: string[] = [];
-        
+
         Object.entries(DEFAULT_CATEGORIES).forEach(([target, categories]) => {
-           targetMap.set(target, [...categories]);
-           allDefaultCategories.push(...categories);
+          targetMap.set(target, [...categories]);
+          allDefaultCategories.push(...categories);
         });
         setTargetCategories(targetMap);
         setTargets(Object.keys(DEFAULT_CATEGORIES));
@@ -36,54 +36,54 @@ export default function QuickEntryPage() {
         // 2. Fetch existing data for autocomplete suggestions
         const response = await fetch('/api/expenses');
         let expenses: Expense[] = [];
-        
+
         if (response.ok) {
-           const rawData = await response.json();
-           expenses = rawData.map((e: any) => ({
-             year: Number(e.year),
-             month: Number(e.month),
-             date: e.date,
-             target: e.target,
-             category: e.category,
-             value: Number(e.value),
-             item: e.item || '',
-             context: e.context || '',
-             method: e.method || '',
-             shop: e.shop || '',
-             location: e.location || ''
-           }));
+          const rawData = await response.json();
+          expenses = rawData.map((e: any) => ({
+            year: Number(e.year),
+            month: Number(e.month),
+            date: e.date,
+            target: e.target,
+            category: e.category,
+            value: Number(e.value),
+            item: e.item || '',
+            context: e.context || '',
+            method: e.method || '',
+            shop: e.shop || '',
+            location: e.location || ''
+          }));
         }
 
         // 3. Build Options
         // Helper to count frequencies
         const buildOptions = (items: string[], field: keyof Expense, defaults: string[] = []): QuickEntryOption[] => {
-            const counts = new Map<string, number>();
-            expenses.forEach(e => {
-              const value = String(e[field]);
-              counts.set(value, (counts.get(value) || 0) + 1);
-            });
-            
-            // Merge defaults and existing items unique
-            const allItems = Array.from(new Set([...defaults, ...items]));
-            
-            return allItems.map(item => ({
-              id: item,
-              label: item,
-              recentCount: counts.get(item) || 0
-            })).sort((a, b) => (b.recentCount || 0) - (a.recentCount || 0));
+          const counts = new Map<string, number>();
+          expenses.forEach(e => {
+            const value = String(e[field]);
+            counts.set(value, (counts.get(value) || 0) + 1);
+          });
+
+          // Merge defaults and existing items unique
+          const allItems = Array.from(new Set([...defaults, ...items]));
+
+          return allItems.map(item => ({
+            id: item,
+            label: item,
+            recentCount: counts.get(item) || 0
+          })).sort((a, b) => (b.recentCount || 0) - (a.recentCount || 0));
         };
 
-        setContexts(['Daily', 'Travel', 'Work', 'Gift', 'Personal']); 
+        setContexts(['Daily', 'Travel', 'Work', 'Gift', 'Personal']);
         setItems(getUniqueValues(expenses, 'item').slice(0, 20));
 
         setAutocompleteData({
-            // Important: Pass allDefaultCategories here so they exist in the options list
-            categories: buildOptions(getUniqueValues(expenses, 'category'), 'category', allDefaultCategories),
-            shops: buildOptions(getUniqueValues(expenses, 'shop'), 'shop'),
-            methods: buildOptions(getUniqueValues(expenses, 'method'), 'method', ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Mobile Payment']),
-            locations: buildOptions(getUniqueValues(expenses, 'location'), 'location'),
+          // Important: Pass allDefaultCategories here so they exist in the options list
+          categories: buildOptions(getUniqueValues(expenses, 'category'), 'category', allDefaultCategories),
+          shops: buildOptions(getUniqueValues(expenses, 'shop'), 'shop'),
+          methods: buildOptions(getUniqueValues(expenses, 'method'), 'method', ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Mobile Payment']),
+          locations: buildOptions(getUniqueValues(expenses, 'location'), 'location'),
         });
-        
+
         setLoading(false);
       } catch (err) {
         console.error('Error initializing quick entry:', err);
@@ -91,41 +91,41 @@ export default function QuickEntryPage() {
         setLoading(false);
       }
     }
-    
+
     initialize();
   }, []);
 
   // Handle save
   const handleSave = async (data: QuickEntryData) => {
     try {
-        const payload = {
-          year: data.date.getFullYear(),
-          month: data.date.getMonth() + 1,
-          date: data.date.toISOString().split('T')[0],
-          target: data.target,
-          category: data.category,
-          value: data.value,
-          item: data.item || 'Expense',
-          context: data.context || 'Daily',
-          method: data.method,
-          shop: data.shop,
-          location: data.location,
-        };
+      const payload = {
+        year: data.date.getFullYear(),
+        month: data.date.getMonth() + 1,
+        date: data.date.toISOString().split('T')[0],
+        target: data.target,
+        category: data.category,
+        value: data.value,
+        item: data.item || 'Expense',
+        context: data.context || 'Daily',
+        method: data.method,
+        shop: data.shop,
+        location: data.location,
+      };
 
-        const response = await fetch('/api/expenses', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        if (!response.ok) {
-            throw new Error('Failed to save expense');
-        }
+      if (!response.ok) {
+        throw new Error('Failed to save expense');
+      }
 
-        // Optionally update cache? router.refresh() handles it usually.
+      // Optionally update cache? router.refresh() handles it usually.
     } catch (err) {
-        console.error('Save failed:', err);
-        throw err; // Propagate to component to show error
+      console.error('Save failed:', err);
+      throw err; // Propagate to component to show error
     }
   };
 
@@ -136,7 +136,7 @@ export default function QuickEntryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center page-ambient">
+      <div className="min-h-screen bg-[#1B4034] flex items-center justify-center page-ambient">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
         </div>
@@ -146,7 +146,7 @@ export default function QuickEntryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 page-ambient">
+      <div className="min-h-screen bg-[#1B4034] flex items-center justify-center p-6 page-ambient">
         <div className="liquid-card-premium p-6 text-center max-w-sm relative z-10 hover-lift">
           <p className="text-laser-magenta text-lg mb-4 font-bold">Error</p>
           <p className="text-secondary-text mb-6">{error}</p>

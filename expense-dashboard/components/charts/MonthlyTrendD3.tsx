@@ -3,12 +3,12 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { MonthlyData } from '@/lib/types';
-import { 
-  createResponsiveSVG, 
-  createTooltip, 
+import {
+  createResponsiveSVG,
+  createTooltip,
   animatePath,
   formatCurrency,
-  createStyledAxis 
+  createStyledAxis
 } from '@/lib/d3-utils';
 
 interface MonthlyTrendD3Props {
@@ -20,78 +20,78 @@ interface MonthlyTrendD3Props {
 
 export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = false }: MonthlyTrendD3Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (!containerRef.current || data.length === 0) return;
-    
+
     // Clear previous chart
     d3.select(containerRef.current).selectAll('*').remove();
-    
+
     const container = containerRef.current;
     const margin = isExpanded
       ? { top: 30, right: 30, bottom: 30, left: 60 } // Balanced margins
       : { top: 20, right: 30, bottom: 40, left: 70 };
 
     const { svg, g, width, height } = createResponsiveSVG(container, margin);
-    
+
     // Create scales
     // Create scales
     // Handle single data point case
     const extent = d3.extent(data, d => d.date) as [Date, Date];
     let domain = extent;
     if (domain[0] && domain[1] && domain[0].getTime() === domain[1].getTime()) {
-        const d = domain[0];
-        // ±1 month for domain
-        domain = [
-            new Date(d.getFullYear(), d.getMonth() - 1, 1),
-            new Date(d.getFullYear(), d.getMonth() + 1, 1)
-        ];
+      const d = domain[0];
+      // ±1 month for domain
+      domain = [
+        new Date(d.getFullYear(), d.getMonth() - 1, 1),
+        new Date(d.getFullYear(), d.getMonth() + 1, 1)
+      ];
     }
 
     const xScale = d3.scaleTime()
       .domain(domain)
       .range([0, width]);
-    
+
     // Y Scale with headroom
     const maxVal = d3.max(data, d => d.total) || 0;
     const yScale = d3.scaleLinear()
       .domain([0, maxVal === 0 ? 1000 : maxVal * 1.1])
       .nice()
       .range([height, 0]);
-    
+
     // Create line generators
     const totalLine = d3.line<MonthlyData>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.total))
       .curve(d3.curveCatmullRom.alpha(0.5));
-    
+
     const livingLine = d3.line<MonthlyData>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.living))
       .curve(d3.curveCatmullRom.alpha(0.5));
-    
+
     const presentLine = d3.line<MonthlyData>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.present))
       .curve(d3.curveCatmullRom.alpha(0.5));
-    
+
     const futureLine = d3.line<MonthlyData>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.future))
       .curve(d3.curveCatmullRom.alpha(0.5));
-    
+
     // Create axes
     const xAxis = d3.axisBottom(xScale)
       .ticks(6)
       .tickFormat(d3.timeFormat('%b %Y') as any);
-    
+
     const yAxis = d3.axisLeft(yScale)
       .ticks(6)
       .tickFormat(d => formatCurrency(d as number));
-    
+
     createStyledAxis(g, xAxis, 'bottom', `translate(0,${height})`);
     createStyledAxis(g, yAxis, 'left');
-    
+
     // Add grid lines
     g.append('g')
       .attr('class', 'grid')
@@ -104,10 +104,10 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
       .attr('y2', d => yScale(d))
       .attr('stroke', '#f3f4f6')
       .attr('stroke-dasharray', '2,2');
-    
+
     // Create gradients for area fills
     const defs = svg.append('defs');
-    
+
     const createAreaGradient = (id: string, color: string) => {
       const gradient = defs.append('linearGradient')
         .attr('id', id)
@@ -115,42 +115,41 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
         .attr('y1', '0%')
         .attr('x2', '0%')
         .attr('y2', '100%');
-      
+
       gradient.append('stop')
         .attr('offset', '0%')
         .attr('stop-color', color)
         .attr('stop-opacity', 0.3);
-      
+
       gradient.append('stop')
         .attr('offset', '100%')
         .attr('stop-color', color)
         .attr('stop-opacity', 0);
     };
-    
-    createAreaGradient('living-gradient', '#06b6d4');
-    createAreaGradient('present-gradient', '#f59e0b');
-    createAreaGradient('future-gradient', '#22c55e');
-    
+
+    // Removed gradient definitions per user request
+
     // Add area fills
     const area = d3.area<MonthlyData>()
       .x(d => xScale(d.date))
       .y0(height)
       .y1(d => yScale(d.total))
       .curve(d3.curveCatmullRom.alpha(0.5));
-    
+
     g.append('path')
       .datum(data)
-      .attr('fill', 'url(#living-gradient)')
+      .attr('fill', 'var(--color-living)') // Living Blue (Dominant area)
+      .attr('fill-opacity', 0.1)
       .attr('d', area.y1(d => yScale(d.living)));
-    
-   // Draw lines with animation
+
+    // Draw lines with animation
     const lines = [
-      { data, generator: totalLine, color: '#FFFFFF', width: 3, label: 'Total' }, // White for Total
-      { data, generator: livingLine, color: '#06b6d4', width: 2, label: 'Living' },
-      { data, generator: presentLine, color: '#f59e0b', width: 2, label: 'Present' },
-      { data, generator: futureLine, color: '#22c55e', width: 2, label: 'Future' }
+      { data, generator: totalLine, color: 'var(--color-total)', width: 3, label: 'Total' }, // White/Teal for Total
+      { data, generator: livingLine, color: 'var(--color-living)', width: 2, label: 'Living' },
+      { data, generator: presentLine, color: 'var(--color-present)', width: 2, label: 'Present' },
+      { data, generator: futureLine, color: 'var(--color-future)', width: 2, label: 'Future' }
     ];
-    
+
     lines.forEach(({ data: lineData, generator, color, width }) => {
       const path = g.append('path')
         .datum(lineData)
@@ -158,10 +157,10 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
         .attr('stroke', color)
         .attr('stroke-width', width)
         .attr('d', generator);
-      
+
       animatePath(path, 1500);
     });
-    
+
     // Add dots for data points on main line
     const dots = g.selectAll('.dot')
       .data(data)
@@ -173,52 +172,52 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
       .attr('fill', '#1f2937')
       .attr('stroke', 'white')
       .attr('stroke-width', 2);
-    
+
     dots.transition()
       .delay((d, i) => i * 50)
       .duration(300)
       .attr('r', 4);
-    
+
     // Tooltip
     const tooltip = createTooltip(container);
-    
+
     dots
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         d3.select(this)
           .transition()
           .duration(200)
           .attr('r', 6);
-        
+
         const formatDate = d3.timeFormat('%B %Y');
         tooltip
           .html(`
             <strong>${formatDate(d.date)}</strong><br/>
             Total: ${formatCurrency(d.total)}<br/>
-            <span style="color: #06b6d4">●</span> Living: ${formatCurrency(d.living)}<br/>
-            <span style="color: #f59e0b">●</span> Present: ${formatCurrency(d.present)}<br/>
-            <span style="color: #22c55e">●</span> Future: ${formatCurrency(d.future)}
+            <span style="color: var(--color-living)">●</span> Living: ${formatCurrency(d.living)}<br/>
+            <span style="color: var(--color-present)">●</span> Present: ${formatCurrency(d.present)}<br/>
+            <span style="color: var(--color-future)">●</span> Future: ${formatCurrency(d.future)}
           `)
           .style('visibility', 'visible');
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip
           .style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         d3.select(this)
           .transition()
           .duration(200)
           .attr('r', 4);
-        
-        
+
+
         tooltip.style('visibility', 'hidden');
       });
-    
+
   }, [data, isExpanded]);
-  
+
   return (
-    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-void-black' : 'liquid-card p-5'}`}>
+    <div className={`${isExpanded ? 'w-full h-full flex flex-col bg-[#1B4034]' : 'liquid-card p-5'}`}>
       {!isExpanded && (
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-label text-secondary-text">Monthly Spending Trend</h2>
@@ -235,7 +234,7 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
               </button>
-              <button 
+              <button
                 onClick={onExpand}
                 className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
                 aria-label="Expand Chart"
@@ -251,17 +250,17 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
           )}
         </div>
       )}
-      
+
       {/* Chart Area */}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={`w-full relative ${isExpanded ? 'flex-1' : ''}`}
-        style={{ height: isExpanded ? '100%' : '400px', flexGrow: 1 }} 
+        style={{ height: isExpanded ? '100%' : '400px', flexGrow: 1 }}
       />
-      
+
       {/* Legend - Floating in Expanded Mode */}
       {isExpanded && (
-        <div 
+        <div
           style={{
             position: 'absolute',
             // Rotated 90deg CW: 
@@ -299,13 +298,13 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
           }}
         >
           {[
-            { label: 'Total', color: '#FFFFFF' },
-            { label: 'Living', color: '#06b6d4' },
-            { label: 'Present', color: '#f59e0b' },
-            { label: 'Future', color: '#22c55e' }
+            { label: 'Total', color: 'var(--color-total)' },
+            { label: 'Living', color: 'var(--color-living)' },
+            { label: 'Present', color: 'var(--color-present)' },
+            { label: 'Future', color: 'var(--color-future)' }
           ].map(item => (
             <div key={item.label} className="flex items-center gap-2">
-              <div 
+              <div
                 style={{ width: '8px', height: '8px', backgroundColor: item.color, borderRadius: '50%' }}
               />
               <span className="text-xs font-medium text-secondary-text">{item.label}</span>
@@ -317,13 +316,13 @@ export default function MonthlyTrendD3({ data, onExpand, onInfo, isExpanded = fa
       {/* Legacy Legend for Desktop */}
       <div className={`flex flex-wrap gap-4 justify-center items-center ${isExpanded ? 'hidden' : 'mt-4'}`}>
         {[
-          { label: 'Total', color: '#FFFFFF' },
-          { label: 'Living', color: '#06b6d4' },
-          { label: 'Present', color: '#f59e0b' },
-          { label: 'Future', color: '#22c55e' }
+          { label: 'Total', color: 'var(--color-total)' },
+          { label: 'Living', color: 'var(--color-living)' },
+          { label: 'Present', color: 'var(--color-present)' },
+          { label: 'Future', color: 'var(--color-future)' }
         ].map(item => (
           <div key={item.label} className="flex items-center gap-2">
-            <div 
+            <div
               style={{ width: '12px', height: '12px', backgroundColor: item.color, borderRadius: '3px' }}
             />
             <span className="text-xs font-medium text-secondary-text">{item.label}</span>
