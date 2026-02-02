@@ -269,7 +269,7 @@ export default function SpendingTrendD3({
             <div className="flex items-center gap-2">
               <button
                 onClick={onInfo}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Chart Info"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -280,7 +280,7 @@ export default function SpendingTrendD3({
               </button>
               <button
                 onClick={onExpand}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Expand Chart"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -307,16 +307,15 @@ export default function SpendingTrendD3({
         <div
           style={{
             position: 'absolute',
-            top: '0px',
-            right: '0px',
+            top: '16px',
+            right: '16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
-            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundColor: '#1B4032', // Solid Muted Green
             padding: '12px',
             borderRadius: '12px',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid #A9D9C7', // Teal Border
             zIndex: 10
           }}
         >

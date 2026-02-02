@@ -22,12 +22,12 @@ export default function ExpandedChartOverlay({ children, onClose }: ExpandedChar
   }, []);
 
   return createPortal(
-    <div 
+    <div
       onClick={() => setShowControls(prev => !prev)}
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: '#000000',
+        backgroundColor: '#1B4034', // Kibo Background
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
@@ -42,17 +42,16 @@ export default function ExpandedChartOverlay({ children, onClose }: ExpandedChar
         }}
         style={{
           position: 'fixed',
-          top: '32px',
-          right: '32px',
+          top: '16px',
+          right: '16px',
           zIndex: 100001,
-          width: '56px',
-          height: '56px',
-          borderRadius: '16px',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-          color: 'white',
+          width: '44px',
+          height: '44px',
+          borderRadius: '12px',
+          backgroundColor: '#1B4032', // Solid Muted Green
+          border: '2px solid #A9D9C7', // Teal Border
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          color: '#A9D9C7', // Teal Icon
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -72,8 +71,11 @@ export default function ExpandedChartOverlay({ children, onClose }: ExpandedChar
       {/* Rotated Container for Landscape View on Mobile */}
       <div
         style={{
-          width: 'calc(100vh - 160px)', 
-          height: '100vw',
+          // Unrotated dimensions:
+          // Width -> Becomes Landscape Width (Long edge)
+          // Height -> Becomes Landscape Height (Short edge)
+          width: 'calc(100vh - 64px)',   // 32px buffer on Left/Right of landscape
+          height: 'calc(100vw - 80px)',  // 40px buffer on Top/Bottom of landscape (Clears Close Button)
           position: 'fixed',
           top: '50%',
           left: '50%',

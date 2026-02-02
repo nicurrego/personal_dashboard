@@ -126,42 +126,7 @@ export default function HomePage() {
     return (
         <main className="min-h-[100dvh] bg-[#1B4034] flex flex-col items-center justify-end pb-28 px-6 page-ambient gap-6">
 
-            {/* Top: Kibo Text & Mascot */}
-            <div className="w-full max-w-[350px] flex flex-col items-center z-10 transition-all duration-300">
-                <MascotSection
-                    investmentPercentage={metrics.investmentPercentage}
-                    pendingPercentage={metrics.pendingPercentage}
-                    userName={user.user_metadata?.name || 'Friend'}
-                />
-            </div>
-
-            {/* Middle: Ring Graph */}
-            <div className="w-full max-w-[350px] relative z-20 transition-all duration-300">
-                <div className="liquid-card p-5 flex items-center justify-between bg-[#1B4034] border border-[#A9D9C7]/20 rounded-3xl gap-4 shadow-lg shadow-black/20">
-
-                    {/* Left: Legend */}
-                    <div className="flex flex-col gap-4 pl-2">
-                        {ringData.map(d => (
-                            <div key={d.label} className="flex items-center gap-3">
-                                <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.3)]" style={{ backgroundColor: d.color }} />
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] uppercase tracking-wider text-[#A9D9C7] opacity-70 leading-none mb-1">{d.label}</span>
-                                    <span className="text-sm font-mono text-white font-bold leading-none">
-                                        {d.budget > 0 ? Math.round((d.spent / d.budget) * 100) : 0}%
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Right: Rings */}
-                    <div className="w-[140px] h-[140px] shrink-0">
-                        <BudgetRingsD3 data={ringData} />
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom: Available Info */}
+            {/* Top: Available Info */}
             <div className="w-full max-w-[350px] z-20 transition-all duration-300">
                 <div className="liquid-card p-6 flex flex-col items-center text-center border border-[#A9D9C7]/30 bg-[#1B4034] rounded-3xl relative overflow-hidden shadow-lg shadow-black/20">
                     {/* Decorative background element */}
@@ -187,12 +152,48 @@ export default function HomePage() {
                         })}
                     </div>
 
-                    <span className="text-[10px] uppercase tracking-wider text-[#A9D9C7]/40 mt-4">
-                        {refDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                    </span>
+                    <div className="mt-4 pt-1 w-full border-t border-[#A9D9C7]/10">
+                        <span className="text-[10px] text-[#A9D9C7]/40 uppercase tracking-widest">
+                            {refDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                        </span>
+                    </div>
                 </div>
             </div>
 
+            {/* Middle: Ring Graph */}
+            <div className="w-full max-w-[350px] relative z-20 transition-all duration-300">
+                <div className="liquid-card p-5 flex items-center justify-between bg-[#1B4034] border border-[#A9D9C7]/20 rounded-3xl gap-4 shadow-lg shadow-black/20">
+
+                    {/* Left: Legend */}
+                    <div className="flex flex-col gap-4 pl-2">
+                        {ringData.map(d => (
+                            <div key={d.label} className="flex items-center gap-3">
+                                <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.3)]" style={{ backgroundColor: d.color }} />
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] uppercase tracking-wider text-[#A9D9C7] opacity-70 leading-none mb-1">{d.label}</span>
+                                    <span className="text-sm font-mono text-white font-bold leading-none">
+                                        {d.budget > 0 ? Math.round((d.spent / d.budget) * 100) : 0}%
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Right: Rings */}
+                    <div className="w-[180px] h-[180px] shrink-0">
+                        <BudgetRingsD3 data={ringData} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom: Kibo Text & Mascot */}
+            <div className="w-full max-w-[350px] flex flex-col items-center z-10 transition-all duration-300">
+                <MascotSection
+                    investmentPercentage={metrics.investmentPercentage}
+                    pendingPercentage={metrics.pendingPercentage}
+                    userName={user.user_metadata?.name || 'Friend'}
+                />
+            </div>
         </main>
     );
 }

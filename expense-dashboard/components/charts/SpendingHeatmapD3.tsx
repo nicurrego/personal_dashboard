@@ -205,7 +205,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
             {onInfo && (
               <button
                 onClick={onInfo}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Chart Info"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -219,7 +219,7 @@ export default function SpendingHeatmapD3({ expenses, onExpand, onInfo, isExpand
             {onExpand && !tooMuchData && (
               <button
                 onClick={onExpand}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Expand Chart"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

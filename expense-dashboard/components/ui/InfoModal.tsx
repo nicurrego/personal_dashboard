@@ -21,17 +21,13 @@ export default function InfoModal({ isOpen, onClose, title, description }: InfoM
 
   useEffect(() => {
     if (isOpen) {
-      // Small delay to allow render before transition
-      requestAnimationFrame(() => setVisible(true));
+      // Immediate open
+      setVisible(true);
       document.body.style.overflow = 'hidden';
     } else {
+      // Immediate close logic
       setVisible(false);
-      const timer = setTimeout(() => {
-        // Wait for animation to finish before unmounting (handled by parent conditional usually, 
-        // but if parent keeps it mounted, this works. If parent unmounts, this effect cleanup runs)
-        document.body.style.overflow = '';
-      }, 300);
-      return () => clearTimeout(timer);
+      document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -40,35 +36,28 @@ export default function InfoModal({ isOpen, onClose, title, description }: InfoM
 
   // We strictly use Portal to ensure it overlays everything
   return createPortal(
-    <div 
-      className={`fixed inset-0 z-[100000] flex items-center justify-center p-4 transition-all duration-300 ${
-        isOpen ? 'pointer-events-auto' : 'pointer-events-none'
-      }`}
+    <div
+      className={`fixed inset-0 z-[100000] flex items-center justify-center p-4 transition-all duration-200 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
     >
       {/* Backdrop */}
-      <div 
-        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-          visible ? 'opacity-100' : 'opacity-0'
-        }`}
+      <div
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'
+          }`}
         onClick={onClose}
       />
 
-      {/* Modal Content */}
-      <div 
-        className={`relative w-full max-w-sm bg-void-black/90 border border-white/10 rounded-2xl p-6 shadow-2xl transform transition-all duration-300 ${
-          visible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'
-        }`}
+      <div
+        className={`relative w-full max-w-sm bg-[#1B4034] border border-[#A9D9C7]/20 rounded-3xl p-6 shadow-2xl transform transition-all duration-200 ease-out ${visible ? 'scale-100 opacity-100 translate-y-0' : 'scale-[0.98] opacity-0 translate-y-2'
+          }`}
         style={{
-          boxShadow: '0 0 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1)'
+          boxShadow: '0 0 40px rgba(0,0,0,0.5)'
         }}
       >
-        {/* Glow Effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 blur-xl opacity-50 -z-10 rounded-2xl" />
-
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-[#A9D9C7]/50 hover:text-[#A9D9C7] transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -77,23 +66,22 @@ export default function InfoModal({ isOpen, onClose, title, description }: InfoM
         </button>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-          <span className="text-2xl">💡</span>
+        <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-[#A9D9C7]/10 flex items-center justify-center border border-[#A9D9C7]/20">
+            <span className="text-sm">💡</span>
+          </div>
           {title}
         </h3>
 
-        {/* Divider */}
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4" />
-
         {/* Description */}
-        <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+        <p className="text-[#A9D9C7]/80 text-sm leading-relaxed whitespace-pre-line mb-6">
           {description}
         </p>
 
         {/* Footer */}
-        <button 
+        <button
           onClick={onClose}
-          className="mt-6 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-white font-medium text-sm transition-all active:scale-95"
+          className="w-full py-3 rounded-xl bg-[#1B4032] hover:bg-[#1B4032]/80 border border-[#A9D9C7]/30 text-[#A9D9C7] font-semibold text-sm transition-all active:scale-95 hover:shadow-[0_0_10px_rgba(169,217,199,0.1)]"
         >
           Got it
         </button>

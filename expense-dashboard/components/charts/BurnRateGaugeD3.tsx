@@ -86,14 +86,14 @@ export default function BurnRateGaugeD3({ spent, budget, onExpand, onInfo, isExp
     g.append('path')
       .datum({ startAngle: -Math.PI / 2, endAngle: Math.PI / 2 })
       .attr('d', timeArc as any)
-      .attr('fill', '#1B4032') // Darker Kibo Green
+      .attr('fill', 'var(--color-muted)') // Darker Kibo Green
       .attr('opacity', 0.5);
 
     // Spend Track
     g.append('path')
       .datum({ startAngle: -Math.PI / 2, endAngle: Math.PI / 2 })
       .attr('d', spendArc as any)
-      .attr('fill', '#1B4032')
+      .attr('fill', 'var(--color-muted)')
       .attr('opacity', 0.5);
 
     // 2. Active Bars
@@ -104,14 +104,14 @@ export default function BurnRateGaugeD3({ spent, budget, onExpand, onInfo, isExp
       .datum({ startAngle: -Math.PI / 2, endAngle: timeAngle })
       .attr('d', timeArc as any)
       .attr('d', timeArc as any)
-      .attr('fill', '#A9D9C7') // Teal for Time
+      .attr('fill', 'var(--color-total)') // Teal for Time instead of hex
       .attr('opacity', 0.8);
     // Removed glow filter
 
     // Spend Bar (Color based on status)
     // Calculate status
     const isOverBurn = (spendProgress > timeProgress);
-    const spendColor = isOverBurn ? '#C24656' : '#614FBB'; // Red (Bad) vs Purple (Good)
+    const spendColor = isOverBurn ? 'var(--color-present)' : 'var(--color-future)'; // Red (Bad) vs Purple (Good)
 
     const spendAngle = angleScale(Math.min(spendProgress, 1));
 
@@ -181,7 +181,7 @@ export default function BurnRateGaugeD3({ spent, budget, onExpand, onInfo, isExp
             <div className="flex items-center gap-2">
               <button
                 onClick={onInfo}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Chart Info"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -192,7 +192,7 @@ export default function BurnRateGaugeD3({ spent, budget, onExpand, onInfo, isExp
               </button>
               <button
                 onClick={onExpand}
-                className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors"
+                className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20"
                 aria-label="Expand Chart"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

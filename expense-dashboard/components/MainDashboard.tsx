@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 // Lib
-import { 
-  aggregateTrendData, 
+import {
+  aggregateTrendData,
   calculateKPIs,
   getTargetDistribution,
   getTopCategories,
@@ -19,10 +19,10 @@ import { CHART_INFO, ChartKey } from '@/lib/constants/chartInfo';
 // Components
 import KPICards from '@/components/KPICards';
 import TransactionTable from '@/components/TransactionTable';
-import { 
-  ExpandedChartOverlay, 
-  DashboardHeader, 
-  DashboardActions 
+import {
+  ExpandedChartOverlay,
+  DashboardHeader,
+  DashboardActions
 } from '@/components/dashboard';
 import { FilterAccordion } from '@/components/filters';
 import { InfoModal, FloatingFilterButton, EmptyState } from '@/components/ui';
@@ -83,7 +83,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
           .select('display_name')
           .eq('id', user.id)
           .single();
-          
+
         if (profile?.display_name) {
           setUserName(profile.display_name);
         } else if (user.user_metadata?.display_name) {
@@ -108,20 +108,40 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   const kpiMetrics = calculateKPIs(filteredExpenses);
   const targetDistribution = getTargetDistribution(filteredExpenses);
   const categoryTotals = getTopCategories(filteredExpenses, 10);
-  
+
   // Calculate Budget Progress
   const budgetProgress = useMemo(() => {
     let baseBudget = budget;
     // Apply time range filter to budget 
     if (timeRangePreset === 'month') {
-       baseBudget = budget.filter(b => b.year === currentYear && b.month === currentMonth);
+      baseBudget = budget.filter(b => b.year === currentYear && b.month === currentMonth);
     } else if (timeRangePreset === 'year') {
-       baseBudget = budget.filter(b => b.year === currentYear);
+      baseBudget = budget.filter(b => b.year === currentYear);
     }
     const filteredBudget = filterBudget(baseBudget, filters);
-    
+
     return getBudgetProgress(filteredExpenses, filteredBudget);
   }, [budget, filteredExpenses, filters, timeRangePreset, currentYear, currentMonth]);
+
+  // Calculate Date Label for Header
+  const headerDateLabel = useMemo(() => {
+    if (filteredExpenses.length === 0) return 'No Data';
+
+    // Dates are strings "YYYY-MM-DD" or Date objects. Assuming standard format.
+    // Safe sort or just min/max
+    const timestamps = filteredExpenses.map(e => new Date(e.date).getTime());
+    if (timestamps.length === 0) return 'No Data';
+
+    const minDate = new Date(Math.min(...timestamps));
+    const maxDate = new Date(Math.max(...timestamps));
+
+    const formatDate = (d: Date) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+    if (minDate.getTime() === maxDate.getTime()) {
+      return formatDate(minDate);
+    }
+    return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
+  }, [filteredExpenses]);
 
   // Loading State
   if (loading) {
@@ -140,18 +160,16 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
   return (
     <div className="min-h-screen bg-void-black font-sans text-white pb-48 page-ambient">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
-        
+
         {/* Header */}
-        <DashboardHeader 
+        <DashboardHeader
           recordCount={filteredExpenses.length}
-          timeRangePreset={timeRangePreset}
-          currentYear={currentYear}
-          currentMonth={currentMonth}
+          dateLabel={headerDateLabel}
         />
 
         {/* Empty State - Show when no data matches filters */}
         {filteredExpenses.length === 0 ? (
-          <EmptyState 
+          <EmptyState
             title="No Expenses Found"
             message="No expenses match your current filter selection. Try selecting a different time period or adjusting your filters."
             onReset={resetFilters}
@@ -165,33 +183,33 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
             <div className="my-4">
               <BudgetProgressRings progress={budgetProgress} />
             </div>
-            
+
             {/* Charts Grid */}
             <div className="space-y-4">
-              
+
               {/* Spending Trend - Full Width (adaptive: daily for 1 month, monthly for longer) */}
-              <SpendingTrendD3 
+              <SpendingTrendD3
                 data={trendData}
                 granularity={granularity}
                 onExpand={() => setExpandedChart('monthly')}
                 onInfo={() => setInfoChart('monthly')}
               />
-              
+
               {/* Row 1: Burn Rate, Distribution, Categories */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <BurnRateGaugeD3 
+                <BurnRateGaugeD3
                   spent={kpiMetrics.totalSpent}
                   budget={500000}
                   onExpand={() => setExpandedChart('burn')}
                   onInfo={() => setInfoChart('burn')}
                 />
-                <TargetDonutD3 
-                  data={targetDistribution} 
+                <TargetDonutD3
+                  data={targetDistribution}
                   onExpand={() => setExpandedChart('donut')}
                   onInfo={() => setInfoChart('donut')}
                 />
-                <CategoryBarD3 
-                  data={categoryTotals} 
+                <CategoryBarD3
+                  data={categoryTotals}
                   onExpand={() => setExpandedChart('bar')}
                   onInfo={() => setInfoChart('bar')}
                 />
@@ -199,26 +217,26 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
 
               {/* Row 2: Day of Week & Top Shops */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <DayOfWeekD3 
-                  expenses={filteredExpenses} 
+                <DayOfWeekD3
+                  expenses={filteredExpenses}
                   onExpand={() => setExpandedChart('dayOfWeek')}
                   onInfo={() => setInfoChart('dayOfWeek')}
                 />
-                <TopShopsD3 
-                  expenses={filteredExpenses} 
+                <TopShopsD3
+                  expenses={filteredExpenses}
                   onExpand={() => setExpandedChart('topShops')}
                   onInfo={() => setInfoChart('topShops')}
                 />
               </div>
 
               {/* Heatmap - Full Width */}
-              <SpendingHeatmapD3 
+              <SpendingHeatmapD3
                 expenses={filteredExpenses}
                 onExpand={() => setExpandedChart('heatmap')}
                 onInfo={() => setInfoChart('heatmap')}
               />
             </div>
-            
+
             {/* Transaction Table */}
             {showTransactions && (
               <section className="mt-6">
@@ -230,28 +248,25 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       </div>
 
       {/* Floating Filter Button */}
-      <FloatingFilterButton 
-        onClick={() => setIsFilterOpen(!isFilterOpen)} 
-        count={activeFilterCount}
-        isOpen={isFilterOpen}
-      />
-      
-      {/* Action Buttons (Save/Reset) */}
-      <DashboardActions 
-        isVisible={isFilterOpen}
-        onSave={saveDefaultView}
-        onReset={resetFilters}
-      />
+      {!isFilterOpen && (
+        <FloatingFilterButton
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+          count={activeFilterCount}
+          isOpen={isFilterOpen}
+        />
+      )}
 
       {/* Filter Accordion */}
       {isFilterOpen && (
-        <FilterAccordion 
+        <FilterAccordion
           filters={filters}
           setFilters={setFilters}
           uniqueValues={uniqueValues}
           order={filterOrder}
           setOrder={setFilterOrder}
           onClose={() => setIsFilterOpen(false)}
+          onSave={saveDefaultView}
+          onReset={resetFilters}
           setTimeRangePreset={setTimeRangePreset}
           timeRangePreset={timeRangePreset}
           currentMonth={currentMonth}
@@ -273,7 +288,7 @@ export default function MainDashboard({ showTransactions = true }: MainDashboard
       )}
 
       {/* Info Modal */}
-      <InfoModal 
+      <InfoModal
         isOpen={!!infoChart}
         onClose={() => setInfoChart(null)}
         title={infoChart ? CHART_INFO[infoChart].title : ''}

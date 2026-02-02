@@ -9,17 +9,18 @@ interface KPICardsProps {
 
 export default function KPICards({ metrics }: KPICardsProps) {
   return (
-    <div className="flex overflow-x-auto snap-x snap-mandatory pt-2 pb-6 -mx-4 px-4 gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:pb-8 md:mx-0 md:px-0 no-scrollbar">
-      <div className="snap-center shrink-0 w-[85vw] md:w-auto h-full">
+    <div className="flex overflow-x-auto snap-x snap-mandatory pt-2 pb-6 -mx-4 px-4 gap-3 md:gap-6 md:grid md:grid-cols-2 lg:grid-cols-4 md:px-0 md:mx-0 no-scrollbar">
+      {/* Cards - Mobile width optimized to show peek of next card */}
+      <div className="snap-center shrink-0 w-[280px] md:w-auto h-full">
         <KPICard
           label="Total Spent"
           value={formatCurrency(metrics.totalTransactions > 0 ? metrics.totalSpent : 0)}
           subtext={`${metrics.totalTransactions} transactions`}
-          accent="cobalt"
+          accent="total"
         />
       </div>
 
-      <div className="snap-center shrink-0 w-[85vw] md:w-auto h-full">
+      <div className="snap-center shrink-0 w-[280px] md:w-auto h-full">
         <KPICard
           label="Monthly Average"
           value={formatCurrency(metrics.avgMonthly)}
@@ -27,65 +28,80 @@ export default function KPICards({ metrics }: KPICardsProps) {
           trend={metrics.monthOverMonth > 0 ? 'up' : 'down'}
           trendValue={`${formatPercentage(Math.abs(metrics.monthOverMonth))} vs prev`}
           inverseTrend={true} // Up is Bad
-          accent="orange"
+          accent="living"
         />
       </div>
 
-      <div className="snap-center shrink-0 w-[85vw] md:w-auto h-full">
+      <div className="snap-center shrink-0 w-[280px] md:w-auto h-full">
         <KPICard
           label="Top Category"
           value={metrics.topCategory}
           subtext="Highest spending area"
-          accent="cobalt"
+          accent="present"
         />
       </div>
 
-      <div className="snap-center shrink-0 w-[85vw] md:w-auto h-full">
+      <div className="snap-center shrink-0 w-[280px] md:w-auto h-full">
         <KPICard
           label="Future Investment"
           value={formatPercentage(metrics.futurePercentage)}
           subtext="Target: 20%"
           trend={metrics.futurePercentage >= 20 ? 'up' : metrics.futurePercentage >= 10 ? 'neutral' : 'down'}
-          accent="green"
+          accent="future"
         />
       </div>
     </div>
   );
 }
 
-function KPICard({ label, value, subtext, trend, trendValue, inverseTrend = false, accent = 'cobalt' }: {
+function KPICard({ label, value, subtext, trend, trendValue, inverseTrend = false, accent = 'total' }: {
   label: string;
   value: string;
   subtext?: string;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
   inverseTrend?: boolean;
-  accent?: 'green' | 'orange' | 'cobalt';
+  accent?: 'total' | 'future' | 'living' | 'present';
 }) {
-  // Determine trend color
-  let trendColor = 'text-muted-foreground';
-  if (trend === 'up') trendColor = inverseTrend ? 'text-[#CC8257]' : 'text-[#8DF2CD]'; // kibo-orange : cat-mint
-  if (trend === 'down') trendColor = inverseTrend ? 'text-[#8DF2CD]' : 'text-[#CC8257]'; // cat-mint : kibo-orange
-  if (trend === 'neutral') trendColor = 'text-[#6CA1B7]'; // kibo-blue
+  // Map accents to Kibo Palette CSS variables
+  // total: Teal (#A9D9C7)
+  // future: Purple (#614FBB)
+  // living: Blue (#65A1C9)
+  // present: Red (#C24656)
 
-  const accentClass = accent === 'green' ? 'border-l-[#8DF2CD]' : accent === 'orange' ? 'border-l-[#CC8257]' : 'border-l-[#6CA1B7]';
+  const accentColors = {
+    total: 'border-l-[var(--color-total)]',
+    future: 'border-l-[var(--color-future)]',
+    living: 'border-l-[var(--color-living)]',
+    present: 'border-l-[var(--color-present)]',
+  };
+
+  const trendColors = {
+    positive: 'text-[var(--color-total)]', // Good (Teal)
+    negative: 'text-[var(--color-present)]', // Bad (Red)
+    neutral: 'text-[var(--color-living)]'    // Neutral (Blue)
+  };
+
+  let trendColorClass = trendColors.neutral;
+  if (trend === 'up') trendColorClass = inverseTrend ? trendColors.negative : trendColors.positive;
+  if (trend === 'down') trendColorClass = inverseTrend ? trendColors.positive : trendColors.negative;
 
   return (
-    <div className={`liquid-card p-6 relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] border-l-4 ${accentClass}`}>
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-label text-secondary-text">{label}</h3>
+    <div className={`liquid-card p-5 h-full relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] border-l-4 first:ml-0 ${accentColors[accent]} shadow-md bg-[#1B4034]`}>
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#A9D9C7]/70">{label}</h3>
         {trend && (
-          <span className={`flex items-center text-xs font-mono font-bold ${trendColor} bg-neutral-900/50 px-2 py-1 rounded-full`}>
+          <span className={`flex items-center text-[10px] font-mono font-bold ${trendColorClass} bg-black/20 px-1.5 py-0.5 rounded-full`}>
             {trend === 'up' ? '▲' : trend === 'down' ? '▼' : '●'} {trendValue}
           </span>
         )}
       </div>
 
-      <p className="text-value mt-1">{value}</p>
+      <p className="text-2xl font-bold text-white tracking-tight break-words truncate" title={value}>{value}</p>
 
       {subtext && (
-        <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-          <p className="text-xs text-secondary-text font-mono uppercase tracking-wider">{subtext}</p>
+        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+          <p className="text-[10px] text-[#A9D9C7]/50 font-mono uppercase tracking-wider truncate">{subtext}</p>
         </div>
       )}
     </div>

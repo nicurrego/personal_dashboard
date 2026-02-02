@@ -27,6 +27,8 @@ interface FilterAccordionProps {
   order: string[];
   setOrder: (order: string[]) => void;
   onClose: () => void;
+  onSave: () => void;
+  onReset: () => void;
   setTimeRangePreset: (preset: 'month' | 'year' | 'all') => void;
   timeRangePreset: 'month' | 'year' | 'all';
   currentMonth: number;
@@ -73,6 +75,8 @@ export default function FilterAccordion({
   order,
   setOrder,
   onClose,
+  onSave,
+  onReset,
   setTimeRangePreset,
   timeRangePreset,
   currentMonth,
@@ -80,6 +84,7 @@ export default function FilterAccordion({
 }: FilterAccordionProps) {
   const [expandedFilters, setExpandedFilters] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -92,7 +97,21 @@ export default function FilterAccordion({
 
   useEffect(() => {
     setMounted(true);
+    // Small delay to ensure initial state is rendered before animation
+    const timer = setTimeout(() => {
+      setVisible(true);
+    }, 10);
+    return () => clearTimeout(timer);
   }, []);
+
+  const handleClose = () => {
+    // Animate out first
+    setVisible(false);
+    // Then call actual close after animation completes
+    setTimeout(() => {
+      onClose();
+    }, 350); // Match animation duration
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -419,25 +438,112 @@ export default function FilterAccordion({
 
   const content = (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)', zIndex: 9996 }} />
+      <div
+        onClick={handleClose}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: '64px',
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 50,
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 300ms ease-out',
+        }}
+      />
       <div className="text-white liquid-card" style={{
-        position: 'fixed', left: 0, right: 0, bottom: '100px',
+        position: 'fixed', left: 0, right: 0, bottom: '64px',
         backgroundColor: '#1B4034', backdropFilter: 'none',
-        zIndex: 9997, maxHeight: '70vh', overflowY: 'auto',
+        zIndex: 51, maxHeight: '65vh',
         borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
         boxShadow: '0 -4px 30px rgba(0,0,0,0.5)', border: '1px solid #A9D9C7',
+        display: 'flex', flexDirection: 'column',
+        transform: visible ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={order} strategy={verticalListSortingStrategy}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {order.map(id => (
-                <SortableFilterItem key={id} id={id}>
-                  {renderFilter(id)}
-                </SortableFilterItem>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+        {/* Scrollable Filter List */}
+        <div style={{ flex: 1, overflowY: 'auto', paddingTop: '8px' }}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={order} strategy={verticalListSortingStrategy}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {order.map(id => (
+                  <SortableFilterItem key={id} id={id}>
+                    {renderFilter(id)}
+                  </SortableFilterItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+
+        {/* Action Buttons Footer */}
+        <div style={{
+          padding: '16px',
+          borderTop: '1px solid rgba(169, 217, 199, 0.2)',
+          display: 'flex',
+          gap: '12px',
+          backgroundColor: '#1B4034',
+        }}>
+          <button
+            onClick={onSave}
+            style={{
+              flex: 1,
+              padding: '14px',
+              borderRadius: '12px',
+              border: '2px solid #614FBB',
+              backgroundColor: 'transparent',
+              color: '#614FBB',
+              fontSize: '13px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+            }}
+          >
+            Save View
+          </button>
+          <button
+            onClick={onReset}
+            style={{
+              flex: 1,
+              padding: '14px',
+              borderRadius: '12px',
+              border: '2px solid #C24656',
+              backgroundColor: 'transparent',
+              color: '#C24656',
+              fontSize: '13px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+            }}
+          >
+            Reset All
+          </button>
+          <button
+            onClick={handleClose}
+            style={{
+              width: '52px',
+              padding: '14px',
+              borderRadius: '12px',
+              backgroundColor: '#1B4032',
+              border: '2px solid #A9D9C7',
+              color: '#A9D9C7',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+            aria-label="Close Filters"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
       </div>
     </>
   );

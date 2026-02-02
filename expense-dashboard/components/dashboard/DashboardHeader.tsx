@@ -2,35 +2,22 @@
 
 interface DashboardHeaderProps {
   recordCount: number;
-  timeRangePreset: 'month' | 'year' | 'all';
-  currentYear: number;
-  currentMonth: number;
+  dateLabel: string;
 }
 
-export default function DashboardHeader({ 
-  recordCount, 
-  timeRangePreset, 
-  currentYear, 
-  currentMonth 
+export default function DashboardHeader({
+  recordCount,
+  dateLabel
 }: DashboardHeaderProps) {
   return (
-    <header className="mb-6">
-      <div className="flex flex-col gap-4">
-        {/* Title Row */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-white tracking-wide uppercase">Dashboard</h1>
-            <p className="text-xs text-secondary-text font-mono">
-              {recordCount} records
-              {timeRangePreset === 'month' && ` • ${currentYear}/${String(currentMonth).padStart(2, '0')}`}
-              {timeRangePreset === 'year' && ` • ${currentYear}`}
-            </p>
-          </div>
-        </div>
-        
-        {/* Spacer for potential controls */}
-        <div className="h-4" />
+    <header className="mb-4 flex items-center justify-between">
+      <div>
+        <h1 className="text-lg font-bold text-white tracking-wide uppercase">Dashboard</h1>
+        <p className="text-[10px] text-secondary-text font-mono mt-0.5">
+          {recordCount} records • {dateLabel}
+        </p>
       </div>
+      {/* Future controls can go here */}
     </header>
   );
 }

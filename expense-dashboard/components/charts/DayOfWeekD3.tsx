@@ -117,12 +117,12 @@ export default function DayOfWeekD3({ expenses, onExpand, onInfo, isExpanded = f
           <h2 className="text-label text-secondary-text">Day of Week Analysis</h2>
           <div className="flex items-center gap-2">
             {onInfo && (
-              <button onClick={onInfo} className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors" aria-label="Chart Info">
+              <button onClick={onInfo} className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20" aria-label="Chart Info">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               </button>
             )}
             {onExpand && (
-              <button onClick={onExpand} className="p-2 -mr-2 text-secondary-text hover:text-white transition-colors" aria-label="Expand Chart">
+              <button onClick={onExpand} className="p-1.5 rounded-lg text-[#A9D9C7]/70 hover:text-[#A9D9C7] hover:bg-[#A9D9C7]/10 transition-all border border-transparent hover:border-[#A9D9C7]/20" aria-label="Expand Chart">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
               </button>
             )}

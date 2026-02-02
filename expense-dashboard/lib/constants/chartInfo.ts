@@ -6,15 +6,15 @@
 export const CHART_INFO = {
   monthly: {
     title: 'Monthly Spending Trend',
-    description: 'Tracks your total spending over time compared to previous months.\n\nThe colored lines break down spending to help you visualize your balance:\n• Living (Cyan): Essential needs.\n• Present (Amber): Wants and short-term enjoyment.\n• Future (Green): Savings and investments.'
+    description: 'Tracks your total spending over time compared to previous months.\n\nThe colored lines break down spending to help you visualize your balance:\n• Living (Blue): Essential needs.\n• Present (Red): Wants and short-term enjoyment.\n• Future (Purple): Savings and investments.'
   },
   burn: {
     title: 'Burn Rate Gauge',
-    description: 'A speedometer for your budget.\n\n• Blue Arc: How much of the month has passed.\n• Colored Arc: How much budget you have used.\n\nIf the colored arc is longer than the blue one, you are "Burning Fast" (spending faster than time is passing).'
+    description: 'A speedometer for your budget.\n\n• Teal Arc: Reference for how much of the month has passed.\n• Inner Arc: How much budget you have actually used.\n\n If the inner arc passes the teal line, you are "Burning Fast" and spending ahead of schedule.'
   },
   donut: {
     title: 'Target Distribution',
-    description: 'See the balance of your financial life. Ideally, you might aim for a 50/30/20 split:\n\n• 50% Living (Needs)\n• 30% Present (Wants)\n• 20% Future (Savings)\n\nThis donut chart shows your actual current split.'
+    description: 'See the balance of your financial life. Aim for your ideal split:\n\n• Living (Blue): Needs (Rent, Groceries)\n• Present (Red): Wants (Dining, Fun)\n• Future (Purple): Savings (Investments)\n\nThis donut chart shows your actual current split.'
   },
   bar: {
     title: 'Top Categories',
@@ -29,8 +29,8 @@ export const CHART_INFO = {
     description: 'Your most frequented merchants.\n\n• Bars represent total spending at each shop.\n• Identifies where your money goes most often (e.g., specific supermarkets, cafes, or subscriptions).'
   },
   heatmap: {
-    title: 'Spending Heatmap (Daily)',
-    description: 'A calendar view of your spending habits.\n\n• Rows: Days of the week (Sun to Sat).\n• Columns: Weeks of the year.\n• Intensity: Brighter/Pinker cells mean higher spending on that specific day.\n\n💡 Ways to use this chart:\n1. Single Month: See exactly which days you splurged.\n2. One Category: Track habits (e.g., "Do I buy coffee every Tuesday?").\n3. Current Year: Get a bird\'s-eye view of your entire year\'s density.\n4. Location: See if specific places trigger spending streaks.\n5. Living vs. Wants: Filter by Target to see if "Needs" are consistent vs. erratic "Wants".'
+    title: 'Spending Heatmap',
+    description: 'A calendar view of your spending intensity.\n\n• Rows: Days of the week.\n• Columns: Weeks of the year.\n• Intensity: Brighter Teal cells mean higher spending on that specific day.\n\nUse this to spot recurring habits, specific "spend-heavy" days, or seasonal patterns.'
   }
 } as const;
 
