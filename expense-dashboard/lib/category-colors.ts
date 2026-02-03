@@ -9,14 +9,14 @@
  */
 
 export const CATEGORY_COLORS = {
-  /** Mint - Savings/Investments/Future */
-  FUTURE: '#8DF2CD',
-  /** Sage - Needs/Essentials/Living */
-  LIVING: '#487363',
-  /** Pale Mint - Wants/Lifestyle/Present */
-  PRESENT: '#A9D9C7',
-  /** Kibo Blue - Income */
-  INCOME: '#6CA1B7',
+  /** Future (Purple) - Savings/Investments */
+  FUTURE: '#614FBB',
+  /** Living (Blue) - Needs/Essentials */
+  LIVING: '#65A1C9',
+  /** Present (Red) - Wants/Lifestyle */
+  PRESENT: '#C24656',
+  /** Income/Total (Teal) */
+  INCOME: '#A9D9C7',
 } as const;
 
 export const CATEGORY_GLOWS = {
@@ -32,24 +32,24 @@ export const CATEGORY_GLOWS = {
  */
 export const CATEGORY_TAILWIND = {
   FUTURE: {
-    text: 'text-[#8DF2CD]',
-    bg: 'bg-[#8DF2CD]',
-    border: 'border-[#8DF2CD]',
+    text: 'text-[#614FBB]',
+    bg: 'bg-[#614FBB]',
+    border: 'border-[#614FBB]',
   },
   LIVING: {
-    text: 'text-[#487363]',
-    bg: 'bg-[#487363]',
-    border: 'border-[#487363]',
+    text: 'text-[#65A1C9]',
+    bg: 'bg-[#65A1C9]',
+    border: 'border-[#65A1C9]',
   },
   PRESENT: {
+    text: 'text-[#C24656]',
+    bg: 'bg-[#C24656]',
+    border: 'border-[#C24656]',
+  },
+  INCOME: {
     text: 'text-[#A9D9C7]',
     bg: 'bg-[#A9D9C7]',
     border: 'border-[#A9D9C7]',
-  },
-  INCOME: {
-    text: 'text-[#6CA1B7]',
-    bg: 'bg-[#6CA1B7]',
-    border: 'border-[#6CA1B7]',
   },
 } as const;
 

@@ -29,6 +29,10 @@ interface EditableExpenseTableProps {
     isPreviewMode?: boolean;
     /** Additional class name */
     className?: string;
+    /** Whether to show the search bar */
+    showSearch?: boolean;
+    /** Callback to change page size */
+    onPageSizeChange?: (size: number) => void;
 }
 
 interface QuickEditState {
@@ -53,7 +57,10 @@ export function EditableExpenseTable({
     pageSize = 25,
     title,
     isPreviewMode = false,
+
     className,
+    showSearch = true,
+    onPageSizeChange,
 }: EditableExpenseTableProps) {
     const [page, setPage] = useState(0);
     const [search, setSearch] = useState('');
@@ -97,9 +104,9 @@ export function EditableExpenseTable({
     const formatCurrency = (val: number) => `¥${val?.toLocaleString() || 0}`;
 
     const targetColors: Record<ExpenseTarget, { bg: string; text: string; border: string }> = {
-        'Living': { bg: 'bg-cyber-cyan/10', text: 'text-cyber-cyan', border: 'border-cyber-cyan/30' },
-        'Present': { bg: 'bg-alert-amber/10', text: 'text-alert-amber', border: 'border-alert-amber/30' },
-        'Future': { bg: 'bg-growth-green/10', text: 'text-growth-green', border: 'border-growth-green/30' },
+        'Living': { bg: 'bg-[var(--color-living)]/10', text: 'text-[var(--color-living)]', border: 'border-[var(--color-living)]/30' },
+        'Present': { bg: 'bg-[var(--color-present)]/10', text: 'text-[var(--color-present)]', border: 'border-[var(--color-present)]/30' },
+        'Future': { bg: 'bg-[var(--color-future)]/10', text: 'text-[var(--color-future)]', border: 'border-[var(--color-future)]/30' },
     };
 
     // Handle opening edit modal
@@ -198,7 +205,7 @@ export function EditableExpenseTable({
         return (
             <div className={cn("liquid-card-premium p-8", className)}>
                 <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyber-cyan" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                 </div>
             </div>
         );
@@ -206,47 +213,69 @@ export function EditableExpenseTable({
 
     return (
         <>
-            <div className={cn("liquid-card-premium overflow-hidden", className)}>
+            <div className={cn("bg-card border border-border rounded-xl overflow-hidden shadow-sm", className)}>
                 {/* Header */}
-                <div className="px-4 py-4 border-b border-white/10 flex flex-col gap-3 relative z-10">
+                <div className="px-4 py-4 border-b border-border flex flex-col gap-3 relative z-10">
                     <div className="flex items-center justify-between">
                         <div>
-                            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
-                            <p className="text-xs text-secondary-text font-mono">
+                            {title && <h2 className="text-lg font-semibold text-foreground">{title}</h2>}
+                            <p className="text-xs text-muted-foreground font-mono">
                                 {filteredExpenses.length} {filteredExpenses.length === 1 ? 'record' : 'records'}
                                 {search && ` (filtered from ${expenses.length})`}
                             </p>
+
                         </div>
+
+                        {onPageSizeChange && (
+                            <div className="flex items-center bg-muted rounded-lg p-1 border border-border">
+                                {[20, 50, 100].map((size) => (
+                                    <button
+                                        key={size}
+                                        onClick={() => onPageSizeChange(size)}
+                                        className={cn(
+                                            "px-3 py-1.5 text-xs font-medium rounded-md transition-all",
+                                            pageSize === size
+                                                ? "bg-secondary text-secondary-foreground shadow-sm font-bold"
+                                                : "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground"
+                                        )}
+                                    >
+                                        {size}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Search - full width on mobile */}
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-text" />
-                        <input
-                            type="text"
-                            placeholder="Search by category, shop, item..."
-                            value={search}
-                            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                            className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-secondary-text/50 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50"
-                        />
-                    </div>
+                    {showSearch && (
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Search by category, shop, item..."
+                                value={search}
+                                onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+                                className="w-full pl-10 pr-4 py-3 bg-muted/50 border border-input rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Mobile Card View (visible on small screens) */}
                 <div className="md:hidden">
                     {paginatedExpenses.length === 0 ? (
-                        <div className="p-8 text-center text-secondary-text">
+                        <div className="p-8 text-center text-muted-foreground">
                             {search ? 'No matching records found' : 'No expenses to display'}
                         </div>
                     ) : (
-                        <div className="divide-y divide-white/5">
+                        <div className="divide-y divide-border">
                             {paginatedExpenses.map((expense, idx) => {
                                 const colors = targetColors[expense.target as ExpenseTarget] || targetColors.Living;
 
                                 return (
                                     <button
                                         key={expense.id || `${expense.date}-${expense.value}-${idx}`}
-                                        className="w-full p-4 flex items-center justify-between hover:bg-white/5 active:bg-white/10 transition-colors text-left"
+                                        className="w-full p-4 flex items-center justify-between hover:bg-muted/50 active:bg-muted transition-colors text-left"
                                         onClick={() => editable && handleEdit(expense, idx)}
                                     >
                                         <div className="flex-1 min-w-0">
@@ -257,25 +286,25 @@ export function EditableExpenseTable({
                                                 )}>
                                                     {expense.target}
                                                 </span>
-                                                <span className="text-xs text-secondary-text font-mono">
+                                                <span className="text-xs text-muted-foreground font-mono">
                                                     {expense.date}
                                                 </span>
                                             </div>
-                                            <p className="text-white font-medium truncate">
+                                            <p className="text-foreground font-medium truncate">
                                                 {expense.category}
                                             </p>
                                             {expense.item && (
-                                                <p className="text-sm text-secondary-text truncate mt-0.5">
+                                                <p className="text-sm text-muted-foreground truncate mt-0.5">
                                                     {expense.item}
                                                 </p>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-3 ml-4">
-                                            <span className="font-mono font-bold text-white text-lg">
+                                            <span className="font-mono font-bold text-foreground text-lg">
                                                 {formatCurrency(expense.value)}
                                             </span>
                                             {editable && (
-                                                <ChevronRight className="w-5 h-5 text-secondary-text" />
+                                                <ChevronRight className="w-5 h-5 text-muted-foreground" />
                                             )}
                                         </div>
                                     </button>
@@ -289,22 +318,22 @@ export function EditableExpenseTable({
                 <div className="hidden md:block overflow-x-auto relative z-10">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-white/10 bg-black/20">
-                                <th className="text-left p-3 text-secondary-text font-medium text-xs uppercase tracking-wide">Date</th>
-                                <th className="text-left p-3 text-secondary-text font-medium text-xs uppercase tracking-wide">Target</th>
-                                <th className="text-left p-3 text-secondary-text font-medium text-xs uppercase tracking-wide">Category</th>
-                                <th className="text-right p-3 text-secondary-text font-medium text-xs uppercase tracking-wide">Value</th>
-                                <th className="text-left p-3 text-secondary-text font-medium text-xs uppercase tracking-wide">Item</th>
-                                <th className="text-left p-3 text-secondary-text font-medium text-xs uppercase tracking-wide hidden lg:table-cell">Shop</th>
+                            <tr className="border-b border-border bg-muted/40">
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Date</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Target</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Category</th>
+                                <th className="text-right p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Value</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Item</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide hidden lg:table-cell">Shop</th>
                                 {editable && (
-                                    <th className="text-center p-3 text-secondary-text font-medium text-xs uppercase tracking-wide w-24">Actions</th>
+                                    <th className="text-center p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide w-24">Actions</th>
                                 )}
                             </tr>
                         </thead>
                         <tbody>
                             {paginatedExpenses.length === 0 ? (
                                 <tr>
-                                    <td colSpan={editable ? 7 : 6} className="p-8 text-center text-secondary-text">
+                                    <td colSpan={editable ? 7 : 6} className="p-8 text-center text-muted-foreground">
                                         {search ? 'No matching records found' : 'No expenses to display'}
                                     </td>
                                 </tr>
@@ -317,13 +346,13 @@ export function EditableExpenseTable({
                                         <tr
                                             key={expense.id || `${expense.date}-${expense.value}-${idx}`}
                                             className={cn(
-                                                "border-b border-white/5 transition-colors",
-                                                editable ? "hover:bg-white/5 cursor-pointer" : ""
+                                                "border-b border-border transition-colors",
+                                                editable ? "hover:bg-muted/50 cursor-pointer" : ""
                                             )}
                                             onClick={() => editable && handleEdit(expense, idx)}
                                         >
                                             {/* Date */}
-                                            <td className="p-3 font-mono text-xs text-white">{expense.date}</td>
+                                            <td className="p-3 font-mono text-xs text-foreground">{expense.date}</td>
 
                                             {/* Target */}
                                             <td className="p-3">
@@ -343,23 +372,23 @@ export function EditableExpenseTable({
                                                             type="text"
                                                             value={quickEdit.value}
                                                             onChange={(e) => setQuickEdit({ ...quickEdit, value: e.target.value })}
-                                                            className="w-full px-2 py-1 bg-white/10 border border-cyber-cyan/50 rounded text-sm text-white focus:outline-none"
+                                                            className="w-full px-2 py-1 bg-input border border-ring rounded text-sm text-foreground focus:outline-none"
                                                             autoFocus
                                                             onKeyDown={(e) => {
                                                                 if (e.key === 'Enter') commitQuickEdit();
                                                                 if (e.key === 'Escape') cancelQuickEdit();
                                                             }}
                                                         />
-                                                        <button onClick={commitQuickEdit} className="p-1 text-growth-green hover:bg-growth-green/20 rounded">
+                                                        <button onClick={commitQuickEdit} className="p-1 text-[var(--color-future)] hover:bg-[var(--color-future)]/20 rounded">
                                                             <Check className="w-3 h-3" />
                                                         </button>
-                                                        <button onClick={cancelQuickEdit} className="p-1 text-laser-magenta hover:bg-laser-magenta/20 rounded">
+                                                        <button onClick={cancelQuickEdit} className="p-1 text-destructive hover:bg-destructive/20 rounded">
                                                             <X className="w-3 h-3" />
                                                         </button>
                                                     </div>
                                                 ) : (
                                                     <span
-                                                        className={cn("text-white", editable && "hover:text-cyber-cyan")}
+                                                        className={cn("text-foreground", editable && "hover:text-primary")}
                                                         onDoubleClick={(e) => {
                                                             e.stopPropagation();
                                                             startQuickEdit(idx, 'category', expense.category);
@@ -371,30 +400,30 @@ export function EditableExpenseTable({
                                             </td>
 
                                             {/* Value */}
-                                            <td className="p-3 text-right font-mono font-bold text-white">
+                                            <td className="p-3 text-right font-mono font-bold text-foreground">
                                                 {isQuickEditing && quickEdit.field === 'value' ? (
                                                     <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                                                         <input
                                                             type="number"
                                                             value={quickEdit.value}
                                                             onChange={(e) => setQuickEdit({ ...quickEdit, value: e.target.value })}
-                                                            className="w-24 px-2 py-1 bg-white/10 border border-cyber-cyan/50 rounded text-sm text-white text-right focus:outline-none"
+                                                            className="w-24 px-2 py-1 bg-input border border-ring rounded text-sm text-foreground text-right focus:outline-none"
                                                             autoFocus
                                                             onKeyDown={(e) => {
                                                                 if (e.key === 'Enter') commitQuickEdit();
                                                                 if (e.key === 'Escape') cancelQuickEdit();
                                                             }}
                                                         />
-                                                        <button onClick={commitQuickEdit} className="p-1 text-growth-green hover:bg-growth-green/20 rounded">
+                                                        <button onClick={commitQuickEdit} className="p-1 text-[var(--color-future)] hover:bg-[var(--color-future)]/20 rounded">
                                                             <Check className="w-3 h-3" />
                                                         </button>
-                                                        <button onClick={cancelQuickEdit} className="p-1 text-laser-magenta hover:bg-laser-magenta/20 rounded">
+                                                        <button onClick={cancelQuickEdit} className="p-1 text-destructive hover:bg-destructive/20 rounded">
                                                             <X className="w-3 h-3" />
                                                         </button>
                                                     </div>
                                                 ) : (
                                                     <span
-                                                        className={editable ? "hover:text-cyber-cyan cursor-pointer" : ""}
+                                                        className={editable ? "hover:text-primary cursor-pointer" : ""}
                                                         onDoubleClick={(e) => {
                                                             e.stopPropagation();
                                                             startQuickEdit(idx, 'value', expense.value.toString());
@@ -406,12 +435,12 @@ export function EditableExpenseTable({
                                             </td>
 
                                             {/* Item */}
-                                            <td className="p-3 text-secondary-text truncate max-w-[150px]">
+                                            <td className="p-3 text-muted-foreground truncate max-w-[150px]">
                                                 {expense.item || '—'}
                                             </td>
 
                                             {/* Shop (hidden on tablet) */}
-                                            <td className="p-3 text-secondary-text hidden lg:table-cell truncate max-w-[120px]">
+                                            <td className="p-3 text-muted-foreground hidden lg:table-cell truncate max-w-[120px]">
                                                 {expense.shop || '—'}
                                             </td>
 
@@ -421,7 +450,7 @@ export function EditableExpenseTable({
                                                     <div className="flex items-center justify-center gap-1">
                                                         <button
                                                             onClick={() => handleEdit(expense, idx)}
-                                                            className="p-2 text-secondary-text hover:text-cyber-cyan hover:bg-cyber-cyan/10 rounded-lg transition-colors"
+                                                            className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                                                             title="Edit"
                                                         >
                                                             <Pencil className="w-4 h-4" />
@@ -429,7 +458,7 @@ export function EditableExpenseTable({
                                                         {showDelete && (
                                                             <button
                                                                 onClick={(e) => handleQuickDelete(expense, idx, e)}
-                                                                className="p-2 text-secondary-text hover:text-laser-magenta hover:bg-laser-magenta/10 rounded-lg transition-colors"
+                                                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                                                                 title="Delete"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -448,36 +477,37 @@ export function EditableExpenseTable({
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-4 py-4 border-t border-white/10 relative z-10">
-                        <p className="text-sm text-secondary-text">
+                    <div className="flex items-center justify-between px-4 py-4 border-t border-border relative z-10">
+                        <p className="text-sm text-muted-foreground">
                             {page * pageSize + 1} - {Math.min((page + 1) * pageSize, filteredExpenses.length)} of {filteredExpenses.length}
                         </p>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setPage(Math.max(0, page - 1))}
                                 disabled={page === 0}
-                                className="p-2 rounded-lg bg-white/5 text-white disabled:opacity-30 hover:bg-white/10 transition-colors"
+                                className="p-2 rounded-lg bg-muted/50 text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <span className="px-3 text-sm text-secondary-text">
+                            <span className="px-3 text-sm text-muted-foreground">
                                 {page + 1} / {totalPages}
                             </span>
                             <button
                                 onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                                 disabled={page >= totalPages - 1}
-                                className="p-2 rounded-lg bg-white/5 text-white disabled:opacity-30 hover:bg-white/10 transition-colors"
+                                className="p-2 rounded-lg bg-muted/50 text-foreground disabled:opacity-30 hover:bg-muted transition-colors"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
                 )}
-            </div>
+            </div >
 
             {/* Edit Modal */}
-            <EditExpenseModal
-                expense={editingExpense?.expense ?? null}
+            < EditExpenseModal
+                expense={editingExpense?.expense ?? null
+                }
                 onClose={() => setEditingExpense(null)}
                 onSave={handleSave}
                 onDelete={showDelete ? handleDelete : undefined}

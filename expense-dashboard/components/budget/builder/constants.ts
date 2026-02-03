@@ -12,34 +12,34 @@ export interface BudgetCategoryDef {
   defaultAmount?: number;
 }
 
-export const BUDGET_GROUPS: Record<BudgetGroupType, { 
-  label: string; 
-  color: string; 
+export const BUDGET_GROUPS: Record<BudgetGroupType, {
+  label: string;
+  color: string;
   bgColor: string;
   hex: string;  // Hex color for charts and inline styles
 }> = {
-  INCOME: { 
-    label: 'Income', 
-    color: 'text-white', 
-    bgColor: 'bg-flux-violet/10',
+  INCOME: {
+    label: 'Income',
+    color: 'text-[var(--color-total)]',
+    bgColor: 'bg-[var(--color-total)]/10',
     hex: CATEGORY_COLORS.INCOME,
   },
-  FUTURE: { 
-    label: 'Future', 
-    color: 'text-growth-green', 
-    bgColor: 'bg-growth-green/10',
+  FUTURE: {
+    label: 'Future',
+    color: 'text-[var(--color-future)]',
+    bgColor: 'bg-[var(--color-future)]/10',
     hex: CATEGORY_COLORS.FUTURE,
   },
-  LIVING: { 
-    label: 'Living', 
-    color: 'text-cyber-cyan', 
-    bgColor: 'bg-cyber-cyan/10',
+  LIVING: {
+    label: 'Living',
+    color: 'text-[var(--color-living)]',
+    bgColor: 'bg-[var(--color-living)]/10',
     hex: CATEGORY_COLORS.LIVING,
   },
-  PRESENT: { 
-    label: 'Present', 
-    color: 'text-alert-amber', 
-    bgColor: 'bg-alert-amber/10',
+  PRESENT: {
+    label: 'Present',
+    color: 'text-[var(--color-present)]',
+    bgColor: 'bg-[var(--color-present)]/10',
     hex: CATEGORY_COLORS.PRESENT,
   },
 };

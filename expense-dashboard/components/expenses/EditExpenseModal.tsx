@@ -40,9 +40,9 @@ const CONTEXT_OPTIONS = [
 ];
 
 const TARGET_COLORS: Record<ExpenseTarget, { text: string; bg: string; border: string }> = {
-    'Living': { text: 'text-cyber-cyan', bg: 'bg-cyber-cyan', border: 'border-cyber-cyan/30' },
-    'Present': { text: 'text-alert-amber', bg: 'bg-alert-amber', border: 'border-alert-amber/30' },
-    'Future': { text: 'text-growth-green', bg: 'bg-growth-green', border: 'border-growth-green/30' },
+    'Living': { text: 'text-[var(--color-living)]', bg: 'bg-[var(--color-living)]', border: 'border-[var(--color-living)]/30' },
+    'Present': { text: 'text-[var(--color-present)]', bg: 'bg-[var(--color-present)]', border: 'border-[var(--color-present)]/30' },
+    'Future': { text: 'text-[var(--color-future)]', bg: 'bg-[var(--color-future)]', border: 'border-[var(--color-future)]/30' },
 };
 
 /**
@@ -99,6 +99,28 @@ export function EditExpenseModal({
             return { ...prev, [field]: String(value) } as Expense;
         });
     }, []);
+
+    // Handle back button behavior for mobile
+    useEffect(() => {
+        // Push a state so the back button can be intercepted
+        window.history.pushState({ modalOpen: true }, '', window.location.href);
+
+        const handlePopState = (event: PopStateEvent) => {
+            // If back button is pressed, close the modal
+            event.preventDefault();
+            onClose();
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            // Optional: If we closed via X button, we should ideally go back to revert our pushState.
+            // But doing so synchronously can cause loops or issues if not careful.
+            // For now, we accept that one extra "back" press might be needed if closed via X.
+        };
+    }, []); // Empty dependency array means this runs once on mount
+
 
     const handleClose = () => {
         if (hasChanges) {
@@ -236,46 +258,46 @@ export function EditExpenseModal({
     // ==========================================
     const renderFieldEdit = (item: typeof detailItems[0]) => {
         return (
-            <div className="fixed inset-0 z-[250] bg-black flex flex-col animate-in fade-in duration-150">
+            <div className="fixed inset-0 z-[1100] bg-background flex flex-col animate-in fade-in duration-150">
                 {/* Edit Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
                     <button
                         onClick={cancelEdit}
-                        className="flex items-center gap-2 text-secondary-text hover:text-white transition-colors"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ChevronLeft className="w-5 h-5" />
                         <span className="text-sm">Back</span>
                     </button>
 
-                    <h1 className="text-sm font-medium text-white">Edit {item.label}</h1>
+                    <h1 className="text-sm font-medium text-foreground">Edit {item.label}</h1>
 
                     <button
                         onClick={confirmEdit}
-                        className="text-growth-green text-sm font-medium hover:text-growth-green/80 transition-colors"
+                        className="text-primary text-sm font-medium hover:text-primary/80 transition-colors"
                     >
                         Done
                     </button>
                 </div>
 
                 <div className="flex-1 px-4 py-6 overflow-y-auto">
-                    <div className="liquid-card-premium p-6 relative z-10">
-                        <h2 className="text-xl font-bold text-white mb-2">{item.label}</h2>
+                    <div className="p-6 relative z-10 bg-card border border-border rounded-2xl shadow-sm">
+                        <h2 className="text-xl font-bold text-foreground mb-2">{item.label}</h2>
 
                         {/* Number input for amount */}
                         {item.type === 'number' && (
                             <div className="mt-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-3xl text-secondary-text">¥</span>
+                                    <span className="text-2xl text-muted-foreground">¥</span>
                                     <input
                                         type="number"
                                         value={tempValue}
                                         onChange={(e) => setTempValue(e.target.value)}
                                         placeholder="0"
                                         autoFocus
-                                        className="flex-1 text-4xl font-bold text-white bg-transparent border-none outline-none placeholder:text-white/20"
+                                        className="flex-1 w-full text-3xl font-bold text-foreground bg-transparent border-none outline-none placeholder:text-muted/20"
                                     />
                                 </div>
-                                <div className="mt-4 h-px bg-gradient-to-r from-cyber-cyan to-growth-green" />
+                                <div className="mt-4 h-px bg-border" />
                             </div>
                         )}
 
@@ -290,7 +312,7 @@ export function EditExpenseModal({
                                             "flex-1 min-w-[100px] py-3 rounded-xl text-sm font-semibold transition-all border-2",
                                             tempValue === target
                                                 ? `${TARGET_COLORS[target].bg} border-transparent text-white`
-                                                : "bg-white/5 border-white/10 text-secondary-text hover:bg-white/10"
+                                                : "bg-muted border-border text-muted-foreground hover:bg-muted/80"
                                         )}
                                     >
                                         {target}
@@ -306,7 +328,7 @@ export function EditExpenseModal({
                                     type="date"
                                     value={tempValue}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white text-lg focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50"
+                                    className="w-full px-4 py-4 rounded-xl bg-input border border-input text-foreground text-lg focus:outline-none focus:ring-2 focus:ring-ring"
                                 />
                             </div>
                         )}
@@ -320,7 +342,7 @@ export function EditExpenseModal({
                                     onChange={(e) => setTempValue(e.target.value)}
                                     placeholder={`Enter ${item.label.toLowerCase()}...`}
                                     autoFocus
-                                    className="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white text-lg placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50"
+                                    className="w-full px-4 py-4 rounded-xl bg-input border border-input text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                                 />
                             </div>
                         )}
@@ -334,7 +356,7 @@ export function EditExpenseModal({
                                     onChange={(e) => setTempValue(e.target.value)}
                                     placeholder={`Enter ${item.label.toLowerCase()}...`}
                                     autoFocus
-                                    className="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white text-lg placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50"
+                                    className="w-full px-4 py-4 rounded-xl bg-input border border-input text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                                 />
                                 <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
                                     {item.suggestions
@@ -347,8 +369,8 @@ export function EditExpenseModal({
                                                 className={cn(
                                                     "px-3 py-2 rounded-lg text-sm transition-colors",
                                                     tempValue === suggestion
-                                                        ? "bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30"
-                                                        : "bg-white/5 text-secondary-text hover:bg-white/10 hover:text-white"
+                                                        ? "bg-primary/20 text-primary border border-primary/30"
+                                                        : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground border border-transparent"
                                                 )}
                                             >
                                                 {suggestion}
@@ -368,15 +390,15 @@ export function EditExpenseModal({
                                         className={cn(
                                             "w-full flex items-center justify-between p-4 rounded-xl transition-all",
                                             tempValue === option
-                                                ? "bg-cyber-cyan/20 border border-cyber-cyan/30"
-                                                : "bg-white/5 border border-white/10 hover:bg-white/10"
+                                                ? "bg-primary/20 border border-primary/30"
+                                                : "bg-muted border border-border hover:bg-muted/80"
                                         )}
                                     >
-                                        <span className={tempValue === option ? "text-cyber-cyan font-medium" : "text-white"}>
+                                        <span className={tempValue === option ? "text-primary font-medium" : "text-foreground"}>
                                             {option}
                                         </span>
                                         {tempValue === option && (
-                                            <Check className="w-5 h-5 text-cyber-cyan" />
+                                            <Check className="w-5 h-5 text-primary" />
                                         )}
                                     </button>
                                 ))}
@@ -386,10 +408,10 @@ export function EditExpenseModal({
                 </div>
 
                 {/* Confirm button */}
-                <div className="px-4 pb-8 pt-4 border-t border-white/10">
+                <div className="px-4 pb-8 pt-4 border-t border-border bg-muted/50">
                     <button
                         onClick={confirmEdit}
-                        className="w-full py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-cyber-cyan to-growth-green text-white active:scale-[0.98] transition-transform"
+                        className="w-full py-4 rounded-2xl font-bold text-lg bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all"
                     >
                         Done
                     </button>
@@ -406,30 +428,32 @@ export function EditExpenseModal({
         }
     }
 
+
+
     // ==========================================
     // MAIN MODAL - Review & Save Format (Popup)
     // ==========================================
     return (
         <div
-            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200"
             onClick={handleClose}
         >
             <div
-                className="w-full max-w-md bg-[#0A0A0A] rounded-3xl border border-white/10 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200"
+                className="w-full max-w-md bg-card rounded-3xl border border-border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 relative z-20">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30 relative z-20">
                     <div>
-                        <h1 className="text-base font-semibold text-white">
+                        <h1 className="text-base font-semibold text-foreground">
                             {isPreviewMode ? 'Edit Entry' : 'Edit Expense'}
                         </h1>
-                        <p className="text-xs text-secondary-text mt-0.5">Tap any field to edit</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Tap any field to edit</p>
                     </div>
 
                     <button
                         onClick={handleClose}
-                        className="p-2 -mr-2 text-secondary-text hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        className="p-2 -mr-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
                         aria-label="Close"
                     >
                         <X className="w-5 h-5" />
@@ -443,17 +467,17 @@ export function EditExpenseModal({
                             key={item.field}
                             onClick={() => startEditing(item.field, item.rawValue as string | number)}
                             className="w-full flex items-center justify-between p-4
-                         rounded-xl bg-white/5 border border-white/10
-                         hover:bg-white/10 hover:border-white/20
+                         rounded-xl bg-muted/30 border border-border/50
+                         hover:bg-muted/50 hover:border-border
                          transition-all duration-150 group active:scale-[0.99]"
                         >
-                            <span className="text-secondary-text text-sm font-medium">{item.label}</span>
+                            <span className="text-muted-foreground text-sm font-medium">{item.label}</span>
 
                             <div className="flex items-center gap-2">
-                                <span className={`font-semibold ${item.colorClass || 'text-white'}`}>
+                                <span className={`font-semibold ${item.colorClass || 'text-foreground'}`}>
                                     {item.value}
                                 </span>
-                                <span className="text-secondary-text/50 group-hover:text-cyber-cyan transition-colors text-sm">
+                                <span className="text-muted-foreground/50 group-hover:text-primary transition-colors text-sm">
                                     Edit
                                 </span>
                             </div>
@@ -462,15 +486,15 @@ export function EditExpenseModal({
                 </div>
 
                 {/* Footer Actions */}
-                <div className="p-4 border-t border-white/10 bg-white/5 flex flex-col gap-3 relative z-20">
+                <div className="p-4 border-t border-border bg-muted/30 flex flex-col gap-3 relative z-20">
                     <button
                         onClick={handleSave}
                         disabled={saving || !isValid}
                         className={cn(
                             "w-full py-3.5 rounded-xl font-bold text-lg transition-all duration-200 border-2",
                             saving || !isValid
-                                ? "bg-white/10 border-white/10 text-secondary-text cursor-not-allowed"
-                                : "bg-growth-green border-growth-green text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98]"
+                                ? "bg-muted border-input text-muted-foreground cursor-not-allowed"
+                                : "bg-primary border-primary text-primary-foreground shadow-sm hover:shadow-md active:scale-[0.98]"
                         )}
                     >
                         {saving ? 'Saving...' : 'Save Transaction'}
@@ -479,7 +503,7 @@ export function EditExpenseModal({
                     {onDelete && !isPreviewMode && (
                         <button
                             onClick={handleDelete}
-                            className="w-full py-3 rounded-xl text-sm font-medium text-laser-magenta/80 hover:text-laser-magenta hover:bg-laser-magenta/5 transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-3 rounded-xl text-sm font-medium text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-colors flex items-center justify-center gap-2"
                         >
                             <Trash2 className="w-4 h-4" />
                             Delete Transaction
@@ -487,7 +511,7 @@ export function EditExpenseModal({
                     )}
 
                     {!isValid && (
-                        <p className="text-xs text-alert-amber text-center font-medium">
+                        <p className="text-xs text-destructive text-center font-medium">
                             Amount, Category, and Target are required
                         </p>
                     )}

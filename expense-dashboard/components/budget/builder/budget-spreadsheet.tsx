@@ -95,7 +95,7 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, in
   const [isResizeActive, setIsResizeActive] = useState(false);
   const [isTotalFixed, setIsTotalFixed] = useState(true);
   const [alertModal, setAlertModal] = useState<AlertModalState | null>(null);
-  
+
   // Modal states
   const [tipsOpen, setTipsOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
@@ -111,7 +111,7 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, in
   const resizeStartXRef = useRef(0);
   const resizeStartWidthRef = useRef(0);
   const initialDataLoadedRef = useRef(false);
-  
+
   const startDate = useMemo(() => new Date(), []);
 
   // Load initial data if provided (for editing existing budget)
@@ -244,11 +244,10 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, in
                 setHasChanges(false);
               }}
               disabled={isLoading}
-              className={`p-2 rounded-full transition-all flex items-center justify-center ml-2 ${
-                  hasChanges 
-                      ? 'text-black bg-growth-green hover:bg-growth-green/90 shadow-[0_0_15px_rgba(34,197,94,0.3)]' 
-                      : 'text-slate-400 hover:text-white hover:bg-white/10'
-              }`}
+              className={`p-2 rounded-full transition-all flex items-center justify-center ml-2 ${hasChanges
+                  ? 'text-black bg-growth-green hover:bg-growth-green/90 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -433,9 +432,9 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, in
 
   return (
     <div className={`relative space-y-10 pb-48 ${isAnyModalOpen ? 'pointer-events-none select-none' : ''}`}>
-      
+
       {/* Fixed Header + Summary Card */}
-      <div className="fixed top-0 left-0 right-0 z-[90] bg-void-black/95 backdrop-blur-xl border-b border-white/5">
+      <div className="fixed top-0 left-0 right-0 z-[90] bg-background border-b border-border">
         {/* Header Bar */}
         <div className="flex flex-row items-center justify-between gap-4 px-4 py-2">
           <div className="flex items-center gap-4 w-auto max-w-[1600px] mx-auto flex-1">
@@ -448,7 +447,7 @@ export default function BudgetSpreadsheet({ onSave, isLoading, headerActions, in
             </div>
           </div>
         </div>
-        
+
         {/* Summary Card - Attached to header */}
         <div className="px-4 pb-4 max-w-[1600px] mx-auto">
           <SummaryCard

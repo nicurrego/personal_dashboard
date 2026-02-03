@@ -8,6 +8,7 @@ import { EditableExpenseTable } from '@/components/expenses';
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageSize, setPageSize] = useState(50);
   const [error, setError] = useState<string | null>(null);
 
   // Load expenses from API
@@ -105,26 +106,18 @@ export default function ExpensesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <Link href="/" className="text-secondary-text text-sm hover:text-white transition-colors mb-2 inline-block">
-              ← Back to Home
+            <Link href="/budget" className="text-secondary-text text-sm hover:text-white transition-colors mb-2 inline-block">
+              ← Back to Budget
             </Link>
-            <h1 className="text-3xl font-bold">Expenses Data</h1>
+            <h1 className="text-3xl font-bold">Transactions</h1>
             <p className="text-secondary-text text-sm mt-1">
-              Click on any row to edit • Double-click a cell for quick edit
+              Manage your transactions, import data, and search for records.
             </p>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <Link
-              href="/upload"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyber-cyan/20 to-growth-green/20 border border-cyber-cyan/30 text-cyber-cyan text-sm font-medium hover:from-cyber-cyan/30 hover:to-growth-green/30 transition-all"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              <span>Import CSV</span>
-            </Link>
+            {/* Import moved to bottom */}
           </div>
         </div>
 
@@ -156,9 +149,24 @@ export default function ExpensesPage() {
           onDelete={handleDelete}
           editable={true}
           showDelete={true}
-          pageSize={50}
-          title="All Expenses"
+          showDelete={true}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          title="All Transactions"
         />
+
+        {/* Bottom Actions */}
+        <div className="mt-8 flex justify-end">
+          <Link
+            href="/upload"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1B4034] border border-[#A9D9C7] text-[#A9D9C7] font-medium hover:bg-[#245244] transition-all shadow-lg"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Import data</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

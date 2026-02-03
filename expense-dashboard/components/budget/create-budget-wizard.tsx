@@ -28,37 +28,37 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
     async function loadExistingBudget() {
       try {
         const existingBudget = await getBudgetForEditing();
-        
+
         if (existingBudget && existingBudget.length > 0) {
           // Convert the budget rows to spreadsheet data format
           const spreadsheetData: Record<string, number> = {};
           const startDate = new Date();
           const startYear = startDate.getFullYear();
           const startMonth = startDate.getMonth() + 1; // 1-indexed
-          
+
           // Map category names to category IDs
           const allCats = [...DEFAULT_CATEGORIES, ...INCOME_CATEGORIES];
           const categoryNameToId = new Map<string, string>();
           allCats.forEach(cat => {
             categoryNameToId.set(cat.name.toLowerCase(), cat.id);
           });
-          
+
           existingBudget.forEach((row: ExistingBudgetRow) => {
             // Calculate the month index relative to start date
             const monthsDiff = (row.year - startYear) * 12 + (row.month - startMonth);
-            
+
             // Only include data for months within the editable range (0-11 for a 12-month budget)
             if (monthsDiff >= 0 && monthsDiff < 12) {
               // Find the category ID from the category name
               const catId = categoryNameToId.get(row.category.toLowerCase());
-              
+
               if (catId) {
                 const key = `${catId}-${monthsDiff}`;
                 spreadsheetData[key] = row.amount;
               }
             }
           });
-          
+
           setInitialData(spreadsheetData);
         }
       } catch (error) {
@@ -68,7 +68,7 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
         setInitialDataLoading(false);
       }
     }
-    
+
     loadExistingBudget();
   }, []);
 
@@ -76,7 +76,7 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
     try {
       setLoading(true);
       const { data } = payload;
-      
+
       const startDate = new Date();
       const rows: BudgetRow[] = [];
 
@@ -105,7 +105,7 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
       }
 
       await saveBudget(rows);
-      
+
       // Show success overlay instead of immediate redirect
       setShowSuccessOverlay(true);
 
@@ -126,8 +126,8 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
     return (
       <div className="min-h-screen bg-void-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
-          <p className="text-secondary-text text-sm">Loading your budget...</p>
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-muted-foreground text-sm">Loading your budget...</p>
         </div>
       </div>
     );
@@ -135,15 +135,15 @@ export default function CreateBudgetWizard({ headerActions }: { headerActions?: 
 
   return (
     <div className="space-y-6">
-      <BudgetSpreadsheet 
-        onSave={handleSave} 
-        isLoading={loading} 
+      <BudgetSpreadsheet
+        onSave={handleSave}
+        isLoading={loading}
         headerActions={headerActions}
         initialData={initialData}
       />
-      
+
       {/* Success Animation Overlay */}
-      <SaveSuccessOverlay 
+      <SaveSuccessOverlay
         isVisible={showSuccessOverlay}
         message="Budget Saved!"
         onComplete={handleSuccessComplete}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
-import { Edit } from 'lucide-react';
+import { Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Expense } from '@/types';
 import { EditableExpenseTable } from '@/components/expenses';
 
@@ -16,10 +16,10 @@ interface BudgetRow {
 }
 
 const TARGET_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Future: { bg: 'bg-growth-green/10', text: 'text-growth-green', border: 'border-growth-green' },
-  Living: { bg: 'bg-cyber-cyan/10', text: 'text-cyber-cyan', border: 'border-cyber-cyan' },
-  Present: { bg: 'bg-alert-amber/10', text: 'text-alert-amber', border: 'border-alert-amber' },
-  Income: { bg: 'bg-flux-violet/10', text: 'text-white', border: 'border-white/20' },
+  Future: { bg: 'bg-[var(--color-future)]/10', text: 'text-[var(--color-future)]', border: 'border-[var(--color-future)]' },
+  Living: { bg: 'bg-[var(--color-living)]/10', text: 'text-[var(--color-living)]', border: 'border-[var(--color-living)]' },
+  Present: { bg: 'bg-[var(--color-present)]/10', text: 'text-[var(--color-present)]', border: 'border-[var(--color-present)]' },
+  Income: { bg: 'bg-[var(--color-total)]/10', text: 'text-[var(--color-total)]', border: 'border-[var(--color-total)]/20' },
 };
 
 const TARGET_ORDER: TargetType[] = ['Future', 'Living', 'Present'];
@@ -28,10 +28,13 @@ export default function BudgetPage() {
   const [data, setData] = useState<BudgetRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
+
   const [expandedTargets, setExpandedTargets] = useState<Record<string, boolean>>({
-    Future: true,
-    Living: true,
-    Present: true,
+    Future: false,
+    Living: false,
+    Present: false,
   });
 
   // Expenses State
@@ -39,7 +42,6 @@ export default function BudgetPage() {
   const [expensesLoading, setExpensesLoading] = useState(true);
 
   // Load Budget Data
-
   useEffect(() => {
     async function loadData() {
       try {
@@ -124,9 +126,21 @@ export default function BudgetPage() {
   const dataYears = [...new Set(data.map(d => d.Year))].sort();
   const years = dataYears.length > 0 ? dataYears : [new Date().getFullYear()];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fullMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   const filteredData = data.filter(d => d.Year === selectedYear);
 
+  // Helper to get budget for a specific category
+  // Respects viewMode: if monthly, returns that month's val; if yearly, returns year sum.
+  const getCategoryBudget = (category: string) => {
+    const entries = filteredData.filter(d => d.Category === category);
+    if (viewMode === 'monthly') {
+      return entries.find(d => d.Month === selectedMonth + 1)?.Budget || 0;
+    }
+    return entries.reduce((sum, d) => sum + d.Budget, 0);
+  };
+
+  // For the Yearly table view - gets row data for all months
   const getCategoryRowData = (category: string) => {
     const row: Record<string, number> = {};
     months.forEach((_, idx) => {
@@ -139,17 +153,31 @@ export default function BudgetPage() {
   };
 
   const getTargetTotal = (target: string) => {
-    // If it's a standard target, use DEFAULT_CATEGORIES to ensure order, but also check data for custom ones?
-    // For now, rely on filteredData matching the target string.
     return filteredData
-      .filter(d => d.Target === target)
+      .filter(d => {
+        const targetMatch = d.Target === target;
+        if (viewMode === 'monthly') {
+          return targetMatch && d.Month === (selectedMonth + 1);
+        }
+        return targetMatch;
+      })
       .reduce((sum, d) => sum + d.Budget, 0);
   };
 
-  const formatCurrency = (val: number) => `¥${Math.round(val).toLocaleString()}`; // Removed decimals for cleaner look
+  const formatCurrency = (val: number) => `¥${Math.round(val).toLocaleString()}`;
 
   const toggleTarget = (target: string) => {
     setExpandedTargets(prev => ({ ...prev, [target]: !prev[target] }));
+  };
+
+  const handlePrevMonth = () => {
+    setSelectedMonth(prev => prev === 0 ? 11 : prev - 1);
+    if (selectedMonth === 0) setSelectedYear(prev => prev - 1);
+  };
+
+  const handleNextMonth = () => {
+    setSelectedMonth(prev => prev === 11 ? 0 : prev + 1);
+    if (selectedMonth === 11) setSelectedYear(prev => prev + 1);
   };
 
   // Calculations for Summary Cards
@@ -158,66 +186,79 @@ export default function BudgetPage() {
   const futureTotal = getTargetTotal('Future');
   const presentTotal = getTargetTotal('Present');
 
-  // Logic: 
-  // Fixed Costs = Living
-  // Discretionary Income = Total Income - Fixed Costs (If Income exists). 
-  // IF Income is 0 (not set), maybe assume Discretionary = Future + Present?
-  // Let's stick to the visual: "Available for categories".
   const fixedCosts = livingTotal;
+  // Discretionary calculation needs careful checking if Income is 0
   const discretionaryIncome = totalIncome > 0 ? (totalIncome - fixedCosts) : (futureTotal + presentTotal);
 
   // For Allocation bars:
   const allAllocationCategories = [
     ...DEFAULT_CATEGORIES.Future.map(c => ({ name: c, target: 'Future' })),
     ...DEFAULT_CATEGORIES.Present.map(c => ({ name: c, target: 'Present' })),
-    // Add Living too? Only if user wants to see all allocations. 
-    // The previous app showed allocations for discretionary spending usually.
-    // Let's show specific categories from Future & Present as "Allocations".
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-void-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyber-cyan"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-void-black text-white p-6 pb-32 page-ambient">
+    <div className="min-h-screen bg-background text-foreground p-6 pb-32">
       <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <Link href="/" className="text-secondary-text text-sm hover:text-white transition-colors mb-2 inline-block">
-              ← Back to Home
-            </Link>
-            <h1 className="text-3xl font-bold">Monthly Budget</h1>
-            <p className="text-secondary-text text-sm font-mono">{selectedYear} Plan</p>
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+          <div className="w-full md:w-auto flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">{viewMode === 'monthly' ? fullMonthNames[selectedMonth] : selectedYear}</h1>
+              <p className="text-muted-foreground text-sm font-mono">
+                {viewMode === 'monthly' ? `Budget • ${selectedYear}` : 'Annual Budget Plan'}
+              </p>
+            </div>
+
+            {/* View Switcher */}
+            <div className="flex bg-muted border border-border rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('monthly')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'monthly'
+                  ? 'bg-secondary text-secondary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                Month
+              </button>
+              <button
+                onClick={() => setViewMode('yearly')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'yearly'
+                  ? 'bg-secondary text-secondary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                Year
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* Year Selector */}
-            <div className="flex gap-2">
-              {years.map(year => (
-                <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedYear === year
-                    ? 'bg-kibo-teal text-kibo-bg'
-                    : 'bg-glass-surface text-secondary-text hover:bg-neutral-800'
-                    }`}
-                >
-                  {year}
+          <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+            {viewMode === 'monthly' && (
+              <div className="flex items-center gap-2 mr-2">
+                <button onClick={handlePrevMonth} className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground">
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-              ))}
-            </div>
+                <span className="text-sm font-mono min-w-[3ch] text-center hidden">{selectedMonth + 1}</span>
+                <button onClick={handleNextMonth} className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
 
             {/* Edit Budget Button */}
             <Link href="/budget/builder">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground">
                 <Edit className="w-4 h-4" />
-                Edit Budget
+                <span className="hidden sm:inline">Edit Plan</span>
+                <span className="sm:hidden">Edit</span>
               </button>
             </Link>
           </div>
@@ -226,46 +267,45 @@ export default function BudgetPage() {
         {/* Pro Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Discretionary Income */}
-          <div className="glass-premium rounded-xl p-5 hover-lift card-glow-future relative overflow-hidden">
-            <div className="highlight-shine" />
-            <p className="text-sm font-medium text-secondary-text mb-1">Discretionary Income</p>
-            <div className="text-2xl font-bold text-growth-green">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden">
+            <p className="text-sm font-medium text-muted-foreground mb-1">Discretionary Income</p>
+            <div className="text-2xl font-bold text-[var(--color-future)]">
               {formatCurrency(discretionaryIncome)}
             </div>
-            <p className="text-xs text-secondary-text mt-1">Available for Future & Present</p>
+            <p className="text-xs text-muted-foreground mt-1">Available for Future & Present</p>
           </div>
 
           {/* Total Income */}
-          <div className="glass-premium rounded-xl p-5 hover-lift card-glow-income relative overflow-hidden">
-            <div className="highlight-shine" />
-            <p className="text-sm font-medium text-secondary-text mb-1">Total Income</p>
-            <div className="text-2xl font-bold text-white">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden">
+            <p className="text-sm font-medium text-muted-foreground mb-1">Total Income</p>
+            <div className="text-2xl font-bold text-[var(--color-total)]">
               {formatCurrency(totalIncome > 0 ? totalIncome : (fixedCosts + discretionaryIncome))}
             </div>
-            <p className="text-xs text-secondary-text mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {totalIncome > 0 ? 'Based on Income Budget' : 'Sum of all Expenses'}
             </p>
           </div>
 
           {/* Fixed Costs */}
-          <div className="glass-premium rounded-xl p-5 hover-lift card-glow-present relative overflow-hidden">
-            <div className="highlight-shine" />
-            <p className="text-sm font-medium text-secondary-text mb-1">Fixed Costs</p>
-            <div className="text-2xl font-bold text-alert-amber">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden">
+            <p className="text-sm font-medium text-muted-foreground mb-1">Fixed Costs</p>
+            <div className="text-2xl font-bold text-[var(--color-present)]">
               {formatCurrency(fixedCosts)}
             </div>
-            <p className="text-xs text-secondary-text mt-1">Living Expenses</p>
+            <p className="text-xs text-muted-foreground mt-1">Living Expenses</p>
           </div>
         </div>
 
         {/* Category Allocations Summary */}
-        <div className="glass-premium rounded-xl p-6 relative overflow-hidden shimmer-effect">
-          <h2 className="text-xl font-bold mb-1">Category Allocations</h2>
-          <p className="text-secondary-text text-sm mb-6">Annual planned spending by category (Future & Present)</p>
+        <div className="bg-card border border-border rounded-xl p-6 relative overflow-hidden shadow-sm">
+          <h2 className="text-xl font-bold mb-1 text-foreground">Category Allocations</h2>
+          <p className="text-muted-foreground text-sm mb-6">
+            {viewMode === 'monthly' ? 'Monthly' : 'Annual'} planned spending by category
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
             {allAllocationCategories.map(({ name, target }) => {
-              const total = getCategoryRowData(name).Total;
+              const total = getCategoryBudget(name); // Use helper that respects viewMode
               if (total === 0) return null;
 
               // Calculate percent of Discretionary
@@ -278,9 +318,9 @@ export default function BudgetPage() {
                     <span className={colors.text}>{name}</span>
                     <span className="font-mono">{formatCurrency(total)}</span>
                   </div>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className={`h-2 w-full ${colors.bg} rounded-full overflow-hidden`}>
                     <div
-                      className={`h-full ${target === 'Future' ? 'bg-growth-green' : 'bg-alert-amber'}`}
+                      className={`h-full ${target === 'Future' ? 'bg-[var(--color-future)]' : 'bg-[var(--color-present)]'}`}
                       style={{ width: `${Math.min(percent, 100)}%` }}
                     />
                   </div>
@@ -290,16 +330,16 @@ export default function BudgetPage() {
           </div>
         </div>
 
-        {/* Detailed Breakdown (Tables) */}
+        {/* Detailed Breakdown */}
         <div className="space-y-6">
-          <h2 className="text-xl font-bold pt-4">Monthly Breakdown</h2>
+          <h2 className="text-xl font-bold pt-4">{viewMode === 'monthly' ? 'Category Details' : 'Yearly Overview'}</h2>
           {TARGET_ORDER.map((target) => {
             const categories = DEFAULT_CATEGORIES[target];
             const colors = TARGET_COLORS[target];
             const isExpanded = expandedTargets[target];
 
             return (
-              <div key={target} className={`liquid-card overflow-hidden border-l-4 ${colors.border}`}>
+              <div key={target} className={`bg-card overflow-hidden border-l-4 rounded-xl shadow-sm my-2 ${colors.border}`}>
                 {/* Target Header */}
                 <button
                   onClick={() => toggleTarget(target)}
@@ -307,7 +347,7 @@ export default function BudgetPage() {
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-xl font-bold ${colors.text}`}>{target}</span>
-                    <span className="text-secondary-text text-sm">({categories.length} categories)</span>
+                    <span className="text-muted-foreground text-sm">({categories.length} categories)</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className={`font-mono font-bold ${colors.text}`}>
@@ -322,44 +362,73 @@ export default function BudgetPage() {
                 {/* Table */}
                 {isExpanded && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left p-3 text-secondary-text font-medium sticky left-0 bg-glass-surface z-10 min-w-[200px]">
-                            Category
-                          </th>
-                          {months.map(m => (
-                            <th key={m} className="text-right p-3 text-secondary-text font-medium min-w-[80px]">{m}</th>
-                          ))}
-                          <th className={`text-right p-3 font-bold ${colors.text} min-w-[100px]`}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {categories.map((category, i) => {
-                          const rowData = getCategoryRowData(category);
-                          const isZeroRow = rowData.Total === 0;
+                    {viewMode === 'monthly' ? (
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-left p-3 text-muted-foreground font-medium bg-card">Category</th>
+                            <th className={`text-right p-3 font-bold ${colors.text}`}>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {categories.map((category, i) => {
+                            const budget = getCategoryBudget(category);
+                            if (budget === 0) return null; // Hide zero items in list view? Or keep them? Let's keep consistent with existing
+                            // existing code kept zero items. But cleaner to hide if 0?
+                            // Let's keep all for now to show structure.
 
-                          return (
-                            <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${isZeroRow ? 'opacity-60 hover:opacity-100' : ''}`}>
-                              <td className="p-3 font-medium sticky left-0 bg-card-surface/80 backdrop-blur-sm">
-                                {category}
-                              </td>
-                              {months.map(m => {
-                                const val = rowData[m];
-                                return (
-                                  <td key={m} className={`text-right p-3 font-mono text-xs ${val === 0 ? 'text-secondary-text/30' : 'text-secondary-text'}`}>
-                                    {val === 0 ? '-' : formatCurrency(val)}
-                                  </td>
-                                );
-                              })}
-                              <td className={`text-right p-3 font-mono font-bold ${colors.text} ${rowData.Total === 0 ? 'opacity-50' : ''}`}>
-                                {formatCurrency(rowData.Total)}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                            return (
+                              <tr key={i} className="border-b border-border hover:bg-muted/30 transition-colors">
+                                <td className="p-3 font-medium text-foreground">{category}</td>
+                                <td className={`text-right p-3 font-mono font-bold ${budget === 0 ? 'opacity-30' : ''} ${colors.text}`}>
+                                  {formatCurrency(budget)}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      /* YEARLY VIEW TABLE (Existing) */
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-left p-3 text-muted-foreground font-medium sticky left-0 bg-card z-10 min-w-[200px]">
+                              Category
+                            </th>
+                            {months.map(m => (
+                              <th key={m} className="text-right p-3 text-muted-foreground font-medium min-w-[80px]">{m}</th>
+                            ))}
+                            <th className={`text-right p-3 font-bold ${colors.text} min-w-[100px]`}>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {categories.map((category, i) => {
+                            const rowData = getCategoryRowData(category);
+                            const isZeroRow = rowData.Total === 0;
+
+                            return (
+                              <tr key={i} className={`border-b border-border hover:bg-muted/30 transition-colors ${isZeroRow ? 'opacity-60 hover:opacity-100' : ''}`}>
+                                <td className="p-3 font-medium sticky left-0 bg-card">
+                                  {category}
+                                </td>
+                                {months.map(m => {
+                                  const val = rowData[m];
+                                  return (
+                                    <td key={m} className={`text-right p-3 font-mono text-xs ${val === 0 ? 'text-muted-foreground/30' : 'text-muted-foreground'}`}>
+                                      {val === 0 ? '-' : formatCurrency(val)}
+                                    </td>
+                                  );
+                                })}
+                                <td className={`text-right p-3 font-mono font-bold ${colors.text} ${rowData.Total === 0 ? 'opacity-50' : ''}`}>
+                                  {formatCurrency(rowData.Total)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 )}
               </div>
@@ -369,31 +438,26 @@ export default function BudgetPage() {
       </div>
 
       {/* Expenses Section */}
-      <div className="pt-8 border-t border-white/10">
+      <div className="pt-8 border-t border-border">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold">All Expenses</h2>
-            <p className="text-secondary-text text-sm mt-1">Manage your transactions</p>
-          </div>
+          <h2 className="text-xl font-bold">Transactions</h2>
           <Link
-            href="/upload"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-kibo-teal/10 border border-kibo-teal/30 text-kibo-teal text-sm font-medium hover:bg-kibo-teal/20 transition-all"
+            href="/expenses"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-border text-foreground text-sm font-medium hover:bg-muted/80 transition-all"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            <span>Import CSV</span>
+            <span>See all</span>
           </Link>
         </div>
 
         <EditableExpenseTable
-          expenses={expenses}
+          expenses={expenses.slice(0, 10)}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
           editable={true}
           showDelete={true}
-          pageSize={20}
+          pageSize={10}
           title=""
+          showSearch={false}
         />
       </div>
     </div>

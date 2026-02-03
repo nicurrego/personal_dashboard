@@ -69,50 +69,47 @@ export function BudgetSection({
 }: BudgetSectionProps) {
   const getBorderClass = () => {
     switch (groupKey) {
-      case 'INCOME': return 'border-flux-violet/30';
-      case 'FUTURE': return 'border-growth-green/30';
-      case 'LIVING': return 'border-cyber-cyan/30';
-      case 'PRESENT': return 'border-alert-amber/30';
-      default: return 'border-white/10';
-    }
-  };
-  
-  const getSectionGradient = () => {
-    switch (groupKey) {
-      case 'INCOME': return 'linear-gradient(90deg, rgba(139,92,246,0.2) 0%, transparent 100%)';
-      case 'FUTURE': return 'linear-gradient(90deg, rgba(34,197,94,0.2) 0%, transparent 100%)';
-      case 'LIVING': return 'linear-gradient(90deg, rgba(6,182,212,0.2) 0%, transparent 100%)';
-      case 'PRESENT': return 'linear-gradient(90deg, rgba(245,158,11,0.2) 0%, transparent 100%)';
-      default: return 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%)';
+      case 'INCOME': return 'border-l-[var(--color-total)]';
+      case 'FUTURE': return 'border-l-[var(--color-future)]';
+      case 'LIVING': return 'border-l-[var(--color-living)]';
+      case 'PRESENT': return 'border-l-[var(--color-present)]';
+      default: return 'border-l-border';
     }
   };
 
-  const bgClass = groupKey === 'INCOME' 
-    ? 'bg-gradient-to-r from-cyber-cyan/20 to-flux-violet/20'
-    : `bg-${groupKey.toLowerCase()}-green/20`;
-  
+  const getHeaderBgClass = () => {
+    switch (groupKey) {
+      case 'INCOME': return 'bg-[var(--color-total)]/10 text-[var(--color-total)]';
+      case 'FUTURE': return 'bg-[var(--color-future)]/10 text-[var(--color-future)]';
+      case 'LIVING': return 'bg-[var(--color-living)]/10 text-[var(--color-living)]';
+      case 'PRESENT': return 'bg-[var(--color-present)]/10 text-[var(--color-present)]';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const bgClass = 'bg-card';
+
   return (
     <Collapsible
       open={!isCollapsed}
       onOpenChange={onToggleCollapse}
-      className={`border ${getBorderClass()} rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl transition-all duration-300`}
+      className={`border border-border rounded-xl overflow-hidden shadow-sm transition-all duration-300 bg-card ${getBorderClass()} border-l-4`}
     >
       <CollapsibleTrigger asChild>
         <div
-          className="p-4 flex items-center justify-between cursor-pointer hover:brightness-125 transition-all border-b border-white/5"
-          style={{ background: getSectionGradient() }}
+          className={`p-4 flex items-center justify-between cursor-pointer hover:opacity-80 transition-all border-b border-border ${getHeaderBgClass()}`}
         >
           <div className="flex items-center gap-2">
             {isCollapsed ? (
-              <ChevronRight className={`h-5 w-5 ${colorClass}`} />
+              <ChevronRight className="h-5 w-5" />
             ) : (
-              <ChevronDown className={`h-5 w-5 ${colorClass}`} />
+              <ChevronDown className="h-5 w-5" />
             )}
-            <span className={`font-bold text-sm tracking-wider uppercase ${colorClass}`}>{title}</span>
+            <span className="font-bold text-sm tracking-wider uppercase">{title}</span>
           </div>
         </div>
       </CollapsibleTrigger>
-      
+
       <CollapsibleContent>
         <div
           className="overflow-x-auto lg:scrollbar-thin lg:scrollbar-thumb-slate-700 lg:scrollbar-track-transparent mobile-scrollbar-hide"
@@ -123,22 +120,22 @@ export function BudgetSection({
             <thead>
               <tr>
                 <th
-                  className={`p-3 text-left sticky left-0 bg-slate-950 z-10 border-b border-white/10 group/header transition-all duration-75 relative cursor-pointer hover:bg-white/5 shadow-[2px_0_8px_rgba(0,0,0,0.3)] ${isResizeActive ? 'bg-white/5 border-r border-blue-500/50' : ''}`}
+                  className={`p-3 text-left sticky left-0 bg-card z-10 border-b border-border group/header transition-all duration-75 relative cursor-pointer hover:bg-muted/50 shadow-[2px_0_8px_rgba(0,0,0,0.05)] ${isResizeActive ? 'bg-muted/50 border-r border-primary/50' : ''}`}
                   style={{ width: categoryColWidth, minWidth: categoryColWidth, maxWidth: categoryColWidth }}
                   onClick={() => { onResizeToggle(); triggerHaptic(); }}
                 >
                   <div className={`flex items-center w-full overflow-hidden ${categoryColWidth < 100 ? 'justify-center' : 'justify-between'}`}>
                     {categoryColWidth >= 100 && (
-                      <span className="truncate select-none font-bold text-slate-400 group-hover/header:text-white transition-colors">Category</span>
+                      <span className="truncate select-none font-bold text-muted-foreground group-hover/header:text-foreground transition-colors">Category</span>
                     )}
                     <button
                       onClick={(e) => { e.stopPropagation(); onEditingCategoriesToggle(); triggerHaptic(); }}
-                      className={`p-1.5 rounded transition-colors flex-shrink-0 ${categoryColWidth >= 100 ? 'ml-1' : ''} ${isEditingCategories ? 'bg-white/20 text-white' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
+                      className={`p-1.5 rounded transition-colors flex-shrink-0 ${categoryColWidth >= 100 ? 'ml-1' : ''} ${isEditingCategories ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  
+
                   {isResizeActive && (
                     <div
                       className="absolute top-0 right-0 h-full w-8 cursor-col-resize z-50 translate-x-1/2 touch-none flex items-center justify-center group/resizer"
@@ -150,7 +147,7 @@ export function BudgetSection({
                     </div>
                   )}
                 </th>
-                
+
                 {columns.map(col => (
                   <ColumnHeader
                     key={col.index}
@@ -159,13 +156,13 @@ export function BudgetSection({
                     onToggleVisibility={() => onToggleColumnVisibility(col.index)}
                   />
                 ))}
-                
-                <th className={`p-4 text-center font-bold text-white bg-slate-900 w-[140px] min-w-[140px] lg:w-[120px] lg:min-w-[120px] border-b border-white/10 border-l border-white/5 select-none ${isTotalFixed ? 'sticky right-0 drop-shadow-2xl z-20' : ''}`}>
+
+                <th className={`p-4 text-center font-bold text-foreground bg-muted/50 w-[140px] min-w-[140px] lg:w-[120px] lg:min-w-[120px] border-b border-border border-l border-border/50 select-none ${isTotalFixed ? 'sticky right-0 drop-shadow-sm z-20' : ''}`}>
                   Total
                 </th>
               </tr>
             </thead>
-            
+
             <tbody>
               {categories.map((cat) => (
                 <CategoryRow
@@ -184,30 +181,30 @@ export function BudgetSection({
                   onToggleAutoComplete={() => onToggleRowAutoComplete(cat.id)}
                 />
               ))}
-              
+
               {isEditingCategories && (
                 <tr className="h-8">
-                  <td className="p-0 sticky left-0 bg-slate-950 z-10 border-r border-white/10 align-middle">
+                  <td className="p-0 sticky left-0 bg-card z-10 border-r border-border align-middle">
                     <div className="flex justify-center w-full">
                       <button
                         onClick={onAddCategorySelect}
-                        className={`flex items-center justify-center font-bold transition-colors uppercase rounded-full p-1.5 w-7 h-7 ${selectedCell?.type === 'add-category' && selectedCell.group === groupKey ? 'bg-purple-500 text-black ring-2 ring-white/20' : 'bg-white/5 text-slate-500 hover:text-white border border-white/5 hover:border-white/20'}`}
+                        className={`flex items-center justify-center font-bold transition-colors uppercase rounded-full p-1.5 w-7 h-7 ${selectedCell?.type === 'add-category' && selectedCell.group === groupKey ? 'bg-primary text-primary-foreground ring-2 ring-ring' : 'bg-muted text-muted-foreground hover:text-foreground border border-border hover:border-border/80'}`}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
                   {columns.map((col) => (
-                    <td key={`spacer-${col.index}`} className="p-0 border-l border-white/5" />
+                    <td key={`spacer-${col.index}`} className="p-0 border-l border-border" />
                   ))}
-                  <td className={`p-0 border-l border-white/10 bg-slate-950 ${isTotalFixed ? 'sticky right-0' : ''}`} />
+                  <td className={`p-0 border-l border-border bg-card ${isTotalFixed ? 'sticky right-0' : ''}`} />
                 </tr>
               )}
-              
+
               {/* Section Subtotal */}
-              <tr className={`${bgClass}/20 border-t border-white/5 font-medium`}>
+              <tr className="bg-muted/30 border-t border-border font-medium">
                 <td
-                  className={`p-3 px-4 ${colorClass} sticky left-0 bg-slate-950 z-10 border-r border-white/10 text-right transition-all duration-75`}
+                  className="p-3 px-4 text-muted-foreground sticky left-0 bg-card z-10 border-r border-border text-right transition-all duration-75"
                   style={{ width: categoryColWidth, minWidth: categoryColWidth, maxWidth: categoryColWidth }}
                 >
                   <div className="truncate w-full">
@@ -217,14 +214,14 @@ export function BudgetSection({
                 {columns.map((col) => {
                   const val = calculateGroupTotal(col.index, col.span);
                   const isHidden = hiddenColumnIndices.includes(col.index);
-                  if (isHidden) return <td key={col.index} className="p-0 w-2 min-w-[8px] bg-slate-950" />;
+                  if (isHidden) return <td key={col.index} className="p-0 w-2 min-w-[8px] bg-card" />;
                   return (
-                    <td key={col.index} className={`p-2 text-right ${colorClass} border-l border-white/5 font-mono bg-slate-900 w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px]`}>
+                    <td key={col.index} className="p-2 text-right text-foreground border-l border-border/50 font-mono bg-muted/30 w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px]">
                       <span className="truncate block w-full">{formatMoney(val)}</span>
                     </td>
                   );
                 })}
-                <td className={`p-2 text-right font-bold ${colorClass} border-l border-white/10 bg-slate-900 w-[140px] min-w-[140px] lg:w-[120px] lg:min-w-[120px] ${isTotalFixed ? 'sticky right-0 drop-shadow-2xl z-10' : ''}`}>
+                <td className={`p-2 text-right font-bold text-foreground border-l border-border bg-muted/50 w-[140px] min-w-[140px] lg:w-[120px] lg:min-w-[120px] ${isTotalFixed ? 'sticky right-0 drop-shadow-sm z-10' : ''}`}>
                   {formatMoney(columns.reduce((acc, col) => acc + calculateGroupTotal(col.index, col.span), 0))}
                 </td>
               </tr>
@@ -250,19 +247,19 @@ function ColumnHeader({
     return (
       <th
         key={col.index}
-        className="p-0 w-2 min-w-[8px] bg-slate-950 cursor-pointer hover:bg-slate-800 transition-colors border-r border-white/5 relative group"
+        className="p-0 w-2 min-w-[8px] bg-card cursor-pointer hover:bg-muted transition-colors border-r border-border relative group"
         onClick={onToggleVisibility}
         title={`Show ${col.label}`}
       >
-        <div className="absolute inset-y-0 left-1/2 w-[2px] bg-slate-600 group-hover:bg-purple-500 rounded-full" />
+        <div className="absolute inset-y-0 left-1/2 w-[2px] bg-muted-foreground group-hover:bg-primary rounded-full" />
       </th>
     );
   }
-  
+
   return (
     <th
       key={col.index}
-      className="p-4 text-center font-medium text-slate-300 bg-slate-900 w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px] border-b border-white/10 border-l border-white/5 select-none relative group"
+      className="p-4 text-center font-medium text-muted-foreground bg-muted/50 w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px] border-b border-border border-l border-border/50 select-none relative group"
       onContextMenu={(e) => {
         e.preventDefault();
         onToggleVisibility();
@@ -272,7 +269,7 @@ function ColumnHeader({
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={onToggleVisibility}
-          className="text-slate-500 hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <EyeOff className="h-3 w-3" />
         </button>
@@ -309,7 +306,7 @@ function CategoryRow({
   isAutoComplete: boolean;
   onToggleAutoComplete: () => void;
 }) {
-  const [editingCell, setEditingCell] = useState<{colIndex: number, startVal: string} | null>(null);
+  const [editingCell, setEditingCell] = useState<{ colIndex: number, startVal: string } | null>(null);
 
   // Global keydown handler for "Type to Edit" behavior
   useEffect(() => {
@@ -336,7 +333,7 @@ function CategoryRow({
           colIndex: col.index,
           startVal: e.key
         });
-      } 
+      }
       // Enter: Start editing with current value
       else if (e.key === 'Enter') {
         e.preventDefault();
@@ -369,15 +366,15 @@ function CategoryRow({
     // However, if the user typed "7", startVal is "7", and they hit enter, val is "7".
     // We should save it.
     if (val !== undefined) {
-       onValueChange(category.id, colIndex, span, val);
+      onValueChange(category.id, colIndex, span, val);
     }
     setEditingCell(null);
   };
 
   return (
-    <tr className="group hover:bg-white/[0.02] transition-colors">
+    <tr className="group hover:bg-muted/50 transition-colors">
       <td
-        className="p-3 px-4 text-slate-300 sticky left-0 bg-slate-950 z-10 group-hover:bg-slate-900 transition-colors border-r border-white/10 pl-2 transition-all duration-75 relative"
+        className="p-3 px-4 text-muted-foreground sticky left-0 bg-card z-10 group-hover:bg-muted/50 transition-colors border-r border-border pl-2 transition-all duration-75 relative"
         style={{ width: categoryColWidth, minWidth: categoryColWidth, maxWidth: categoryColWidth }}
       >
         <div className="flex items-center w-full overflow-hidden gap-1">
@@ -388,33 +385,32 @@ function CategoryRow({
                 e.stopPropagation();
                 onToggleAutoComplete();
               }}
-              className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                isAutoComplete 
-                  ? 'bg-purple-500 border-purple-500 text-black' 
-                  : 'border-slate-500 hover:border-slate-400'
-              }`}
+              className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAutoComplete
+                  ? 'bg-primary border-primary text-primary-foreground'
+                  : 'border-muted-foreground hover:border-foreground'
+                }`}
               title={isAutoComplete ? "Auto-fill enabled: first column value fills all" : "Auto-fill disabled: each column is independent"}
             >
               {isAutoComplete && <Check className="w-3 h-3" />}
             </button>
           )}
-          
+
           <Popover>
             <PopoverTrigger asChild>
               <button
-                className="text-left flex items-center hover:bg-white/5 rounded transition-colors truncate p-1.5 flex-1 min-w-0"
+                className="text-left flex items-center hover:bg-muted rounded transition-colors truncate p-1.5 flex-1 min-w-0"
                 onClick={triggerHaptic}
               >
-                <span className="font-bold text-white truncate text-sm">
+                <span className="font-bold text-foreground truncate text-sm">
                   {category.emoji} {category.word}
                 </span>
               </button>
             </PopoverTrigger>
-            <PopoverContent side="right" className="w-auto py-2 px-3 bg-zinc-900 border-white/10 shadow-2xl">
-              <span className="text-sm font-bold text-white">{category.word}</span>
+            <PopoverContent side="right" className="w-auto py-2 px-3 bg-popover border-border shadow-md">
+              <span className="text-sm font-bold text-foreground">{category.word}</span>
             </PopoverContent>
           </Popover>
-          
+
           {isEditingCategories && (
             <div className="flex-shrink-0">
               <button
@@ -427,7 +423,7 @@ function CategoryRow({
                     value: category.emoji ? `${category.emoji} ${category.word}` : category.word
                   });
                 }}
-                className="text-purple-500 p-1.5 hover:scale-110 transition-transform bg-white/10 rounded-full shadow-lg"
+                className="text-primary p-1.5 hover:scale-110 transition-transform bg-primary/10 rounded-full shadow-sm"
               >
                 <Pencil className="w-3.5 h-3.5" />
               </button>
@@ -435,25 +431,25 @@ function CategoryRow({
           )}
         </div>
       </td>
-      
+
       {columns.map((col) => {
         const isHidden = hiddenColumnIndices.includes(col.index);
         if (isHidden) {
           return (
-            <td key={col.index} className="p-0 w-2 min-w-[8px] bg-slate-900/50 border-r border-white/5 relative group">
-              <div className="absolute inset-y-0 left-1/2 w-[1px] bg-slate-800 group-hover:bg-slate-700" />
+            <td key={col.index} className="p-0 w-2 min-w-[8px] bg-muted/30 border-r border-border relative group">
+              <div className="absolute inset-y-0 left-1/2 w-[1px] bg-border group-hover:bg-muted-foreground" />
             </td>
           );
         }
-        
+
         const value = getCellValue(category.id, col.index, col.span);
         const isSelected = selectedCell?.id === category.id && selectedCell?.colIndex === col.index;
         const isEditing = editingCell?.colIndex === col.index;
-        
+
         return (
-          <td key={col.index} className={`p-1 border-l border-white/5 bg-transparent w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px] relative ${isSelected || isEditing ? 'z-20' : ''}`}>
-             <div className={`w-full h-full rounded-lg overflow-hidden transition-all relative group/cell min-h-[44px] lg:min-h-[32px] flex items-center ${isSelected ? 'ring-2 ring-purple-500 bg-white/10' : ''}`} data-selected={isSelected ? 'true' : undefined}>
-              
+          <td key={col.index} className={`p-1 border-l border-border/50 bg-transparent w-[140px] min-w-[140px] lg:w-[105px] lg:min-w-[105px] relative ${isSelected || isEditing ? 'z-20' : ''}`}>
+            <div className={`w-full h-full rounded-lg overflow-hidden transition-all relative group/cell min-h-[44px] lg:min-h-[32px] flex items-center ${isSelected ? 'ring-2 ring-primary bg-primary/10' : ''}`} data-selected={isSelected ? 'true' : undefined}>
+
               {isEditing ? (
                 <DesktopInlineEdit
                   value={editingCell.startVal}
@@ -492,31 +488,31 @@ function CategoryRow({
                           startVal: e.key // Start with the typed character
                         });
                       } else if (e.key === 'Enter') {
-                         e.preventDefault();
-                         setEditingCell({
+                        e.preventDefault();
+                        setEditingCell({
                           colIndex: col.index,
                           startVal: value > 0 ? value.toString() : ""
                         });
                       } else if (e.key === 'Backspace' || e.key === 'Delete') {
-                         setEditingCell({
+                        setEditingCell({
                           colIndex: col.index,
                           startVal: "" // Clear value
                         });
                       }
                     }}
-                    className="w-full h-full text-right p-3 lg:p-1.5 font-mono text-white hover:bg-white/5 transition-colors whitespace-nowrap block text-sm lg:text-xs focus:outline-none focus:bg-white/10 rounded-lg"
+                    className="w-full h-full text-right p-3 lg:p-1.5 font-mono text-foreground hover:bg-muted/50 transition-colors whitespace-nowrap block text-sm lg:text-xs focus:outline-none focus:bg-muted rounded-lg"
                   >
-                    {value > 0 ? formatMoney(value) : <span className="text-slate-700">—</span>}
+                    {value > 0 ? formatMoney(value) : <span className="text-muted-foreground/50">—</span>}
                   </button>
 
                   <div className="hidden lg:block pointer-events-none">
-                     <DesktopCellOverlay
-                        onEdit={() => setEditingCell({
-                          colIndex: col.index,
-                          startVal: value > 0 ? value.toString() : ""
-                        })}
-                        className="rounded-lg"
-                     />
+                    <DesktopCellOverlay
+                      onEdit={() => setEditingCell({
+                        colIndex: col.index,
+                        startVal: value > 0 ? value.toString() : ""
+                      })}
+                      className="rounded-lg"
+                    />
                   </div>
                 </>
               )}
@@ -524,8 +520,8 @@ function CategoryRow({
           </td>
         );
       })}
-      
-      <td className={`p-2 text-right font-bold text-white border-l border-white/10 bg-slate-900 w-[140px] min-w-[140px] ${isTotalFixed ? 'sticky right-0 drop-shadow-2xl z-10' : ''}`}>
+
+      <td className={`p-2 text-right font-bold text-foreground border-l border-border bg-muted/50 w-[140px] min-w-[140px] ${isTotalFixed ? 'sticky right-0 drop-shadow-sm z-10' : ''}`}>
         {formatMoney(columns.reduce((acc, col) => acc + getCellValue(category.id, col.index, col.span), 0))}
       </td>
     </tr>

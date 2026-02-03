@@ -50,22 +50,21 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
   };
 
   return (
-    <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-6 sm:px-10 pt-8 pb-8 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
-      {/* Ambient Background Glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2 opacity-100" />
+    <div className="bg-card border border-border px-6 sm:px-10 pt-8 pb-8 rounded-[1.5rem] shadow-sm overflow-hidden">
+      {/* Ambient Background Glow - Removed for minimalist solid style */}
 
       <div className="relative z-10 flex flex-row items-center justify-between gap-4 h-full">
         {/* LEFT SIDE: Cash Flow & Percentages - Opens Explanation Modal */}
-        <div 
+        <div
           className="flex flex-col gap-2 w-1/2 cursor-pointer"
           onClick={(e) => { e.stopPropagation(); handleExplanationOpen(); }}
         >
-          <span className="text-slate-400 font-medium text-sm uppercase tracking-wider">
+          <span className="text-muted-foreground font-medium text-sm uppercase tracking-wider">
             Net Cash Flow
           </span>
 
-          <span className={`font-bold font-mono tracking-tighter text-white hover:opacity-80 block truncate ${getSummaryFontSize()}`}>
-            <span className={isPositive ? "text-white" : "text-red-500"}>
+          <span className={`font-bold font-mono tracking-tighter text-foreground hover:opacity-80 block truncate ${getSummaryFontSize()}`}>
+            <span className={isPositive ? "text-foreground" : "text-destructive"}>
               {cashFlowVal === 0 ? "$0" : cashFlowStr}
             </span>
           </span>
@@ -79,7 +78,7 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
         </div>
 
         {/* RIGHT SIDE: Dynamic Chart - Opens Graph Modal */}
-        <div 
+        <div
           className="flex items-center justify-center cursor-pointer w-1/2"
           onClick={(e) => { e.stopPropagation(); handleGraphOpen(); }}
         >
@@ -87,17 +86,17 @@ export function SummaryCard({ totals, onExplanationOpen, onGraphOpen, selectedCh
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 w-full">
               {/* Chart 1: D3 Allocation Donut */}
               <div className="h-24">
-                 <BudgetDonutD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                <BudgetDonutD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
               {/* Chart 2: D3 Income vs Expenses (Bar) */}
               <div className="h-24 hidden lg:block">
-                 <BudgetBarD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                <BudgetBarD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
               {/* Chart 3: D3 Projection (Area) - Visible on XL screens */}
               <div className="h-24 hidden xl:block">
-                 <BudgetProjectionD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
+                <BudgetProjectionD3 totals={totals} size="small" monthlyNetCashFlow={cashFlowVal} />
               </div>
-             </div>
+            </div>
           </div>
         </div>
       </div>
