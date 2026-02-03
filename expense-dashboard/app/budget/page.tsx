@@ -241,8 +241,17 @@ export default function BudgetPage() {
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+            {/* Edit Budget Button - Placed First */}
+            <Link href="/budget/builder">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground">
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit Plan</span>
+                <span className="sm:hidden">Edit</span>
+              </button>
+            </Link>
+
             {viewMode === 'monthly' && (
-              <div className="flex items-center gap-2 mr-2">
+              <div className="flex items-center gap-2">
                 <button onClick={handlePrevMonth} className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground">
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -252,15 +261,6 @@ export default function BudgetPage() {
                 </button>
               </div>
             )}
-
-            {/* Edit Budget Button */}
-            <Link href="/budget/builder">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground">
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit Plan</span>
-                <span className="sm:hidden">Edit</span>
-              </button>
-            </Link>
           </div>
         </div>
 
@@ -269,7 +269,7 @@ export default function BudgetPage() {
           {/* Discretionary Income */}
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground mb-1">Discretionary Income</p>
-            <div className="text-2xl font-bold text-[var(--color-future)]">
+            <div className="text-2xl font-bold text-[var(--color-total)]">
               {formatCurrency(discretionaryIncome)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Available for Future & Present</p>
@@ -289,7 +289,7 @@ export default function BudgetPage() {
           {/* Fixed Costs */}
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm relative overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground mb-1">Fixed Costs</p>
-            <div className="text-2xl font-bold text-[var(--color-present)]">
+            <div className="text-2xl font-bold text-[var(--color-living)]">
               {formatCurrency(fixedCosts)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Living Expenses</p>
@@ -315,10 +315,10 @@ export default function BudgetPage() {
               return (
                 <div key={name} className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
-                    <span className={colors.text}>{name}</span>
-                    <span className="font-mono">{formatCurrency(total)}</span>
+                    <span className="text-foreground">{name}</span>
+                    <span className="font-mono text-foreground">{formatCurrency(total)}</span>
                   </div>
-                  <div className={`h-2 w-full ${colors.bg} rounded-full overflow-hidden`}>
+                  <div className={`h-2 w-full rounded-full overflow-hidden ${target === 'Future' ? 'bg-[var(--color-future)]/20' : 'bg-[var(--color-present)]/20'}`}>
                     <div
                       className={`h-full ${target === 'Future' ? 'bg-[var(--color-future)]' : 'bg-[var(--color-present)]'}`}
                       style={{ width: `${Math.min(percent, 100)}%` }}
@@ -340,20 +340,20 @@ export default function BudgetPage() {
 
             return (
               <div key={target} className={`bg-card overflow-hidden border-l-4 rounded-xl shadow-sm my-2 ${colors.border}`}>
-                {/* Target Header */}
+                {/* Target Header - Only left border for color differentiation */}
                 <button
                   onClick={() => toggleTarget(target)}
-                  className={`w-full p-4 flex justify-between items-center ${colors.bg} hover:bg-opacity-80 transition-all`}
+                  className="w-full p-4 flex justify-between items-center hover:bg-muted/30 transition-all"
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`text-xl font-bold ${colors.text}`}>{target}</span>
+                    <span className="text-xl font-bold text-foreground">{target}</span>
                     <span className="text-muted-foreground text-sm">({categories.length} categories)</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className={`font-mono font-bold ${colors.text}`}>
+                    <span className="font-mono font-bold text-foreground">
                       {formatCurrency(getTargetTotal(target))}
                     </span>
-                    <span className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                    <span className={`transform transition-transform text-muted-foreground ${isExpanded ? 'rotate-180' : ''}`}>
                       ▼
                     </span>
                   </div>
@@ -367,20 +367,18 @@ export default function BudgetPage() {
                         <thead>
                           <tr className="border-b border-border">
                             <th className="text-left p-3 text-muted-foreground font-medium bg-card">Category</th>
-                            <th className={`text-right p-3 font-bold ${colors.text}`}>Amount</th>
+                            <th className="text-right p-3 font-bold text-foreground">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
                           {categories.map((category, i) => {
                             const budget = getCategoryBudget(category);
-                            if (budget === 0) return null; // Hide zero items in list view? Or keep them? Let's keep consistent with existing
-                            // existing code kept zero items. But cleaner to hide if 0?
-                            // Let's keep all for now to show structure.
+                            if (budget === 0) return null;
 
                             return (
                               <tr key={i} className="border-b border-border hover:bg-muted/30 transition-colors">
                                 <td className="p-3 font-medium text-foreground">{category}</td>
-                                <td className={`text-right p-3 font-mono font-bold ${budget === 0 ? 'opacity-30' : ''} ${colors.text}`}>
+                                <td className={`text-right p-3 font-mono font-bold text-foreground ${budget === 0 ? 'opacity-30' : ''}`}>
                                   {formatCurrency(budget)}
                                 </td>
                               </tr>
@@ -399,7 +397,7 @@ export default function BudgetPage() {
                             {months.map(m => (
                               <th key={m} className="text-right p-3 text-muted-foreground font-medium min-w-[80px]">{m}</th>
                             ))}
-                            <th className={`text-right p-3 font-bold ${colors.text} min-w-[100px]`}>Total</th>
+                            <th className="text-right p-3 font-bold text-foreground min-w-[100px]">Total</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -420,7 +418,7 @@ export default function BudgetPage() {
                                     </td>
                                   );
                                 })}
-                                <td className={`text-right p-3 font-mono font-bold ${colors.text} ${rowData.Total === 0 ? 'opacity-50' : ''}`}>
+                                <td className={`text-right p-3 font-mono font-bold text-foreground ${rowData.Total === 0 ? 'opacity-50' : ''}`}>
                                   {formatCurrency(rowData.Total)}
                                 </td>
                               </tr>

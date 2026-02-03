@@ -149,7 +149,6 @@ export default function ExpensesPage() {
           onDelete={handleDelete}
           editable={true}
           showDelete={true}
-          showDelete={true}
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
           title="All Transactions"
