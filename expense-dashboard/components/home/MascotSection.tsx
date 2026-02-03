@@ -14,6 +14,10 @@ interface MascotSectionProps {
     userName?: string;
 }
 
+// Default to Kibo if nothing selected
+const DEFAULT_MASCOT = 'kibo';
+const DEFAULT_NAME = 'Kibo';
+
 const getMascotMessages = (
     investmentPercentage: number,
     pendingPercentage: number
@@ -54,19 +58,25 @@ const getMascotMessages = (
     return messages;
 };
 
-const getMascotImage = (mood: 'normal' | 'happy' | 'sad' | 'pleased'): string => {
-    const images = {
-        normal: '/mascot/normal.png',
-        happy: '/mascot/happy.png',
-        sad: '/mascot/sad.png',
-        pleased: '/mascot/pleased.png'
-    };
-    return images[mood];
+const getMascotImage = (type: string, mood: 'normal' | 'happy' | 'sad' | 'pleased'): string => {
+    return `/mascot/${type}/${mood}.png`;
 };
 
 export function MascotSection({ investmentPercentage, pendingPercentage, userName }: MascotSectionProps) {
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+
+    // Mascot state
+    const [mascotType, setMascotType] = useState(DEFAULT_MASCOT);
+    const [mascotName, setMascotName] = useState(DEFAULT_NAME);
+
+    useEffect(() => {
+        const storedType = localStorage.getItem('mascot_type');
+        const storedName = localStorage.getItem('mascot_name');
+
+        if (storedType) setMascotType(storedType);
+        if (storedName) setMascotName(storedName);
+    }, []);
 
     const messages = getMascotMessages(investmentPercentage, pendingPercentage);
     const currentMessage = messages[currentMessageIndex];
@@ -157,8 +167,8 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
                      drop-shadow-[0_0_10px_rgba(169,217,199,0.2)]"
                 >
                     <Image
-                        src={getMascotImage(currentMessage?.mood || 'normal')}
-                        alt="Kibo - Tu mascota financiera"
+                        src={getMascotImage(mascotType, currentMessage?.mood || 'normal')}
+                        alt={`${mascotName} - Tu mascota financiera`}
                         fill
                         className="object-contain"
                         priority

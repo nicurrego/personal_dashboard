@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -69,10 +70,12 @@ export default function Home() {
 
         {/* Mascot */}
         <div className="relative w-64 h-64 md:w-80 md:h-80 animate-float my-4">
-          <img
-            src="/mascot/happy.png"
+          <Image
+            src="/mascot/kibo/happy.png"
             alt="Kibo Mascot"
-            className="w-full h-full object-contain drop-shadow-2xl"
+            fill
+            className="object-contain drop-shadow-2xl"
+            priority
           />
         </div>
 
