@@ -497,15 +497,8 @@ export default function UploadPage() {
     <div className="min-h-screen bg-black pb-20 page-ambient">
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="text-secondary-text hover:text-white transition-colors"
-          >
-            ← Back
-          </Link>
-          <h1 className="text-lg font-semibold text-white">Import Data</h1>
-          <div className="w-16" />
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-lg font-semibold text-white text-center">Import Data</h1>
         </div>
       </header>
 

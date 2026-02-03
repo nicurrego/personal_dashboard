@@ -256,7 +256,7 @@ export default function BudgetPage() {
           </div>
 
           {/* Right side: Edit Button */}
-          <Link href="/budget/builder">
+          <Link href="/budget/quick">
             <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground">
               <Edit className="w-4 h-4" />
               <span className="hidden sm:inline">Edit Plan</span>

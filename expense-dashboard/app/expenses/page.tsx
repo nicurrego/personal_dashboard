@@ -106,9 +106,6 @@ export default function ExpensesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <Link href="/budget" className="text-secondary-text text-sm hover:text-white transition-colors mb-2 inline-block">
-              ← Back to Budget
-            </Link>
             <h1 className="text-3xl font-bold">Transactions</h1>
             <p className="text-secondary-text text-sm mt-1">
               Manage your transactions, import data, and search for records.

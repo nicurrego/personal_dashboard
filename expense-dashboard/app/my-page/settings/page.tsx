@@ -86,6 +86,10 @@ export default function SettingsPage() {
     const [mascotType, setMascotType] = useState('kibo');
     const [mascotName, setMascotName] = useState('Kibo');
 
+    // Advanced settings
+    const [proBuilderMobile, setProBuilderMobile] = useState(false);
+    const [initialProBuilderMobile, setInitialProBuilderMobile] = useState(false);
+
     // Password change states
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -115,6 +119,13 @@ export default function SettingsPage() {
             setMascotName(storedMascotName);
             setInitialMascotName(storedMascotName);
         }
+
+        // Load pro builder mobile setting
+        const storedProBuilderMobile = localStorage.getItem('pro_builder_mobile');
+        if (storedProBuilderMobile === 'true') {
+            setProBuilderMobile(true);
+            setInitialProBuilderMobile(true);
+        }
     }, []);
 
     // Warn user before leaving if there are unsaved changes (Browser Refresh/Close)
@@ -135,7 +146,8 @@ export default function SettingsPage() {
             displayName !== initialDisplayName ||
             currency !== initialCurrency ||
             mascotType !== initialMascotType ||
-            mascotName !== initialMascotName
+            mascotName !== initialMascotName ||
+            proBuilderMobile !== initialProBuilderMobile
         );
     };
 
@@ -258,12 +270,14 @@ export default function SettingsPage() {
             // Save mascot settings to local storage
             localStorage.setItem('mascot_type', mascotType);
             localStorage.setItem('mascot_name', mascotName);
+            localStorage.setItem('pro_builder_mobile', proBuilderMobile.toString());
 
             // Reset dirty state
             setInitialDisplayName(displayName);
             setInitialCurrency(currency);
             setInitialMascotType(mascotType);
             setInitialMascotName(mascotName);
+            setInitialProBuilderMobile(proBuilderMobile);
 
             // Dispatch valid event to notify other components if needed
             window.dispatchEvent(new Event('storage'));
@@ -367,13 +381,6 @@ export default function SettingsPage() {
                 {/* Header */}
                 <header className="border-b border-white/10 px-4 py-4">
                     <div className="max-w-2xl mx-auto flex items-center justify-between">
-                        <Link
-                            href="/my-page"
-                            onClick={handleBackWithCheck}
-                            className="text-secondary-text hover:text-white transition-colors flex items-center gap-2"
-                        >
-                            ← Back to My Page
-                        </Link>
                         <h1 className="text-lg font-semibold text-white">Settings</h1>
                         <button
                             onClick={handleSaveProfile}
@@ -516,6 +523,26 @@ export default function SettingsPage() {
                          text-white placeholder:text-secondary-text/50
                          focus:border-cyber-cyan focus:outline-none transition-colors"
                             />
+                        </div>
+                    </div>
+
+                    {/* Advanced Settings */}
+                    <div className="liquid-card-premium p-6 space-y-4 hover-lift relative z-10">
+                        <h2 className="text-xl font-semibold text-white">Advanced</h2>
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-white font-medium">Pro Builder on Mobile</p>
+                                <p className="text-secondary-text text-xs">Show link to Pro Budget Builder on mobile devices</p>
+                            </div>
+                            <button
+                                onClick={() => setProBuilderMobile(!proBuilderMobile)}
+                                className={`relative w-12 h-6 rounded-full transition-colors ${proBuilderMobile ? 'bg-cyber-cyan' : 'bg-white/20'
+                                    }`}
+                            >
+                                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${proBuilderMobile ? 'translate-x-7' : 'translate-x-1'
+                                    }`} />
+                            </button>
                         </div>
                     </div>
 
