@@ -120,8 +120,7 @@ export function useMockExpenseData() {
     }, [filters.dateRange, filters.months, expenses, timeRangePreset, referenceYear, referenceMonth]);
 
     const saveDefaultView = useCallback(() => {
-        console.log('Mock: Saved view');
-        // Could allow saving to local storage too if we want persistence during tour session?
+        // No-op for tour mode
     }, []);
 
     const resetFilters = useCallback(() => {

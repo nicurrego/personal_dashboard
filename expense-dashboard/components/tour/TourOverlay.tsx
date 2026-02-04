@@ -62,9 +62,6 @@ export function TourOverlay() {
                     </div>
                 </div>
 
-                {/* Progress Indicator Dots */}
-                {/* Optional: Add dots to show progress if desired, straightforward for now */}
-
                 {/* Controls */}
                 <div className="flex gap-3 mt-4">
                     <button

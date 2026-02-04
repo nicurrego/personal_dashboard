@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Plus, Trash2, Pencil, X } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import { MOCK_BUDGET } from '@/lib/tour/mockData';
 import { DEFAULT_CATEGORIES } from '@/lib/constants/defaultCategories';
 import { CATEGORY_COLORS } from '@/lib/category-colors';
@@ -33,9 +33,6 @@ export default function TourBudgetBuilderPage() {
     const [activeTab, setActiveTab] = useState<TabType>('Income');
     const [budgetEntries, setBudgetEntries] = useState<BudgetEntry[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Edit mode state - mostly unused but kept for type parity if needed
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadBudget() {
@@ -103,14 +100,7 @@ export default function TourBudgetBuilderPage() {
         }
     };
 
-    // Toggle selected category for visual demonstration of "actionable but disabled"
-    const handleCategoryTap = (category: string) => {
-        if (selectedCategory === category) {
-            setSelectedCategory(null);
-        } else {
-            setSelectedCategory(category);
-        }
-    };
+
 
     if (loading) {
         return (
@@ -179,7 +169,7 @@ export default function TourBudgetBuilderPage() {
                                 <span className="w-px h-4 bg-border/50" />
                             )}
                             <button
-                                onClick={() => { setActiveTab(tab.id); setSelectedCategory(null); }}
+                                onClick={() => setActiveTab(tab.id)}
                                 className={`flex-1 py-2 text-xs font-medium transition-colors rounded-lg ${activeTab === tab.id ? 'bg-card' : 'text-muted-foreground'
                                     }`}
                                 style={activeTab === tab.id ? { color: tab.color } : undefined}
@@ -199,27 +189,10 @@ export default function TourBudgetBuilderPage() {
                             </div>
 
                             {getEntriesForTab(activeTab).map(entry => (
-                                <div key={entry.category} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3 relative opacity-80 cursor-not-allowed">
-
-                                    {/* Category name (button-like appearance but non-interactive) */}
-                                    <button
-                                        onClick={() => handleCategoryTap(entry.category)}
-                                        className="flex-1 text-sm font-medium text-foreground truncate text-left hover:text-muted-foreground transition-colors"
-                                    >
+                                <div key={entry.category} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3 opacity-80">
+                                    <span className="flex-1 text-sm font-medium text-foreground truncate">
                                         {entry.category}
-                                    </button>
-
-                                    {/* Visual "Edit/Delete" Controls appear on tap but aren't usable */}
-                                    {selectedCategory === entry.category && (
-                                        <div className="flex items-center gap-1 mr-2 animate-in fade-in zoom-in duration-200">
-                                            <button disabled className="p-1.5 rounded-lg bg-muted text-muted-foreground opacity-50 cursor-not-allowed">
-                                                <Pencil className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button disabled className="p-1.5 rounded-lg bg-muted text-muted-foreground opacity-50 cursor-not-allowed">
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    )}
+                                    </span>
 
                                     {/* Amount input (Disabled for tour) */}
                                     <div className="flex items-center gap-1">

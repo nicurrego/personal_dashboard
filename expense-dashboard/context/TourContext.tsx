@@ -39,17 +39,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    // Reset tour on mount if needed, or check local storage?
-    // For now, simple state.
-
-    // Handle initial load / reload
+    // Reset tour on mount if user lands on /tour without active tour
     useEffect(() => {
-        // If we are on a tour page but tour is NOT active, redirect to home only if it's a hard reload (initially).
-        // But since we can't easily detect "hard reload" separate from standard navigation without persistence,
-        // we can check if the pathname starts with /tour and isTourActive is false.
-
-        // However, we don't want to break direct links if we ever wanted them, but for this app:
-        // "The Tour should handle page reloads. (Back to Welcome screen)."
         if (pathname?.startsWith('/tour') && !isTourActive) {
             router.replace('/');
         }
@@ -58,13 +49,13 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     const startTour = useCallback(() => {
         setIsTourActive(true);
         setCurrentStepIndex(0);
-        router.push('/tour/home'); // Start at Tour home
+        router.push('/tour/home');
     }, [router]);
 
     const endTour = useCallback(() => {
         setIsTourActive(false);
         setCurrentStepIndex(0);
-        router.push('/'); // Go back to welcome/login or stay? Let's go to root Welcome
+        router.push('/');
     }, [router]);
 
     const nextStep = useCallback(() => {
@@ -91,24 +82,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         }
     }, [currentStepIndex, router, pathname]);
 
-    // Sync route if user navigates manually?
-    // For now, force route match might be better:
-    useEffect(() => {
-        if (isTourActive) {
-            const expectedPath = TOUR_STEPS[currentStepIndex].path;
-            // Soft check? If user navigates away, maybe we should guide them back?
-            // Or just let the overlay be there.
-            // But for this "Guided Tour", let's auto-push if they drift (or just updated state on transition)
-            if (pathname !== expectedPath) {
-                // This might conflict with Next.js router transitions, so be careful. 
-                // We do the push in nextStep/prevStep. 
-                // Validating here ensures if they refresh, they go back to the right place?
-                // Let's skip auto-redirect on mounting for now to avoid loops.
-            }
-        }
-    }, [isTourActive, currentStepIndex, pathname]);
-
-    // Disable Pull-to-Refresh on Mobile
+    // Disable Pull-to-Refresh on Mobile during tour
     useEffect(() => {
         if (isTourActive) {
             document.body.style.overscrollBehaviorY = 'none'; // Chrome/Modern

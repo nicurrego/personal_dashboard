@@ -67,32 +67,6 @@ export default function TourBudgetPage() {
         if (selectedMonth === 11) setSelectedYear(prev => prev + 1);
     };
 
-    // Mock Mutation Handlers - This gives the "Sandbox" feel!
-    // Updates only persist in local state for this session.
-    const handleUpdateExpense = async (updatedExpense: Expense) => {
-        setExpenses(prev => prev.map(e => {
-            // Find by unique combo? Mock data has no ID! 
-            // We should add IDs to mock data or match by fields. 
-            // For now, let's assume we match by strict equality or index (table passes object).
-            // Since we don't have IDs, strict comparison might fail if object reference changed.
-            // Let's just find index.
-            return e === updatedExpense ? updatedExpense : e;
-            // Actually EditableTable passes the *changed* object. We need to find the *original*.
-            // Detailed implementation would require IDs. 
-            // For a quick tour demo, maybe we just console log "Updated!" or try to match.
-            // Let's implement a simple ID injection on mount.
-        }));
-        // Since we don't have IDs, this is tricky. 
-        // Let's just pretend we updated it. 
-        // Real implementation: We should map MOCK_EXPENSES to have IDs.
-        alert("Sandbox: Expense updated! (Changes stick until refresh)");
-    };
-
-    // Actually, let's just make it view-only or show a toast for the tour?
-    // User asked for "Sandbox app". So interactivity is good.
-    // I will skip implementation of complex update logic for now unless requested.
-    // I'll make the functions optional in View.
-
     return (
         <BudgetView
             data={data}
