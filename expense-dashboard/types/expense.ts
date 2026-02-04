@@ -9,7 +9,7 @@
  * - Present: Discretionary spending (entertainment, dining out)
  * - Future: Savings and investments
  */
-export type ExpenseTarget = 'Living' | 'Present' | 'Future';
+export type ExpenseTarget = 'Living' | 'Present' | 'Future' | 'Income';
 
 /**
  * Core expense record interface

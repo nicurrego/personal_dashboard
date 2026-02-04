@@ -6,10 +6,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { useTour } from '@/context/TourContext';
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { startTour } = useTour();
 
   const router = useRouter();
 
@@ -94,6 +96,14 @@ export default function Home() {
           >
             Create Account
           </Link>
+
+          {/* Tour Button */}
+          <button
+            onClick={startTour}
+            className="block w-full py-2 rounded-xl text-[#A9D9C7] font-medium text-sm hover:text-white transition-colors"
+          >
+            Just take a look →
+          </button>
         </div>
 
         {/* Footer Text */}

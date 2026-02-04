@@ -4,6 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { useTour } from '@/context/TourContext';
 
 // Force dynamic rendering for pages that use client-side hooks
 // export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const { startTour } = useTour();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -139,6 +141,8 @@ function LoginForm() {
             ← Back to home
           </Link>
         </p>
+
+
       </div>
     </div>
   );

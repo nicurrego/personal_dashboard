@@ -1,47 +1,19 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-
-import { User } from '@supabase/supabase-js';
-import { useTour } from '@/context/TourContext';
-import { useExpenseData } from '@/hooks/use-expense-data';
-import { MascotSection } from '@/components/home/MascotSection';
-import BudgetRingsD3 from '@/components/charts/BudgetRingsD3';
-import { formatCurrency } from '@/lib/d3-utils';
-import { ExpenseTarget } from '@/types';
+import React, { useMemo } from 'react';
 import { HomeView } from '@/components/screens/HomeView';
+import { MOCK_EXPENSES, MOCK_BUDGET } from '@/lib/tour/mockData';
+import { ExpenseTarget } from '@/types';
 
-export default function HomePage() {
-    const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
-    const { expenses, budget, loading } = useExpenseData();
-    const { isTourActive } = useTour();
+export default function TourHomePage() {
+    // Use MOCK DATA
+    const expenses = MOCK_EXPENSES;
+    const budget = MOCK_BUDGET;
 
-    // -- Authentication Check --
-    useEffect(() => {
-        // If tour is active, we don't strictly require a user
-        // BUT wait, we are reverting that. The USER wants strict separation.
-        // So this page SHOULD redirect if not logged in.
-        // If tour is active, we should NOT BE ON THIS PAGE. We should be on /tour/home.
-        // So I revert the tour check.
-        // if (isTourActive) return;
-
-        const supabase = createClient();
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                router.push('/login');
-            } else {
-                setUser(user);
-            }
-        };
-        checkUser();
-    }, [router]);
-
-    // -- Data Processing --
     const { ringData, availableBudget, metrics, refDate } = useMemo(() => {
+        // For Tour, we hardcode to the "current" month in mock data
+        // Mock data logic in mockData.ts uses 'new Date()' to generate months.
+        // So filter for current month/year.
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
@@ -86,32 +58,32 @@ export default function HomePage() {
                 label: 'Total',
                 spent: totalSpent,
                 budget: totalBudget,
-                color: '#A9D9C7' // Total (Teal)
+                color: '#A9D9C7'
             },
             {
                 label: 'Future',
                 spent: futureSpent,
                 budget: futureBudget,
-                color: '#614FBB' // Future (Purple)
+                color: '#614FBB'
             },
             {
                 label: 'Living',
                 spent: livingSpent,
                 budget: livingBudget,
-                color: '#65A1C9' // Living (Blue)
+                color: '#65A1C9'
             },
             {
                 label: 'Present',
                 spent: presentSpent,
                 budget: presentBudget,
-                color: '#C24656' // Present (Red)
+                color: '#C24656'
             }
         ];
 
-        // 5. Available (Total Budget - Total Spent)
+        // 5. Available
         const availableBudget = Math.max(0, totalBudget - totalSpent);
 
-        // Metrics for Mascot (Investment Health)
+        // Metrics for Mascot
         const investmentPercentage = totalBudget > 0 ? (futureSpent / totalBudget) * 100 : 0;
         const pendingPercentage = totalBudget > 0 ? (availableBudget / totalBudget) * 100 : 0;
 
@@ -123,23 +95,15 @@ export default function HomePage() {
         };
     }, [expenses, budget]);
 
-
-    if (!user || loading) {
-        return (
-            <div className="min-h-screen bg-[#1B4034] flex items-center justify-center">
-                <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-            </div>
-        );
-    }
-
     return (
         <HomeView
-            user={{ name: user.user_metadata?.name }}
+            user={{ name: 'Guest' }}
             ringData={ringData}
             availableBudget={availableBudget}
             metrics={metrics}
             refDate={refDate}
-            loading={loading}
+            loading={false}
+            mascotTypeOverride="tane"
         />
     );
 }

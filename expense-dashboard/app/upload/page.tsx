@@ -183,7 +183,7 @@ export default function UploadPage() {
       <p className="text-secondary-text text-sm mb-4">
         Your CSV file should have these columns (order matters):
       </p>
-      <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+      <div className="bg-[#1B4034]/50 rounded-lg p-4 overflow-x-auto">
         <code className="text-xs text-cyber-cyan whitespace-nowrap">
           Year, Month, Date, Target, Category, Value, Item, Context, Method, Shop, Location
         </code>
@@ -465,7 +465,7 @@ export default function UploadPage() {
   );
 
   const renderSuccess = () => (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#1B4034] flex items-center justify-center p-6">
       <div className="text-center">
         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-growth-green/20 flex items-center justify-center animate-pulse">
           <svg className="w-10 h-10 text-growth-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -494,7 +494,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pb-20 page-ambient">
+    <div className="min-h-screen bg-[#1B4034] pb-20 page-ambient">
       {/* Header */}
       <header className="border-b border-white/10 px-4 py-4">
         <div className="max-w-4xl mx-auto">

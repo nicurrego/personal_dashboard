@@ -25,7 +25,7 @@ function ExitConfirmationModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-[#1B4034]/80 backdrop-blur-sm animate-fade-in">
             <div className="w-full max-w-sm bg-[#1B4032] border border-white/20 rounded-3xl p-6 shadow-2xl scale-100 animate-scale-up">
 
                 <div className="flex flex-col items-center text-center space-y-4">
@@ -452,7 +452,8 @@ export default function SettingsPage() {
                                 value={currency}
                                 onChange={(e) => setCurrency(e.target.value)}
                                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                             text-white focus:border-cyber-cyan focus:outline-none transition-colors"
+                             text-white focus:border-cyber-cyan focus:outline-none transition-colors
+                             [&>option]:bg-[#1B4034] [&>option]:text-white"
                             >
                                 <option value="¥">¥ (Yen)</option>
                                 <option value="$">$ (Dollar)</option>
@@ -500,7 +501,7 @@ export default function SettingsPage() {
 
                                         {mascotType === mascot && (
                                             <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-cyber-cyan flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 text-black">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 text-[#1B4034]">
                                                     <polyline points="20 6 9 17 4 12"></polyline>
                                                 </svg>
                                             </div>
@@ -639,7 +640,7 @@ export default function SettingsPage() {
                                     value={deleteConfirmText}
                                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                                     placeholder="DELETE"
-                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-laser-magenta/50
+                                    className="w-full px-4 py-3 rounded-xl bg-[#1B4034]/50 border border-laser-magenta/50
                             text-white placeholder:text-secondary-text/50
                             focus:border-laser-magenta focus:outline-none transition-colors"
                                 />

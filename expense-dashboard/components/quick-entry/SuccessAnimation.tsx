@@ -12,35 +12,35 @@ export function SuccessAnimation({ onComplete }: SuccessAnimationProps) {
     const timer = setTimeout(() => {
       onComplete?.();
     }, 2000);
-    
+
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1B4034]/95 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-6 animate-[fadeIn_0.3s_ease-out_forwards]">
         {/* Animated checkmark */}
         <div className="relative">
-          {/* Outer ring with ping */}
-          <div 
-            className="w-32 h-32 rounded-full border-4 border-growth-green"
-            style={{ 
+          {/* Outer ring with ping - Teal */}
+          <div
+            className="w-32 h-32 rounded-full border-4 border-cyber-cyan"
+            style={{
               animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) forwards'
             }}
           />
-          
-          {/* Inner circle with checkmark */}
+
+          {/* Inner circle with checkmark - Teal bg */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div 
-              className="w-24 h-24 rounded-full bg-growth-green/20 
+            <div
+              className="w-24 h-24 rounded-full bg-cyber-cyan/20 
                          flex items-center justify-center"
               style={{
                 animation: 'scaleIn 0.4s ease-out 0.2s forwards',
                 transform: 'scale(0)'
               }}
             >
-              <svg 
-                className="w-12 h-12 text-growth-green"
+              <svg
+                className="w-12 h-12 text-cyber-cyan"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -48,7 +48,7 @@ export function SuccessAnimation({ onComplete }: SuccessAnimationProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <polyline 
+                <polyline
                   points="20 6 9 17 4 12"
                   style={{
                     strokeDasharray: 100,
@@ -60,9 +60,9 @@ export function SuccessAnimation({ onComplete }: SuccessAnimationProps) {
             </div>
           </div>
         </div>
-        
+
         {/* Success text */}
-        <div 
+        <div
           className="text-center"
           style={{
             animation: 'fadeUp 0.4s ease-out 0.5s forwards',
@@ -72,14 +72,15 @@ export function SuccessAnimation({ onComplete }: SuccessAnimationProps) {
           <h2 className="text-2xl font-bold text-white mb-2">
             Transaction Saved!
           </h2>
-          <p className="text-secondary-text">
+          <p className="text-[#A9D9C7]">
             Added to your expense log
           </p>
         </div>
       </div>
-      
+
       {/* Inline keyframes using a style tag */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }

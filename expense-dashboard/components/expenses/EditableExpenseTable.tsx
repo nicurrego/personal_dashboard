@@ -107,6 +107,7 @@ export function EditableExpenseTable({
         'Living': { bg: 'bg-[var(--color-living)]/10', text: 'text-[var(--color-living)]', border: 'border-[var(--color-living)]/30' },
         'Present': { bg: 'bg-[var(--color-present)]/10', text: 'text-[var(--color-present)]', border: 'border-[var(--color-present)]/30' },
         'Future': { bg: 'bg-[var(--color-future)]/10', text: 'text-[var(--color-future)]', border: 'border-[var(--color-future)]/30' },
+        'Income': { bg: 'bg-[var(--color-total)]/10', text: 'text-[var(--color-total)]', border: 'border-[var(--color-total)]/30' },
     };
 
     // Handle opening edit modal

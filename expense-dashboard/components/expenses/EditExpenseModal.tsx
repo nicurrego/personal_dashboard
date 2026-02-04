@@ -22,7 +22,7 @@ interface EditExpenseModalProps {
 
 type EditingField = keyof Expense | null;
 
-const TARGET_OPTIONS: ExpenseTarget[] = ['Living', 'Present', 'Future'];
+const TARGET_OPTIONS: ExpenseTarget[] = ['Living', 'Present', 'Future', 'Income'];
 
 const CATEGORY_SUGGESTIONS = [
     'Food', 'Transport', 'Housing', 'Utilities', 'Entertainment',
@@ -43,6 +43,7 @@ const TARGET_COLORS: Record<ExpenseTarget, { text: string; bg: string; border: s
     'Living': { text: 'text-[var(--color-living)]', bg: 'bg-[var(--color-living)]', border: 'border-[var(--color-living)]/30' },
     'Present': { text: 'text-[var(--color-present)]', bg: 'bg-[var(--color-present)]', border: 'border-[var(--color-present)]/30' },
     'Future': { text: 'text-[var(--color-future)]', bg: 'bg-[var(--color-future)]', border: 'border-[var(--color-future)]/30' },
+    'Income': { text: 'text-[var(--color-total)]', bg: 'bg-[var(--color-total)]', border: 'border-[var(--color-total)]/30' },
 };
 
 /**

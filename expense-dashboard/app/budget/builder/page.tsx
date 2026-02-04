@@ -57,7 +57,7 @@ export default function BudgetBuilderPage() {
 
       {/* Screen Size Warning Modal */}
       {showScreenWarning && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#1B4034]/80 backdrop-blur-sm">
           <div className="bg-[#1B4034] border border-white/20 rounded-2xl p-6 max-w-md w-full shadow-2xl">
             {/* Icon */}
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-alert-amber/20 flex items-center justify-center">

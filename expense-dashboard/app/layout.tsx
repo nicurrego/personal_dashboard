@@ -46,6 +46,11 @@ export const viewport: Viewport = {
   themeColor: '#1B4034',
 };
 
+import { TourProvider } from "@/context/TourContext";
+import { TourOverlay } from "@/components/tour/TourOverlay";
+
+// ... (keep imports)
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,8 +68,11 @@ export default function RootLayout({
         className={`${outfit.variable} font-sans antialiased text-white bg-[#1B4034]`}
       >
         <OfflineProvider>
-          {children}
-          <BottomNav />
+          <TourProvider>
+            {children}
+            <BottomNav />
+            <TourOverlay />
+          </TourProvider>
         </OfflineProvider>
 
         {/* Service Worker Registration */}

@@ -26,7 +26,8 @@ export default function TargetDonutD3({ data, onExpand, onInfo, isExpanded = fal
   const colorMap = {
     'Living': 'var(--color-living)',
     'Present': 'var(--color-present)',
-    'Future': 'var(--color-future)'
+    'Future': 'var(--color-future)',
+    'Income': 'var(--color-total)'
   };
 
   useEffect(() => {

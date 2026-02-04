@@ -32,6 +32,7 @@ export function useExpenseData() {
   const [referenceYear, setReferenceYear] = useState<number>(new Date().getFullYear());
   const [referenceMonth, setReferenceMonth] = useState<number>(new Date().getMonth() + 1);
 
+
   // Load Data
   useEffect(() => {
     async function loadData() {

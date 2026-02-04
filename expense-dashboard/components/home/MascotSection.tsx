@@ -12,6 +12,7 @@ interface MascotSectionProps {
     investmentPercentage: number;
     pendingPercentage: number;
     userName?: string;
+    mascotTypeOverride?: string;
 }
 
 // Default to Kibo if nothing selected
@@ -62,21 +63,29 @@ const getMascotImage = (type: string, mood: 'normal' | 'happy' | 'sad' | 'please
     return `/mascot/${type}/${mood}.png`;
 };
 
-export function MascotSection({ investmentPercentage, pendingPercentage, userName }: MascotSectionProps) {
+export function MascotSection({ investmentPercentage, pendingPercentage, userName, mascotTypeOverride }: MascotSectionProps) {
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
 
     // Mascot state
-    const [mascotType, setMascotType] = useState(DEFAULT_MASCOT);
+    const [mascotType, setMascotType] = useState(mascotTypeOverride || DEFAULT_MASCOT);
     const [mascotName, setMascotName] = useState(DEFAULT_NAME);
 
     useEffect(() => {
+        // If override is present, do not respect local storage
+        if (mascotTypeOverride) {
+            setMascotType(mascotTypeOverride);
+            setMascotName('Tane'); // Assuming Tane is the name for 'tane' type
+            return;
+        }
+
+        // Otherwise load from local storage
         const storedType = localStorage.getItem('mascot_type');
         const storedName = localStorage.getItem('mascot_name');
 
         if (storedType) setMascotType(storedType);
         if (storedName) setMascotName(storedName);
-    }, []);
+    }, [mascotTypeOverride]);
 
     const messages = getMascotMessages(investmentPercentage, pendingPercentage);
     const currentMessage = messages[currentMessageIndex];
