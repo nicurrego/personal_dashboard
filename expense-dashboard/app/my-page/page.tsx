@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Settings, User, Star, Zap, Ghost, Loader2 } from 'lucide-react';
+import { Settings, User, Star, Zap, Ghost, Loader2, Pencil, Check } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { debounce } from 'lodash';
@@ -11,6 +11,7 @@ import { GoalCard } from '@/components/my-page/GoalCard';
 export default function MyPage() {
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
     const router = useRouter();
     const supabase = createClient();
 
@@ -85,6 +86,12 @@ export default function MyPage() {
         debouncedSave({ [field]: value });
     };
 
+    const handleSave = () => {
+        setIsEditing(false);
+        // Data is already auto-saving, but logic to force save could go here if needed.
+        // For now, the debouncer handles it reliably as user types.
+    };
+
     if (!mounted || loading) {
         return (
             <div className="min-h-screen bg-[#1B4034] flex items-center justify-center">
@@ -133,11 +140,19 @@ export default function MyPage() {
 
                 {/* Design Your Life Section */}
                 <section>
-                    <div className="mb-6">
-                        <h2 className="text-xl font-bold text-white mb-2">Design Your Life</h2>
-                        <p className="text-[#A9D9C7] text-sm leading-relaxed">
-                            I’m here to help you afford the life you actually want. Let's figure out what matters to you (and what doesn't) so you can do more of the fun stuff.
-                        </p>
+                    <div className="mb-6 flex items-start justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-2">Design Your Life</h2>
+                            <p className="text-[#A9D9C7] text-sm leading-relaxed">
+                                I’m here to help you afford the life you actually want. Let's figure out what matters to you (and what doesn't) so you can do more of the fun stuff.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                            className={`p-2 rounded-full ring-1 ring-inset transition-all ml-4 shrink-0 shadow-lg ${isEditing ? 'bg-[#A9D9C7] ring-[#A9D9C7] text-[#1B4034]' : 'bg-[#1B4032] ring-[#A9D9C7] text-[#A9D9C7]'}`}
+                        >
+                            {isEditing ? <Check className="w-5 h-5" /> : <Pencil className="w-5 h-5" />}
+                        </button>
                     </div>
 
                     <div className="space-y-6">
@@ -153,6 +168,7 @@ export default function MyPage() {
                             onDetailsChange={(val) => updateField('identity_details', val)}
                             detailsQuestion="What is one specific purchase that proves you are becoming this person?"
                             detailsPlaceholder="e.g., Buying a website domain, paying for a marathon entry, investing in a specific course..."
+                            isEditing={isEditing}
                         />
 
                         {/* Card 2: The Energy Asset */}
@@ -168,6 +184,7 @@ export default function MyPage() {
                             detailsQuestion="How do you feel immediately after spending money here?"
                             detailsPlaceholder="e.g., 'I feel clearer headed,' 'I feel capable,' 'I feel reconnected with the world'..."
                             isSelect={true}
+                            isEditing={isEditing}
                         />
 
                         {/* Card 3: The Ghost */}
@@ -183,6 +200,7 @@ export default function MyPage() {
                             detailsQuestion="What specific situation or emotion usually triggers this?"
                             detailsPlaceholder="e.g., 'Late night boredom,' 'Stress after client meetings,' 'Feeling lonely on Fridays'..."
                             isSelect={true}
+                            isEditing={isEditing}
                         />
                     </div>
                 </section>
