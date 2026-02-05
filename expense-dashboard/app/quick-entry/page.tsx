@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { QuickEntryFlow } from '@/components/quick-entry';
 import { QuickEntryData, AutocompleteData, QuickEntryOption, Expense } from '@/types';
 import { getUniqueValues } from '@/lib/analytics';
-import { DEFAULT_CATEGORIES, TargetType } from '@/lib/constants/defaultCategories';
+import { DEFAULT_CATEGORIES, DEFAULT_CONTEXTS, DEFAULT_METHODS, TargetType } from '@/lib/constants/defaultCategories';
 
 export default function QuickEntryPage() {
   const router = useRouter();
@@ -73,14 +73,13 @@ export default function QuickEntryPage() {
           })).sort((a, b) => (b.recentCount || 0) - (a.recentCount || 0));
         };
 
-        setContexts(['Daily', 'Travel', 'Work', 'Gift', 'Personal']);
+        setContexts([...DEFAULT_CONTEXTS]);
         setItems(getUniqueValues(expenses, 'item').slice(0, 20));
 
         setAutocompleteData({
-          // Important: Pass allDefaultCategories here so they exist in the options list
           categories: buildOptions(getUniqueValues(expenses, 'category'), 'category', allDefaultCategories),
           shops: buildOptions(getUniqueValues(expenses, 'shop'), 'shop'),
-          methods: buildOptions(getUniqueValues(expenses, 'method'), 'method', ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Mobile Payment']),
+          methods: buildOptions(getUniqueValues(expenses, 'method'), 'method', [...DEFAULT_METHODS]),
           locations: buildOptions(getUniqueValues(expenses, 'location'), 'location'),
         });
 

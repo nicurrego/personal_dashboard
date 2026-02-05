@@ -42,3 +42,7 @@ export const TARGET_COLORS: Record<string, { border: string; text: string; bg: s
   Living: { border: 'border-[#65A1C9]', text: 'text-[#65A1C9]', bg: 'bg-[#65A1C9]' },
   Present: { border: 'border-[#C24656]', text: 'text-[#C24656]', bg: 'bg-[#C24656]' },
 };
+
+export const DEFAULT_CONTEXTS = ['Daily', 'Travel', 'Work', 'Gift', 'Personal'] as const;
+
+export const DEFAULT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Mobile Payment'] as const;

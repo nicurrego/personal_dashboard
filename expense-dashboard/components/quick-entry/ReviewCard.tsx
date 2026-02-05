@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { QuickEntryData } from '@/types';
+import { KIBO_COLORS } from '@/lib/constants/colors';
 import { getFeelingLabel, getFeelingColor } from './FeelingInput';
 
 interface ReviewCardProps {
@@ -12,7 +13,7 @@ interface ReviewCardProps {
   error?: string | null;
 }
 
-export function ReviewCard({ data, onEdit, onConfirm, isSubmitting, error }: ReviewCardProps) {
+export const ReviewCard = React.memo(function ReviewCard({ data, onEdit, onConfirm, isSubmitting, error }: ReviewCardProps) {
   const formatAmount = (value: number | null): string => {
     if (value === null) return '¥0';
     return '¥' + value.toLocaleString('ja-JP');
@@ -29,10 +30,10 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting, error }: Rev
 
   const getTargetColor = (target: string | null): string => {
     switch (target) {
-      case 'Living': return 'text-[#65A1C9]';
-      case 'Present': return 'text-[#C24656]';
-      case 'Saving': return 'text-[#A9D9C7]';
-      case 'Investment': return 'text-[#614FBB]';
+      case 'Living': return `text-[${KIBO_COLORS.Living}]`;
+      case 'Present': return `text-[${KIBO_COLORS.Present}]`;
+      case 'Saving': return `text-[${KIBO_COLORS.Saving}]`;
+      case 'Future': return `text-[${KIBO_COLORS.Future}]`;
       default: return 'text-secondary-text';
     }
   };
@@ -51,8 +52,6 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting, error }: Rev
     { label: 'Feeling', value: getFeelingLabel(data.feeling), step: 'feeling', colorStyle: getFeelingColor(data.feeling) },
     { label: 'Date', value: formatDate(data.date), step: 'date' },
   ];
-
-  const isValid = data.value && data.category && data.target;
 
   return (
     <div className="flex flex-col h-full overflow-hidden gap-4">
@@ -95,4 +94,4 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting, error }: Rev
       </div>
     </div>
   );
-}
+});

@@ -4,6 +4,9 @@ import React, { useState, useRef } from 'react';
 import { OptionChip } from './OptionChip';
 import { QuickEntryOption } from '@/types';
 
+// Transition delay for smooth navigation (in milliseconds)
+const TRANSITION_DELAY_MS = 150;
+
 interface AutocompleteSelectProps {
   options: QuickEntryOption[];
   value: string;
@@ -42,24 +45,22 @@ export function AutocompleteSelect({
       setSearchTerm('');
     } else {
       // Focus when shown
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
+      return () => clearTimeout(timer); // Cleanup to prevent memory leak
     }
   }, [showInput]);
   const sortedOptions = [...options].sort((a, b) => {
     if (a.id === value) return 1; // Selected at the very end (bottom)
     if (b.id === value) return -1;
 
-    // Primary sort: Count Ascending
+    // Primary sort by count (ascending, so lower counts appear first)
     if ((a.recentCount || 0) !== (b.recentCount || 0)) {
       return (a.recentCount || 0) - (b.recentCount || 0);
     }
-    // Secondary sort: Alphabetical
-    return b.label.localeCompare(a.label); // Z->A (so A is at bottom near fingers? Or A->Z?)
-    // Actually alphabetical isn't critical, but let's keep A->Z. 
-    // If we want A at top and Z at bottom:
-    // return a.label.localeCompare(b.label);
+    // Secondary sort: A-Z alphabetical
+    return a.label.localeCompare(b.label);
   });
 
   // Filter options based on search
@@ -94,10 +95,8 @@ export function AutocompleteSelect({
   const handleChipClick = (optionId: string) => {
     onChange(optionId);
     setSearchTerm('');
-    // Input visibility is handled by parent resetting the state if needed, or better:
-    // When we select, we move to next step, so parent resets state anyway.
     if (onSubmit) {
-      setTimeout(onSubmit, 150);
+      setTimeout(onSubmit, TRANSITION_DELAY_MS);
     }
   };
 
@@ -105,9 +104,8 @@ export function AutocompleteSelect({
     if (searchTerm.trim() && !exactMatch) {
       onChange(searchTerm.trim());
       setSearchTerm('');
-      // setShowInput(false); -> handled by flow navigation
       if (onSubmit) {
-        setTimeout(onSubmit, 150);
+        setTimeout(onSubmit, TRANSITION_DELAY_MS);
       }
     } else if (exactMatch) {
       handleChipClick(exactMatch.id);
@@ -119,10 +117,6 @@ export function AutocompleteSelect({
       handleCustomSubmit();
     }
   };
-
-
-  // handleInputFocus removed as input is now conditionally rendered
-
 
   return (
     <div className="flex flex-col h-full overflow-hidden">

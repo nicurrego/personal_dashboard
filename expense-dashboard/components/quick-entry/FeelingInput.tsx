@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { KIBO_COLORS } from '@/lib/constants/colors';
 
 interface FeelingOption {
     value: number;
@@ -11,11 +12,11 @@ interface FeelingOption {
 }
 
 const FEELING_OPTIONS: FeelingOption[] = [
-    { value: 5, label: 'Great!', description: 'I will do it again!', emoji: '😄', color: '#22c55e' },
-    { value: 4, label: 'Good', description: 'Satisfied with this', emoji: '🙂', color: '#A9D9C7' },
-    { value: 3, label: 'Neutral', description: 'Neither good nor bad', emoji: '😐', color: '#94a3b8' },
-    { value: 2, label: 'Slight regret', description: 'Probably didn\'t need this', emoji: '😕', color: '#f59e0b' },
-    { value: 1, label: 'Regret', description: 'I shouldn\'t have done this', emoji: '😞', color: '#C24656' },
+    { value: 5, label: 'Great!', description: 'I will do it again!', emoji: '😄', color: KIBO_COLORS.FeelingGreat },
+    { value: 4, label: 'Good', description: 'Satisfied with this', emoji: '🙂', color: KIBO_COLORS.FeelingGood },
+    { value: 3, label: 'Neutral', description: 'Neither good nor bad', emoji: '😐', color: KIBO_COLORS.FeelingNeutral },
+    { value: 2, label: 'Slight regret', description: 'Probably didn\'t need this', emoji: '😕', color: KIBO_COLORS.FeelingSlightRegret },
+    { value: 1, label: 'Regret', description: 'I shouldn\'t have done this', emoji: '😞', color: KIBO_COLORS.FeelingRegret },
 ];
 
 interface FeelingInputProps {

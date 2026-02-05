@@ -6,6 +6,8 @@ import {
   QuickEntryStep,
   AutocompleteData
 } from '@/types';
+import { KIBO_COLORS } from '@/lib/constants/colors';
+import { ExitConfirmationModal } from '@/components/shared/ExitConfirmationModal';
 import { ProgressIndicator } from './ProgressIndicator';
 import { StepCard } from './StepCard';
 import { OptionChip } from './OptionChip';
@@ -16,6 +18,9 @@ import { AutocompleteSelect } from './AutocompleteSelect';
 import { ReviewCard } from './ReviewCard';
 import { SuccessAnimation } from './SuccessAnimation';
 import { FeelingInput } from './FeelingInput';
+
+// Transition delay for smooth step changes (in milliseconds)
+const TRANSITION_DELAY_MS = 150;
 
 // Step order: Target comes BEFORE category (category depends on target)
 const STEP_ORDER: QuickEntryStep[] = [
@@ -47,11 +52,10 @@ const STEP_CONFIG: Record<QuickEntryStep, { title: string; subtitle?: string }> 
 
 // Target colors for visual distinction
 const TARGET_COLORS: Record<string, string> = {
-  'Living': '#65A1C9',    // Living Blue
-  'Present': '#C24656',   // Present Red
-  'Saving': '#A9D9C7',    // Income/Safe Teal
-  'Investment': '#614FBB', // Future Purple
-  'Future': '#614FBB',    // Future Purple
+  'Living': KIBO_COLORS.Living,
+  'Present': KIBO_COLORS.Present,
+  'Saving': KIBO_COLORS.Saving,
+  'Future': KIBO_COLORS.Future,
 };
 
 interface QuickEntryFlowProps {
@@ -89,6 +93,7 @@ export function QuickEntryFlow({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [returnToReview, setReturnToReview] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Get categories filtered by selected target
   const filteredCategories = useMemo(() => {
@@ -107,6 +112,49 @@ export function QuickEntryFlow({
     }
   }, [currentStep]);
 
+  // Prevent accidental browser navigation/close when user has progress
+  useEffect(() => {
+    const hasProgress = data.value !== null || data.target !== null;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasProgress && !showSuccess) {
+        e.preventDefault();
+        e.returnValue = ''; // Chrome requires returnValue to be set
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [data.value, data.target, showSuccess]);
+
+  // Intercept internal navigation (Links, Bottom Nav)
+  useEffect(() => {
+    const hasProgress = data.value !== null || data.target !== null;
+
+    const handleAnchorClick = (e: MouseEvent) => {
+      if (!hasProgress || showSuccess) return;
+
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+
+      if (anchor && anchor.href) {
+        // Check if it's an internal link
+        const isInternal = anchor.href.startsWith(window.location.origin);
+        const isSelf = anchor.target === '' || anchor.target === '_self';
+
+        if (isInternal && isSelf) {
+          e.preventDefault();
+          e.stopPropagation();
+          setShowExitConfirm(true);
+        }
+      }
+    };
+
+    // Capture phase to intercept before Next.js Link handles it
+    document.addEventListener('click', handleAnchorClick, true);
+    return () => document.removeEventListener('click', handleAnchorClick, true);
+  }, [data.value, data.target, showSuccess]);
+
   // Navigation functions
   const goToStep = useCallback((step: QuickEntryStep) => {
     setCurrentStep(step);
@@ -124,9 +172,15 @@ export function QuickEntryFlow({
     if (currentIndex > 0) {
       setCurrentStep(STEP_ORDER[currentIndex - 1]);
     } else {
-      onCancel();
+      // Check if user has made progress (past step 1 - target)
+      const hasProgress = currentIndex >= 2 || data.value !== null || data.target !== null;
+      if (hasProgress) {
+        setShowExitConfirm(true);
+      } else {
+        onCancel();
+      }
     }
-  }, [currentStep, onCancel]);
+  }, [currentStep, data.value, data.target, onCancel]);
 
   const handleReturnToReview = useCallback(() => {
     setCurrentStep('review');
@@ -147,7 +201,7 @@ export function QuickEntryFlow({
       target: target as QuickEntryData['target'],
       category: ''
     }));
-    setTimeout(goNext, 150);
+    setTimeout(goNext, TRANSITION_DELAY_MS);
   }, [goNext]);
 
   // Handle final save
@@ -357,6 +411,16 @@ export function QuickEntryFlow({
     onCancel();
   };
 
+  // Exit confirmation handlers
+  const handleConfirmExit = () => {
+    setShowExitConfirm(false);
+    onCancel();
+  };
+
+  const handleCancelExit = () => {
+    setShowExitConfirm(false);
+  };
+
   if (showSuccess) {
     return <SuccessAnimation onComplete={handleSuccessComplete} />;
   }
@@ -440,6 +504,17 @@ export function QuickEntryFlow({
           {renderStepContent()}
         </StepCard>
       </div>
+
+      {/* Exit Confirmation Modal */}
+      <ExitConfirmationModal
+        isOpen={showExitConfirm}
+        onCancel={handleCancelExit}
+        onConfirm={handleConfirmExit}
+        title="Leave Quick Entry?"
+        message="You have unsaved changes. Are you sure you want to leave? Your progress will be lost."
+        cancelText="Stay"
+        confirmText="Leave"
+      />
 
     </div>
   );

@@ -40,12 +40,12 @@ export function AmountInput({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value.replace(/[^0-9]/g, '');
 
-    // If user types '5' while value is '0', result is '05'. We want '5'.
+    // Remove leading zero if present
     if (raw.length > 1 && raw.startsWith('0')) {
       raw = raw.substring(1);
     }
 
-    // If user deleted everything, back to '0'
+    // Default to '0' if empty
     if (raw === '') {
       raw = '0';
     }
@@ -54,15 +54,7 @@ export function AmountInput({
 
     if (!isNaN(num)) {
       setDisplayValue(formatNumber(num));
-      // Logic: If 0, actual value is special? 
-      // User allows 0 amount? usually yes, but previously we returned null. 
-      // If we want 'empty' state logic downstream, we might keep 0 as valid or not.
-      // Assuming 0 is valid amount or means empty? 
-      // Previous logic: onChange(num). 
-      // If 0 -> return 0.
-      onChange(num === 0 ? null : num); // Treat 0 as null if that was original intent
-      // Actually previous code: if num !== null ... onChange(num). 
-      // else onChange(null).
+      onChange(num === 0 ? null : num); // Treat 0 as null
     } else {
       setDisplayValue('0');
       onChange(null);
@@ -131,9 +123,6 @@ export function AmountInput({
           Clear
         </button>
       )}
-
-      {/* Validation hint */}
-      {/* Validation hint removed */}
     </div>
   );
 }
