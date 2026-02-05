@@ -5,9 +5,9 @@
  * Caches static assets, app shell, and API responses.
  */
 
-const CACHE_NAME = 'expense-os-v2';
-const STATIC_CACHE = 'expense-os-static-v2';
-const DYNAMIC_CACHE = 'expense-os-dynamic-v2';
+const CACHE_NAME = 'expense-os-v3';
+const STATIC_CACHE = 'expense-os-static-v3';
+const DYNAMIC_CACHE = 'expense-os-dynamic-v3';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
@@ -87,12 +87,30 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // For static assets, cache first
+    // For Next.js chunks - use network-first (chunks change every deployment)
+    // This prevents stale cache issues on custom domains
+    if (url.pathname.startsWith('/_next/static/chunks')) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Only cache successful responses
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(STATIC_CACHE).then((cache) => {
+                            cache.put(request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(request))
+        );
+        return;
+    }
+
+    // For other static assets (icons, fonts, images) - cache first is fine
     if (
         url.pathname.startsWith('/_next/static') ||
         url.pathname.startsWith('/icons') ||
-        url.pathname.endsWith('.js') ||
-        url.pathname.endsWith('.css') ||
         url.pathname.endsWith('.woff2') ||
         url.pathname.endsWith('.png') ||
         url.pathname.endsWith('.svg')
