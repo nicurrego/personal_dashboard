@@ -123,3 +123,47 @@ CREATE TRIGGER update_budgets_updated_at
 -- ============================================
 -- SUCCESS!
 -- ============================================
+
+-- ============================================
+-- PROFILES TABLE (Updated Schema)
+-- ============================================
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  email TEXT,
+  display_name TEXT DEFAULT '',
+  currency TEXT DEFAULT '¥',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  identity_goal TEXT DEFAULT '',
+  identity_details TEXT DEFAULT '',
+  fuel_category TEXT DEFAULT '',
+  fuel_details TEXT DEFAULT '',
+  leak_category TEXT DEFAULT '',
+  leak_details TEXT DEFAULT ''
+);
+
+-- Profiles policies
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- DROP existing policies first to avoid "already exists" error
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+
+-- Re-create policies
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Trigger for profiles
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+CREATE TRIGGER update_profiles_updated_at
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
