@@ -30,12 +30,14 @@ export interface QuickEntryData {
   context: string;
   /** Date of expense */
   date: Date;
+  /** User's feeling about this transaction (1-5 scale) */
+  feeling: number | null;
 }
 
 /**
  * Steps in the quick entry flow
  */
-export type QuickEntryStep = 
+export type QuickEntryStep =
   | 'amount'
   | 'category'
   | 'target'
@@ -44,6 +46,7 @@ export type QuickEntryStep =
   | 'location'
   | 'item'
   | 'context'
+  | 'feeling'
   | 'review';
 
 /**
@@ -80,7 +83,8 @@ export const INITIAL_QUICK_ENTRY_DATA: QuickEntryData = {
   location: '',
   item: '',
   context: '',
-  date: new Date()
+  date: new Date(),
+  feeling: null
 };
 
 /**
@@ -105,5 +109,6 @@ export const QUICK_ENTRY_STEPS: StepConfig[] = [
   { id: 'location', label: 'Location', placeholder: 'Location', required: false },
   { id: 'item', label: 'Item', placeholder: 'What did you buy?', required: false },
   { id: 'context', label: 'Context', placeholder: 'Context (Daily, Travel...)', required: false },
+  { id: 'feeling', label: 'Feeling', placeholder: 'How do you feel?', required: false },
   { id: 'review', label: 'Review', placeholder: '', required: false }
 ];

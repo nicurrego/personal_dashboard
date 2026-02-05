@@ -40,6 +40,10 @@ export interface Expense {
   shop: string;
   /** Location where purchase was made */
   location: string;
+  /** User's feeling at transaction time (1=regret, 5=great) */
+  feeling?: number;
+  /** Reviewed feeling from retrospective prompt (1-5 scale) */
+  feeling_review?: number;
 }
 
 /**
@@ -57,6 +61,7 @@ export interface ExpenseInput {
   method?: string;
   shop?: string;
   location?: string;
+  feeling?: number;
 }
 
 /**

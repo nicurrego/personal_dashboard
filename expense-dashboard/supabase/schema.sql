@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS expenses (
   method TEXT DEFAULT '',
   shop TEXT DEFAULT '',
   location TEXT DEFAULT '',
+  feeling INTEGER CHECK (feeling >= 1 AND feeling <= 5),
+  feeling_review INTEGER CHECK (feeling_review >= 1 AND feeling_review <= 5),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

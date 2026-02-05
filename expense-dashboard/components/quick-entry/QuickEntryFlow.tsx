@@ -15,6 +15,7 @@ import { DatePicker } from './DatePicker';
 import { AutocompleteSelect } from './AutocompleteSelect';
 import { ReviewCard } from './ReviewCard';
 import { SuccessAnimation } from './SuccessAnimation';
+import { FeelingInput } from './FeelingInput';
 
 // Step order: Target comes BEFORE category (category depends on target)
 const STEP_ORDER: QuickEntryStep[] = [
@@ -26,6 +27,7 @@ const STEP_ORDER: QuickEntryStep[] = [
   'location',
   'item',      // Text input with suggestions
   'context',   // Text input with suggestions
+  'feeling',   // How did this purchase make you feel?
   'review'
 ];
 
@@ -39,6 +41,7 @@ const STEP_CONFIG: Record<QuickEntryStep, { title: string; subtitle?: string }> 
   location: { title: 'Location', subtitle: 'Area or city' },
   item: { title: 'Item', subtitle: 'What did you buy?' },
   context: { title: 'Context', subtitle: 'What was the occasion?' },
+  feeling: { title: 'How do you feel?', subtitle: 'About this purchase' },
   review: { title: 'Review & Save', subtitle: 'Confirm your transaction' },
 };
 
@@ -81,6 +84,7 @@ export function QuickEntryFlow({
     item: '',
     context: '',
     date: new Date(),
+    feeling: null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -158,6 +162,7 @@ export function QuickEntryFlow({
       location: 'location',
       item: 'item',
       context: 'context',
+      feeling: 'feeling',
       date: 'amount',
     };
     goToStep(stepMap[step] || 'amount');
@@ -277,6 +282,15 @@ export function QuickEntryFlow({
           />
         );
 
+      case 'feeling':
+        return (
+          <FeelingInput
+            value={data.feeling}
+            onChange={(v) => updateData('feeling', v)}
+            onSubmit={goNext}
+          />
+        );
+
       case 'review':
         return (
           <ReviewCard
@@ -360,7 +374,7 @@ export function QuickEntryFlow({
               }
             `}
           >
-            {currentStep === 'context' ? 'Review' : 'Continue'}
+            {currentStep === 'feeling' ? 'Review' : 'Continue'}
           </button>
         </div>
       )}

@@ -39,6 +39,20 @@ const CONTEXT_OPTIONS = [
     'Daily', 'Weekly', 'Monthly', 'One-time', 'Travel', 'Work', 'Personal', 'Weekend'
 ];
 
+const FEELING_OPTIONS = [
+    { value: 5, label: 'Great!', emoji: '😄', color: '#22c55e' },
+    { value: 4, label: 'Good', emoji: '🙂', color: '#A9D9C7' },
+    { value: 3, label: 'Neutral', emoji: '😐', color: '#94a3b8' },
+    { value: 2, label: 'Slight regret', emoji: '😕', color: '#f59e0b' },
+    { value: 1, label: 'Regret', emoji: '😞', color: '#C24656' },
+];
+
+const getFeelingDisplay = (value: number | undefined): string => {
+    if (!value) return '—';
+    const option = FEELING_OPTIONS.find(o => o.value === value);
+    return option ? `${option.emoji} ${option.label}` : '—';
+};
+
 const TARGET_COLORS: Record<ExpenseTarget, { text: string; bg: string; border: string }> = {
     'Living': { text: 'text-[var(--color-living)]', bg: 'bg-[var(--color-living)]', border: 'border-[var(--color-living)]/30' },
     'Present': { text: 'text-[var(--color-present)]', bg: 'bg-[var(--color-present)]', border: 'border-[var(--color-present)]/30' },
@@ -95,6 +109,11 @@ export function EditExpenseModal({
                     year: date.getFullYear(),
                     month: date.getMonth() + 1,
                 };
+            }
+
+            if (field === 'feeling' || field === 'feeling_review') {
+                const numValue = typeof value === 'string' ? (value ? parseInt(value) : undefined) : value;
+                return { ...prev, [field]: numValue };
             }
 
             return { ...prev, [field]: String(value) } as Expense;
@@ -252,6 +271,20 @@ export function EditExpenseModal({
             type: 'date',
             rawValue: formData.date
         },
+        {
+            label: 'Feeling',
+            value: getFeelingDisplay(formData.feeling),
+            field: 'feeling' as keyof Expense,
+            type: 'feeling',
+            rawValue: String(formData.feeling || '')
+        },
+        {
+            label: 'Feeling (Review)',
+            value: getFeelingDisplay(formData.feeling_review),
+            field: 'feeling_review' as keyof Expense,
+            type: 'feeling',
+            rawValue: String(formData.feeling_review || '')
+        },
     ];
 
     // ==========================================
@@ -403,6 +436,49 @@ export function EditExpenseModal({
                                         )}
                                     </button>
                                 ))}
+                            </div>
+                        )}
+
+                        {/* Feeling selector */}
+                        {item.type === 'feeling' && (
+                            <div className="mt-4 space-y-2">
+                                {FEELING_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => setTempValue(String(option.value))}
+                                        className={cn(
+                                            "w-full flex items-center gap-4 p-4 rounded-xl transition-all border-2",
+                                            tempValue === String(option.value)
+                                                ? "bg-white/10"
+                                                : "bg-muted border-border hover:bg-muted/80"
+                                        )}
+                                        style={{
+                                            borderColor: tempValue === String(option.value) ? option.color : undefined,
+                                        }}
+                                    >
+                                        <span className="text-2xl">{option.emoji}</span>
+                                        <span
+                                            className="font-medium"
+                                            style={{ color: tempValue === String(option.value) ? option.color : undefined }}
+                                        >
+                                            {option.label}
+                                        </span>
+                                        {tempValue === String(option.value) && (
+                                            <Check className="w-5 h-5 ml-auto" style={{ color: option.color }} />
+                                        )}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => setTempValue('')}
+                                    className={cn(
+                                        "w-full flex items-center justify-center p-3 rounded-xl transition-all border",
+                                        !tempValue
+                                            ? "bg-muted/50 border-muted-foreground/30 text-muted-foreground"
+                                            : "border-border text-muted-foreground hover:bg-muted/50"
+                                    )}
+                                >
+                                    Clear feeling
+                                </button>
                             </div>
                         )}
                     </div>

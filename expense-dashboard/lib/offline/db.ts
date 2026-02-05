@@ -34,6 +34,10 @@ export interface LocalExpense {
     method: string;
     shop: string;
     location: string;
+    /** User's feeling at transaction time (1-5 scale) */
+    feeling?: number;
+    /** Reviewed feeling from retrospective prompt (1-5 scale) */
+    feeling_review?: number;
     /** Soft delete flag */
     isDeleted: boolean;
 }
@@ -86,11 +90,15 @@ class ExpenseDatabase extends Dexie {
 
         // Schema version 1
         this.version(1).stores({
-            // Expenses table with indexes for common queries
             expenses: 'localId, serverId, syncStatus, year, month, date, target, category, isDeleted, localUpdatedAt',
-            // Sync queue - ordered by creation time
             syncQueue: '++id, localId, operation, createdAt',
-            // App metadata
+            meta: 'key'
+        });
+
+        // Schema version 2 - Add feeling columns
+        this.version(2).stores({
+            expenses: 'localId, serverId, syncStatus, year, month, date, target, category, isDeleted, localUpdatedAt, feeling',
+            syncQueue: '++id, localId, operation, createdAt',
             meta: 'key'
         });
     }
@@ -120,6 +128,8 @@ export function serverToLocal(expense: Expense): LocalExpense {
         method: expense.method || '',
         shop: expense.shop || '',
         location: expense.location || '',
+        feeling: expense.feeling,
+        feeling_review: expense.feeling_review,
         isDeleted: false,
     };
 }
@@ -141,6 +151,8 @@ export function localToServer(local: LocalExpense): Omit<Expense, 'id'> & { id?:
         method: local.method,
         shop: local.shop,
         location: local.location,
+        feeling: local.feeling,
+        feeling_review: local.feeling_review,
     };
 }
 

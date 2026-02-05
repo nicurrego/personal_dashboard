@@ -4,7 +4,7 @@ export { ProgressIndicator } from './ProgressIndicator';
 export { StepCard } from './StepCard';
 export { OptionChip } from './OptionChip';
 export { AmountInput } from './AmountInput';
-export { DetailInput } from './DetailInput';
+export { FeelingInput, getFeelingLabel, getFeelingColor } from './FeelingInput';
 export { SuggestionInput } from './SuggestionInput';
 export { DatePicker } from './DatePicker';
 export { AutocompleteSelect } from './AutocompleteSelect';

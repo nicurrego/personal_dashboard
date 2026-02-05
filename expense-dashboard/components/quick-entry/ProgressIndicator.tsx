@@ -12,6 +12,7 @@ const STEPS: QuickEntryStep[] = [
   'location',
   'item',      // Renamed from 'detail'
   'context',
+  'feeling',   // How did you feel?
   'review'
 ];
 

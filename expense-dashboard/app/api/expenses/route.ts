@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
-  
+
   // Check auth
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  
+
   // Check auth
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    
+
     // Validate required fields
     const { year, month, date, target, category, value } = body;
     if (!year || !month || !date || !target || !category || value === undefined) {
@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
         method: body.method || '',
         shop: body.shop || '',
         location: body.location || '',
+        feeling: body.feeling || null,
       })
       .select()
       .single();

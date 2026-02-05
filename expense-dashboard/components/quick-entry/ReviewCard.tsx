@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { QuickEntryData } from '@/types';
+import { getFeelingLabel, getFeelingColor } from './FeelingInput';
 
 interface ReviewCardProps {
   data: QuickEntryData;
@@ -46,6 +47,7 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
     { label: 'Location', value: data.location || 'Not set', step: 'location' },
     { label: 'Item', value: data.item || '—', step: 'item' },        // Renamed from 'Detail'
     { label: 'Context', value: data.context || 'Not set', step: 'context' },
+    { label: 'Feeling', value: getFeelingLabel(data.feeling), step: 'feeling', colorStyle: getFeelingColor(data.feeling) },
     { label: 'Date', value: formatDate(data.date), step: 'date' },
   ];
 
@@ -67,7 +69,10 @@ export function ReviewCard({ data, onEdit, onConfirm, isSubmitting }: ReviewCard
             <span className="text-secondary-text text-sm font-medium">{item.label}</span>
 
             <div className="flex items-center gap-2">
-              <span className={`font-semibold ${item.colorClass || 'text-white'}`}>
+              <span
+                className={`font-semibold ${item.colorClass || (item.colorStyle ? '' : 'text-white')}`}
+                style={item.colorStyle ? { color: item.colorStyle } : undefined}
+              >
                 {item.value}
               </span>
               <span className="text-secondary-text/50 group-hover:text-white transition-colors text-sm">

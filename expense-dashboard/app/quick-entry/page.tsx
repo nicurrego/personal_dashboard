@@ -110,6 +110,7 @@ export default function QuickEntryPage() {
         method: data.method,
         shop: data.shop,
         location: data.location,
+        feeling: data.feeling,
       };
 
       const response = await fetch('/api/expenses', {

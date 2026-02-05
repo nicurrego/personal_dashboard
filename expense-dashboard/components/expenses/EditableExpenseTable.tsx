@@ -110,6 +110,13 @@ export function EditableExpenseTable({
         'Income': { bg: 'bg-[var(--color-total)]/10', text: 'text-[var(--color-total)]', border: 'border-[var(--color-total)]/30' },
     };
 
+    // Feeling display helper
+    const getFeelingEmoji = (value: number | undefined): string => {
+        if (!value) return '';
+        const emojis: Record<number, string> = { 5: '😄', 4: '🙂', 3: '😐', 2: '😕', 1: '😞' };
+        return emojis[value] || '';
+    };
+
     // Handle opening edit modal
     const handleEdit = (expense: Expense, filteredIndex: number) => {
         const originalIndex = getOriginalIndex(expense, filteredIndex);
@@ -301,6 +308,13 @@ export function EditableExpenseTable({
                                             )}
                                         </div>
                                         <div className="flex items-center gap-3 ml-4">
+                                            {(expense.feeling || expense.feeling_review) && (
+                                                <div className="flex items-center gap-1 text-lg" title={`Initial: ${expense.feeling || '-'} | Review: ${expense.feeling_review || '-'}`}>
+                                                    <span>{getFeelingEmoji(expense.feeling) || '•'}</span>
+                                                    <span className="text-muted-foreground text-xs">→</span>
+                                                    <span>{getFeelingEmoji(expense.feeling_review) || '•'}</span>
+                                                </div>
+                                            )}
                                             <span className="font-mono font-bold text-foreground text-lg">
                                                 {formatCurrency(expense.value)}
                                             </span>
@@ -323,8 +337,10 @@ export function EditableExpenseTable({
                                 <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Date</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Target</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Category</th>
-                                <th className="text-right p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Value</th>
+                                <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Value</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide">Item</th>
+                                <th className="text-center p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide w-16" title="Initial feeling">Feel</th>
+                                <th className="text-center p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide w-16" title="Reviewed feeling">Rev</th>
                                 <th className="text-left p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide hidden lg:table-cell">Shop</th>
                                 {editable && (
                                     <th className="text-center p-3 text-muted-foreground font-medium text-xs uppercase tracking-wide w-24">Actions</th>
@@ -334,7 +350,7 @@ export function EditableExpenseTable({
                         <tbody>
                             {paginatedExpenses.length === 0 ? (
                                 <tr>
-                                    <td colSpan={editable ? 7 : 6} className="p-8 text-center text-muted-foreground">
+                                    <td colSpan={editable ? 9 : 8} className="p-8 text-center text-muted-foreground">
                                         {search ? 'No matching records found' : 'No expenses to display'}
                                     </td>
                                 </tr>
@@ -438,6 +454,16 @@ export function EditableExpenseTable({
                                             {/* Item */}
                                             <td className="p-3 text-muted-foreground truncate max-w-[150px]">
                                                 {expense.item || '—'}
+                                            </td>
+
+                                            {/* Feeling */}
+                                            <td className="p-3 text-center text-lg" title={expense.feeling ? `Initial feeling: ${expense.feeling}/5` : 'No feeling recorded'}>
+                                                {getFeelingEmoji(expense.feeling) || '—'}
+                                            </td>
+
+                                            {/* Feeling Review */}
+                                            <td className="p-3 text-center text-lg" title={expense.feeling_review ? `Reviewed feeling: ${expense.feeling_review}/5` : 'Not reviewed yet'}>
+                                                {getFeelingEmoji(expense.feeling_review) || '—'}
                                             </td>
 
                                             {/* Shop (hidden on tablet) */}
