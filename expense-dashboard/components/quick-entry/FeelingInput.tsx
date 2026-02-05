@@ -33,61 +33,63 @@ export function FeelingInput({ value, onChange, onSubmit }: FeelingInputProps) {
     };
 
     return (
-        <div className="flex flex-col gap-3">
-            {FEELING_OPTIONS.map((option) => {
-                const isSelected = value === option.value;
+        <div className="overflow-y-auto flex-1 -mx-2 px-2 pb-2">
+            <div className="flex flex-col gap-3">
+                {FEELING_OPTIONS.map((option) => {
+                    const isSelected = value === option.value;
 
-                return (
-                    <button
-                        key={option.value}
-                        onClick={() => handleSelect(option.value)}
-                        className={`
+                    return (
+                        <button
+                            key={option.value}
+                            onClick={() => handleSelect(option.value)}
+                            className={`
               w-full flex items-center gap-4 p-4 rounded-2xl
               border-2 transition-all duration-200
               ${isSelected
-                                ? 'border-current bg-white/10'
-                                : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
-                            }
+                                    ? 'border-current bg-white/10'
+                                    : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                                }
               active:scale-[0.98]
             `}
-                        style={{
-                            borderColor: isSelected ? option.color : undefined,
-                            boxShadow: isSelected ? `0 0 20px ${option.color}40` : undefined,
-                        }}
-                    >
-                        {/* Emoji */}
-                        <span className="text-3xl">{option.emoji}</span>
+                            style={{
+                                borderColor: isSelected ? option.color : undefined,
+                                boxShadow: isSelected ? `0 0 20px ${option.color}40` : undefined,
+                            }}
+                        >
+                            {/* Emoji */}
+                            <span className="text-3xl">{option.emoji}</span>
 
-                        {/* Text content */}
-                        <div className="flex-1 text-left">
-                            <p
-                                className="font-semibold text-lg"
-                                style={{ color: isSelected ? option.color : '#FFFFFF' }}
-                            >
-                                {option.label}
-                            </p>
-                            <p className="text-sm text-secondary-text">
-                                {option.description}
-                            </p>
-                        </div>
+                            {/* Text content */}
+                            <div className="flex-1 text-left">
+                                <p
+                                    className="font-semibold text-lg"
+                                    style={{ color: isSelected ? option.color : '#FFFFFF' }}
+                                >
+                                    {option.label}
+                                </p>
+                                <p className="text-sm text-secondary-text">
+                                    {option.description}
+                                </p>
+                            </div>
 
-                        {/* Selection indicator */}
-                        {isSelected && (
-                            <span
-                                className="text-xl font-bold"
-                                style={{ color: option.color }}
-                            >
-                                ✓
-                            </span>
-                        )}
-                    </button>
-                );
-            })}
+                            {/* Selection indicator */}
+                            {isSelected && (
+                                <span
+                                    className="text-xl font-bold"
+                                    style={{ color: option.color }}
+                                >
+                                    ✓
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
 
-            {/* Skip hint */}
-            <p className="text-xs text-secondary-text/50 text-center mt-2">
-                This is optional • Press Next to skip
-            </p>
+                {/* Skip hint */}
+                <p className="text-xs text-secondary-text/50 text-center mt-2 pb-4">
+                    This is optional • Press Next to skip
+                </p>
+            </div>
         </div>
     );
 }

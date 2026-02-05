@@ -11,7 +11,9 @@ interface AutocompleteSelectProps {
   onSubmit?: () => void;
   placeholder?: string;
   allowCustom?: boolean;
-  autoFocus?: boolean; // Only auto-focus for fields that need typing (Detail, etc.)
+  autoFocus?: boolean;
+  showSearch?: boolean;
+  onSearchClose?: () => void;
 }
 
 export function AutocompleteSelect({
@@ -21,20 +23,43 @@ export function AutocompleteSelect({
   onSubmit,
   placeholder = 'Search or select...',
   allowCustom = true,
-  autoFocus = false // Default to NOT auto-focusing - let user pick from chips first
+  autoFocus = false,
+  showSearch = false,
+  onSearchClose
 }: AutocompleteSelectProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showInput, setShowInput] = useState(false);
+  const [showInput, setShowInput] = useState(showSearch);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sort options: selected first, then by recent count, then alphabetically
-  const sortedOptions = [...options].sort((a, b) => {
-    if (a.id === value) return -1;
-    if (b.id === value) return 1;
-    if ((b.recentCount || 0) !== (a.recentCount || 0)) {
-      return (b.recentCount || 0) - (a.recentCount || 0);
+  // Sync internal state with prop
+  React.useEffect(() => {
+    setShowInput(showSearch);
+  }, [showSearch]);
+
+  // Clear search term when search is hidden
+  React.useEffect(() => {
+    if (!showInput) {
+      setSearchTerm('');
+    } else {
+      // Focus when shown
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
     }
-    return a.label.localeCompare(b.label);
+  }, [showInput]);
+  const sortedOptions = [...options].sort((a, b) => {
+    if (a.id === value) return 1; // Selected at the very end (bottom)
+    if (b.id === value) return -1;
+
+    // Primary sort: Count Ascending
+    if ((a.recentCount || 0) !== (b.recentCount || 0)) {
+      return (a.recentCount || 0) - (b.recentCount || 0);
+    }
+    // Secondary sort: Alphabetical
+    return b.label.localeCompare(a.label); // Z->A (so A is at bottom near fingers? Or A->Z?)
+    // Actually alphabetical isn't critical, but let's keep A->Z. 
+    // If we want A at top and Z at bottom:
+    // return a.label.localeCompare(b.label);
   });
 
   // Filter options based on search
@@ -49,10 +74,28 @@ export function AutocompleteSelect({
     opt => opt.label.toLowerCase() === searchTerm.toLowerCase()
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom on mount to show most frequent options
+  React.useEffect(() => {
+    if (containerRef.current) {
+      // Immediate scroll attempt
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+
+      // Robust scroll after layout/paint
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+      });
+    }
+  }, [filteredOptions]); // Re-scroll when options change/filter
+
   const handleChipClick = (optionId: string) => {
     onChange(optionId);
     setSearchTerm('');
-    setShowInput(false);
+    // Input visibility is handled by parent resetting the state if needed, or better:
+    // When we select, we move to next step, so parent resets state anyway.
     if (onSubmit) {
       setTimeout(onSubmit, 150);
     }
@@ -62,7 +105,7 @@ export function AutocompleteSelect({
     if (searchTerm.trim() && !exactMatch) {
       onChange(searchTerm.trim());
       setSearchTerm('');
-      setShowInput(false);
+      // setShowInput(false); -> handled by flow navigation
       if (onSubmit) {
         setTimeout(onSubmit, 150);
       }
@@ -77,73 +120,89 @@ export function AutocompleteSelect({
     }
   };
 
-  const handleInputFocus = () => {
-    setShowInput(true);
-  };
+
+  // handleInputFocus removed as input is now conditionally rendered
+
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Options grid - SHOW FIRST so users can tap to select */}
-      <div className="flex flex-wrap gap-2">
-        {filteredOptions.slice(0, 12).map((option) => (
-          <OptionChip
-            key={option.id}
-            label={option.label}
-            selected={value === option.id}
-            onClick={() => handleChipClick(option.id)}
-            recentCount={option.recentCount}
-          />
-        ))}
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Search/Custom input section - FIXED AT TOP */}
+      {/* Search Toggle / Input Header */}
+      {allowCustom && showInput && (
+        <div className="shrink-0 mb-4 pt-1 flex justify-end px-2">
+          <div className="relative w-full animate-in fade-in slide-in-from-top-2 duration-200">
+            <input
+              ref={inputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              className="w-full px-4 py-3 rounded-xl
+                          bg-white/5 border border-white/10
+                          text-white text-base
+                          outline-none focus:border-[#A9D9C7] focus:bg-white/10
+                          placeholder:text-secondary-text
+                          transition-all duration-200 pr-12"
+            />
 
-        {filteredOptions.length === 0 && searchTerm && (
-          <p className="text-white text-sm py-2 px-3 bg-white/10 rounded-lg">
-            No matches. Press Enter to add <strong>{searchTerm}</strong>
-          </p>
-        )}
-      </div>
+            {/* Close / Submit logic */}
+            {searchTerm && !exactMatch ? (
+              <button
+                onClick={handleCustomSubmit}
+                className="absolute right-2 top-1/2 -translate-y-1/2
+                            px-3 py-1.5 rounded-lg
+                            bg-[#A9D9C7] text-[#1B4034] text-xs font-bold
+                            hover:bg-[#A9D9C7]/90 transition-colors"
+              >
+                Add
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowInput(false);
+                  setSearchTerm('');
+                  onSearchClose?.();
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/50 hover:text-white"
+              >
+                ✕
+              </button>
+            )}
+          </div>
 
-      {/* Show more indicator */}
-      {filteredOptions.length > 12 && !searchTerm && (
-        <p className="text-xs text-secondary-text text-center">
-          + {filteredOptions.length - 12} more options
-        </p>
-      )}
-
-      {/* Search/Custom input section - tap to open */}
-      {allowCustom && (
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={handleInputFocus}
-            onKeyDown={handleKeyDown}
-            placeholder={showInput ? placeholder : "Tap to search or add new..."}
-            autoFocus={autoFocus}
-            className="w-full px-5 py-4 rounded-2xl
-                       bg-white/5 border-2 border-white/15
-                       text-white text-lg
-                       outline-none focus:border-cyber-cyan focus:bg-cyber-cyan/5
-                       placeholder:text-secondary-text
-                       transition-all duration-200"
-          />
-
-          {/* Custom value submit button - HIGH visibility */}
-          {searchTerm && !exactMatch && (
-            <button
-              onClick={handleCustomSubmit}
-              className="absolute right-2 top-1/2 -translate-y-1/2
-                         px-4 py-2 rounded-xl 
-                         bg-growth-green text-white text-sm font-bold
-                         hover:bg-growth-green/90 transition-colors
-                         shadow-[0_0_15px_rgba(34,197,94,0.4)]"
-            >
-              + Add "{searchTerm}"
-            </button>
-          )}
         </div>
       )}
+
+      {/* Options grid - Scrollable Area */}
+      {/* This container scrolls. The content inside is what overflows. */}
+      {/* We use flex-col justify-end to start content at bottom of this container if it's small. */}
+      {/* If it's large, overflow-y-auto handles scrolling. */}
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto min-h-0 relative -mx-2 px-2 pb-2" // Negative margin to scroll edge-to-edge
+      >
+        <div className="min-h-full flex flex-col justify-end">
+          <div className="flex flex-wrap gap-2 content-end pb-4 pt-4">
+
+            {filteredOptions.length === 0 && searchTerm && (
+              <p className="text-secondary-text text-sm py-2 w-full text-center">
+                No matches found.
+              </p>
+            )}
+
+            {filteredOptions.map((option) => (
+              <OptionChip
+                key={option.id}
+                label={option.label}
+                selected={value === option.id}
+                onClick={() => handleChipClick(option.id)}
+                recentCount={option.recentCount}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

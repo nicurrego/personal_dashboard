@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   QuickEntryData,
   QuickEntryStep,
@@ -34,7 +34,7 @@ const STEP_ORDER: QuickEntryStep[] = [
 // Step metadata - NO emojis, just text
 const STEP_CONFIG: Record<QuickEntryStep, { title: string; subtitle?: string }> = {
   amount: { title: 'How much?', subtitle: 'Enter the transaction amount' },
-  target: { title: 'Target Bucket', subtitle: 'Which budget does this affect?' },
+  target: { title: 'Target', subtitle: 'Which budget does this affect?' },
   category: { title: 'Category', subtitle: 'What type of expense?' },
   shop: { title: 'Where?', subtitle: 'Shop or vendor name' },
   method: { title: 'Payment Method', subtitle: 'How did you pay?' },
@@ -47,7 +47,7 @@ const STEP_CONFIG: Record<QuickEntryStep, { title: string; subtitle?: string }> 
 
 // Target colors for visual distinction
 const TARGET_COLORS: Record<string, string> = {
-  'Living': '#614FBB',    // Future/Living Purple
+  'Living': '#65A1C9',    // Living Blue
   'Present': '#C24656',   // Present Red
   'Saving': '#A9D9C7',    // Income/Safe Teal
   'Investment': '#614FBB', // Future Purple
@@ -88,6 +88,7 @@ export function QuickEntryFlow({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [returnToReview, setReturnToReview] = useState(false);
 
   // Get categories filtered by selected target
   const filteredCategories = useMemo(() => {
@@ -98,6 +99,13 @@ export function QuickEntryFlow({
       categoriesForTarget.includes(cat.id)
     );
   }, [data.target, targetCategories, autocompleteData.categories]);
+
+  // Clear returnToReview flag when we reach the review step
+  useEffect(() => {
+    if (currentStep === 'review') {
+      setReturnToReview(false);
+    }
+  }, [currentStep]);
 
   // Navigation functions
   const goToStep = useCallback((step: QuickEntryStep) => {
@@ -120,6 +128,10 @@ export function QuickEntryFlow({
     }
   }, [currentStep, onCancel]);
 
+  const handleReturnToReview = useCallback(() => {
+    setCurrentStep('review');
+  }, []);
+
   // Data update helpers
   const updateData = useCallback(<K extends keyof QuickEntryData>(
     key: K,
@@ -140,6 +152,9 @@ export function QuickEntryFlow({
 
   // Handle final save
   const handleSave = async () => {
+    if (!data.value || !data.category || !data.target) {
+      return;
+    }
     setIsSubmitting(true);
     try {
       await onSave(data);
@@ -153,6 +168,7 @@ export function QuickEntryFlow({
 
   // Handle edit from review
   const handleEditFromReview = (step: string) => {
+    setReturnToReview(true);
     const stepMap: Record<string, QuickEntryStep> = {
       amount: 'amount',
       category: 'category',
@@ -166,6 +182,20 @@ export function QuickEntryFlow({
       date: 'amount',
     };
     goToStep(stepMap[step] || 'amount');
+  };
+
+  const [showSearch, setShowSearch] = useState(false);
+
+  // Reset search visibility when step changes
+  useEffect(() => {
+    setShowSearch(false);
+  }, [currentStep]);
+
+  // Steps that allow searching
+  const searchableSteps = ['category', 'shop', 'method', 'location'];
+
+  const handleToggleSearch = () => {
+    setShowSearch(prev => !prev);
   };
 
   // Render current step content
@@ -190,17 +220,19 @@ export function QuickEntryFlow({
 
       case 'target':
         return (
-          <div className="flex flex-wrap gap-3 justify-center">
-            {targets.map((target) => (
-              <OptionChip
-                key={target}
-                label={target}
-                selected={data.target === target}
-                onClick={() => handleTargetChange(target)}
-                variant="target"
-                color={TARGET_COLORS[target]}
-              />
-            ))}
+          <div className="flex flex-col h-full justify-end">
+            <div className="flex flex-wrap gap-3 justify-center pb-8">
+              {targets.map((target) => (
+                <OptionChip
+                  key={target}
+                  label={target}
+                  selected={data.target === target}
+                  onClick={() => handleTargetChange(target)}
+                  variant="target"
+                  color={TARGET_COLORS[target]}
+                />
+              ))}
+            </div>
           </div>
         );
 
@@ -213,7 +245,9 @@ export function QuickEntryFlow({
             onSubmit={goNext}
             placeholder="Search categories..."
             allowCustom={true}
-            autoFocus={false}
+            autoFocus={true} // Focus when search opens
+            showSearch={showSearch}
+            onSearchClose={() => setShowSearch(false)}
           />
         );
 
@@ -226,7 +260,9 @@ export function QuickEntryFlow({
             onSubmit={goNext}
             placeholder="Search shops..."
             allowCustom={true}
-            autoFocus={false}
+            autoFocus={true}
+            showSearch={showSearch}
+            onSearchClose={() => setShowSearch(false)}
           />
         );
 
@@ -239,7 +275,9 @@ export function QuickEntryFlow({
             onSubmit={goNext}
             placeholder="Payment method..."
             allowCustom={true}
-            autoFocus={false}
+            autoFocus={true}
+            showSearch={showSearch}
+            onSearchClose={() => setShowSearch(false)}
           />
         );
 
@@ -252,7 +290,9 @@ export function QuickEntryFlow({
             onSubmit={goNext}
             placeholder="Location..."
             allowCustom={true}
-            autoFocus={false}
+            autoFocus={true}
+            showSearch={showSearch}
+            onSearchClose={() => setShowSearch(false)}
           />
         );
 
@@ -292,12 +332,17 @@ export function QuickEntryFlow({
         );
 
       case 'review':
+        const missingFields = (!data.value || !data.category || !data.target)
+          ? 'Amount, Category, and Target are required'
+          : null;
+
         return (
           <ReviewCard
             data={data}
             onEdit={handleEditFromReview}
             onConfirm={handleSave}
             isSubmitting={isSubmitting}
+            error={missingFields}
           />
         );
 
@@ -319,7 +364,7 @@ export function QuickEntryFlow({
   const stepConfig = STEP_CONFIG[currentStep];
 
   return (
-    <div className="min-h-screen bg-[#1B4034] flex flex-col pb-32 page-ambient">
+    <div className="h-screen max-h-screen bg-[#1B4034] flex flex-col overflow-hidden page-ambient">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <button
@@ -335,12 +380,22 @@ export function QuickEntryFlow({
         <h1 className="text-sm font-medium text-white">Quick Entry</h1>
 
         {currentStep !== 'review' ? (
-          <button
-            onClick={goNext}
-            className="text-cyber-cyan text-sm font-medium hover:text-cyber-cyan/80 transition-colors"
-          >
-            Next
-          </button>
+          <div className="flex items-center gap-4">
+            {returnToReview && (
+              <button
+                onClick={handleReturnToReview}
+                className="text-white/70 text-sm font-medium hover:text-white transition-colors"
+              >
+                Review
+              </button>
+            )}
+            <button
+              onClick={goNext}
+              className="text-cyber-cyan text-sm font-medium hover:text-cyber-cyan/80 transition-colors"
+            >
+              Next
+            </button>
+          </div>
         ) : (
           <div className="w-12" />
         )}
@@ -350,34 +405,42 @@ export function QuickEntryFlow({
       <ProgressIndicator currentStep={currentStep} />
 
       {/* Main content */}
-      <div className="flex-1 px-4 py-6 overflow-y-auto">
+      <div className="flex-1 px-4 pt-4 pb-28 overflow-hidden flex flex-col">
         <StepCard
           title={stepConfig.title}
           subtitle={stepConfig.subtitle}
+          headerRight={
+            searchableSteps.includes(currentStep) ? (
+              <button
+                onClick={handleToggleSearch}
+                className={`p-2 rounded-full transition-all duration-200 ${showSearch ? 'bg-white/20 text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            ) : currentStep === 'review' ? (
+              <button
+                onClick={handleSave}
+                disabled={isSubmitting || !(data.value && data.category && data.target)}
+                className={`
+                  px-4 py-1.5 rounded-full font-bold text-sm
+                  transition-all duration-200
+                  ${isSubmitting || !(data.value && data.category && data.target)
+                    ? 'bg-white/10 text-white/30 cursor-not-allowed'
+                    : 'bg-[#A9D9C7] text-[#1B4034] hover:bg-[#A9D9C7]/90 active:scale-[0.98]'
+                  }
+                `}
+              >
+                {isSubmitting ? 'Saving...' : 'Save'}
+              </button>
+            ) : undefined
+          }
         >
           {renderStepContent()}
         </StepCard>
       </div>
 
-      {/* Bottom navigation */}
-      {currentStep !== 'review' && (
-        <div className="px-4 pb-8 pt-4 border-t border-white/10">
-          <button
-            onClick={goNext}
-            disabled={currentStep === 'amount' && !data.value}
-            className={`
-              w-full py-4 rounded-2xl font-bold text-lg
-              transition-all duration-200
-              ${currentStep === 'amount' && !data.value
-                ? 'bg-white/10 text-secondary-text cursor-not-allowed'
-                : 'bg-[#614FBB] text-white active:scale-[0.98]'
-              }
-            `}
-          >
-            {currentStep === 'feeling' ? 'Review' : 'Continue'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }

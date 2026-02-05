@@ -30,19 +30,9 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
       <div className="relative h-1 bg-white/10 rounded-full overflow-hidden">
         {/* Animated progress fill */}
         <div
-          className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
+          className="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out bg-[#A9D9C7]"
           style={{
-            width: `${progress}%`,
-            background: 'linear-gradient(90deg, #06b6d4 0%, #22c55e 50%, #f59e0b 100%)'
-          }}
-        />
-
-        {/* Glow effect */}
-        <div
-          className="absolute top-0 h-full rounded-full blur-sm opacity-50 transition-all duration-500 ease-out"
-          style={{
-            width: `${progress}%`,
-            background: 'linear-gradient(90deg, #06b6d4 0%, #22c55e 50%, #f59e0b 100%)'
+            width: `${progress}%`
           }}
         />
       </div>

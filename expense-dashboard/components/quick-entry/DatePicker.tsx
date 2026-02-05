@@ -10,10 +10,10 @@ interface DatePickerProps {
 export function DatePicker({ value, onChange }: DatePickerProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  
+
   const isToday = value.toDateString() === today.toDateString();
   const isYesterday = value.toDateString() === yesterday.toDateString();
 
@@ -40,10 +40,10 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
         <button
           onClick={() => onChange(today)}
           className={`
-            px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border-2
-            ${isToday 
-              ? 'bg-growth-green border-growth-green text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]' 
-              : 'bg-white/5 border-white/15 text-secondary-text hover:bg-white/10 hover:border-white/30'}
+            px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border
+            ${isToday
+              ? 'bg-[#A9D9C7] border-[#A9D9C7] text-[#1B4034]'
+              : 'bg-white/5 border-white/10 text-secondary-text hover:bg-white/10 hover:border-white/20'}
           `}
         >
           Today {isToday && '✓'}
@@ -51,10 +51,10 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
         <button
           onClick={() => onChange(yesterday)}
           className={`
-            px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border-2
-            ${isYesterday 
-              ? 'bg-growth-green border-growth-green text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]' 
-              : 'bg-white/5 border-white/15 text-secondary-text hover:bg-white/10 hover:border-white/30'}
+            px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border
+            ${isYesterday
+              ? 'bg-[#A9D9C7] border-[#A9D9C7] text-[#1B4034]'
+              : 'bg-white/5 border-white/10 text-secondary-text hover:bg-white/10 hover:border-white/20'}
           `}
         >
           Yesterday {isYesterday && '✓'}

@@ -28,8 +28,8 @@ export function OptionChip({
         return {
           backgroundColor: color,
           borderColor: color,
-          color: '#FFFFFF', // White text for readability
-          boxShadow: `0 0 20px ${color}60`
+          // Use dark text for the Teal color (#A9D9C7), white for others
+          color: color === '#A9D9C7' ? '#1B4034' : '#FFFFFF',
         };
       }
       // Variant-specific selected colors with WHITE text
@@ -39,28 +39,24 @@ export function OptionChip({
             backgroundColor: '#A9D9C7',
             borderColor: '#A9D9C7',
             color: '#1B4034', // Dark text on light teal
-            boxShadow: '0 0 20px rgba(169,217,199,0.5)'
           };
         case 'method':
           return {
-            backgroundColor: '#614FBB',
-            borderColor: '#614FBB',
-            color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(97,79,187,0.5)'
+            backgroundColor: '#A9D9C7',
+            borderColor: '#A9D9C7',
+            color: '#1B4034',
           };
         case 'context':
           return {
-            backgroundColor: '#614FBB',
-            borderColor: '#614FBB',
-            color: '#FFFFFF',
-            boxShadow: '0 0 20px rgba(97,79,187,0.5)'
+            backgroundColor: '#A9D9C7',
+            borderColor: '#A9D9C7',
+            color: '#1B4034',
           };
         default:
           return {
             backgroundColor: '#A9D9C7',
             borderColor: '#A9D9C7',
             color: '#1B4034',
-            boxShadow: '0 0 20px rgba(169,217,199,0.5)'
           };
       }
     }

@@ -9,13 +9,13 @@ interface AmountInputProps {
   currency?: string;
 }
 
-export function AmountInput({ 
-  value, 
-  onChange, 
+export function AmountInput({
+  value,
+  onChange,
   onSubmit,
-  currency = '¥' 
+  currency = '¥'
 }: AmountInputProps) {
-  const [displayValue, setDisplayValue] = useState(value?.toString() || '');
+  const [displayValue, setDisplayValue] = useState(value?.toString() || '0');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Format number with commas
@@ -33,19 +33,38 @@ export function AmountInput({
     if (value !== null) {
       setDisplayValue(formatNumber(value));
     } else {
-      setDisplayValue('');
+      setDisplayValue('0');
     }
   }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, '');
-    const num = parseDisplayValue(raw);
-    
-    if (num !== null) {
+    let raw = e.target.value.replace(/[^0-9]/g, '');
+
+    // If user types '5' while value is '0', result is '05'. We want '5'.
+    if (raw.length > 1 && raw.startsWith('0')) {
+      raw = raw.substring(1);
+    }
+
+    // If user deleted everything, back to '0'
+    if (raw === '') {
+      raw = '0';
+    }
+
+    const num = parseInt(raw, 10);
+
+    if (!isNaN(num)) {
       setDisplayValue(formatNumber(num));
-      onChange(num);
+      // Logic: If 0, actual value is special? 
+      // User allows 0 amount? usually yes, but previously we returned null. 
+      // If we want 'empty' state logic downstream, we might keep 0 as valid or not.
+      // Assuming 0 is valid amount or means empty? 
+      // Previous logic: onChange(num). 
+      // If 0 -> return 0.
+      onChange(num === 0 ? null : num); // Treat 0 as null if that was original intent
+      // Actually previous code: if num !== null ... onChange(num). 
+      // else onChange(null).
     } else {
-      setDisplayValue('');
+      setDisplayValue('0');
       onChange(null);
     }
   };
@@ -57,7 +76,7 @@ export function AmountInput({
   };
 
   const handleClear = () => {
-    setDisplayValue('');
+    setDisplayValue('0');
     onChange(null);
     inputRef.current?.focus();
   };
@@ -72,19 +91,32 @@ export function AmountInput({
             ref={inputRef}
             type="text"
             inputMode="numeric"
-            value={displayValue}
+            value={value === null ? '0' : displayValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="0"
+            // No placeholder needed if we force '0'
             className="text-6xl font-bold text-white bg-transparent 
                        text-center w-full max-w-[280px]
                        outline-none border-none
-                       placeholder:text-white/20
                        caret-cyber-cyan"
             autoFocus
+            onClick={(e) => {
+              // Force cursor to end if needed, though default behavior often works
+              const input = e.target as HTMLInputElement;
+              if (input.value === '0') {
+                input.setSelectionRange(1, 1);
+              }
+            }}
+            onFocus={(e) => {
+              const input = e.target;
+              if (input.value === '0') {
+                // Defer slightly to override browser default select-all or placement
+                setTimeout(() => input.setSelectionRange(1, 1), 10);
+              }
+            }}
           />
         </div>
-        
+
         {/* Underline with glow */}
         <div className="mt-2 h-0.5 bg-gradient-to-r from-transparent via-cyber-cyan to-transparent" />
       </div>
@@ -101,11 +133,7 @@ export function AmountInput({
       )}
 
       {/* Validation hint */}
-      {!value && (
-        <p className="text-sm text-secondary-text animate-pulse">
-          Enter an amount to continue
-        </p>
-      )}
+      {/* Validation hint removed */}
     </div>
   );
 }

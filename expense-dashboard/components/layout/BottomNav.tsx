@@ -36,8 +36,8 @@ const navItems: NavItem[] = [
     label: 'Add',
     icon: (
       <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-          d="M12 4v16m8-8H4" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+          d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   },
@@ -88,17 +88,14 @@ export function BottomNav() {
               href={item.href}
               className={`
                 flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-xl transition-all
-                ${isAddButton
-                  ? 'text-kibo-bg -mt-4 px-5 py-3 rounded-full border-4 border-[#1B4034]'
-                  : isActive
-                    ? 'text-kibo-teal' // Teal for active
-                    : 'text-[#F2F2F2]/50 hover:text-kibo-teal' // Dimmed white for inactive, Teal on hover
+                ${isActive
+                  ? 'text-kibo-teal' // Teal for active
+                  : 'text-[#F2F2F2]/50 hover:text-kibo-teal' // Dimmed white for inactive, Teal on hover
                 }
               `}
-              style={isAddButton ? { backgroundColor: 'var(--color-total)' } : undefined}
             >
               {item.icon}
-              <span className={`text-[10px] font-medium ${isAddButton ? 'hidden' : ''}`}>
+              <span className="text-[10px] font-medium">
                 {item.label}
               </span>
             </Link>
