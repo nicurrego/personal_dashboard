@@ -114,10 +114,19 @@ export default function SettingsPage() {
         if (storedMascotType) {
             setMascotType(storedMascotType);
             setInitialMascotType(storedMascotType);
+        } else {
+            // New user - set defaults
+            setMascotType('kibo');
+            setInitialMascotType('kibo');
         }
+
         if (storedMascotName) {
             setMascotName(storedMascotName);
             setInitialMascotName(storedMascotName);
+        } else {
+            // New user - set defaults
+            setMascotName('Kibo');
+            setInitialMascotName('Kibo');
         }
 
         // Load pro builder mobile setting
@@ -345,6 +354,11 @@ export default function SettingsPage() {
 
             // Account deleted successfully
             setMessage({ type: 'success', text: 'Account permanently deleted. Redirecting...' });
+
+            // Clear all localStorage data
+            if (data.clear_storage) {
+                localStorage.clear();
+            }
 
             // Redirect to home
             setTimeout(() => {

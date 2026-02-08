@@ -79,12 +79,23 @@ export function MascotSection({ investmentPercentage, pendingPercentage, userNam
             return;
         }
 
-        // Otherwise load from local storage
+        // Otherwise load from local storage, or use defaults for new users
         const storedType = localStorage.getItem('mascot_type');
         const storedName = localStorage.getItem('mascot_name');
 
-        if (storedType) setMascotType(storedType);
-        if (storedName) setMascotName(storedName);
+        if (storedType) {
+            setMascotType(storedType);
+        } else {
+            // New user - ensure default is set
+            setMascotType(DEFAULT_MASCOT);
+        }
+
+        if (storedName) {
+            setMascotName(storedName);
+        } else {
+            // New user - ensure default is set
+            setMascotName(DEFAULT_NAME);
+        }
     }, [mascotTypeOverride]);
 
     const messages = getMascotMessages(investmentPercentage, pendingPercentage);

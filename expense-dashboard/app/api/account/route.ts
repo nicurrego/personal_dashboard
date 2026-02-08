@@ -11,7 +11,7 @@ export async function DELETE(request: NextRequest) {
     // Get the current user
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -27,7 +27,7 @@ export async function DELETE(request: NextRequest) {
 
     // Use admin client to delete the user
     const adminClient = createAdminClient();
-    
+
     // Delete user from auth.users (this will cascade delete all user data due to ON DELETE CASCADE)
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id);
 
@@ -42,11 +42,12 @@ export async function DELETE(request: NextRequest) {
     // Sign out the user (clear session cookies)
     await supabase.auth.signOut();
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Account permanently deleted' 
+    return NextResponse.json({
+      success: true,
+      message: 'Account permanently deleted',
+      clear_storage: true // Signal to client to clear localStorage
     });
-    
+
   } catch (error) {
     console.error('Account deletion error:', error);
     return NextResponse.json(
